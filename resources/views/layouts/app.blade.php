@@ -13,7 +13,7 @@
         <!-- Burger Menu -->
         <div class="md:hidden col-span-12 bg-green-600 text-white p-4">
             <button id="burger-menu" class="text-white">
-                ☰ Menu
+            <i class="fa-solid fa-bars"></i> <span class="ml-2">Menu</span>
             </button>
             <div id="mobile-menu" class="hidden">
                 @include('layouts.partials.aside')
