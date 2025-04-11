@@ -10,8 +10,8 @@
 
     <a href="/login" class="hidden md:flex bg-green-600 text-white rounded-lg hover:bg-green-700 transition-all duration-300 items-center gap-2 px-2 py-1">
         <div class="flex items-center gap-4 px-2 py-1 transition-all duration-300">
-            <p class="">Connexion</p>
             <i class="fa-solid fa-circle-user text-2xl text-white"></i>
+            <p class="">Connexion</p>
         </div>
     </a>
 </div>
