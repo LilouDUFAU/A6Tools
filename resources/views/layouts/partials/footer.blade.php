@@ -1,0 +1,1 @@
+<p>&copy; {{ date('Y') }} {{ config('app.name') }}. Tous droits réservés.</p>
