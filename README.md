@@ -66,6 +66,9 @@ If you discover a security vulnerability within Laravel, please send an e-mail t
 The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
 
 # 📦 Projet de Stage BUT2 - A6Tools : Application web collaborative de gestion
+<p align="center">
+  <img src="./public/images/logo_a6tools.png" alt="logo_a6Tools" width="200"/>
+</p>
 
 ## 🧾 Présentation du projet
 
