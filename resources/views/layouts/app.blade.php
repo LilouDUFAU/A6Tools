@@ -21,7 +21,7 @@
         </div>
 
         <!-- Aside pour md et lg -->
-        <aside class="hidden md:block col-start-1 md:col-span-3 lg:col-span-2 border-r border-gray-300">
+        <aside class="hidden md:block col-start-1 md:col-span-3 lg:col-span-2 border-r border-gray-300 bg-white">
             @include('layouts.partials.aside')
         </aside>
 
