@@ -5,7 +5,7 @@
 
 ## 🧾 Présentation du projet
 
-Ce projet a été réalisé dans le cadre d’un stage de deuxième année de BUT Informatique. Il s’intègre dans le système d’information de l’entreprise **A6Tools**, spécialisée dans la vente, la gestion et le suivi de matériel informatique et technique. L’objectif principal du projet est la conception et la mise en place d’un **système de gestion centralisé**, permettant de suivre efficacement les commandes, les livraisons, les produits, les stocks, les interventions et les différents acteurs internes/externes.
+Ce projet a été réalisé dans le cadre d’un stage de deuxième année de BUT Informatique. Il s’intègre dans le système d’information de l’entreprise **A6Landes Informatique**, spécialisée dans la vente, la gestion et le suivi de matériel informatique et technique. L’objectif principal du projet est la conception et la mise en place d’un **système de gestion centralisé**, permettant de suivre efficacement les commandes, les livraisons, les produits, les stocks, les interventions et les différents acteurs internes/externes.
 
 ---
 
