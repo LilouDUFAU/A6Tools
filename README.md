@@ -67,7 +67,7 @@ The Laravel framework is open-sourced software licensed under the [MIT license](
 
 # 📦 Projet de Stage BUT2 - A6Tools : Application web collaborative de gestion
 <p align="center">
-  <img src="./public/images/logo_a6tools.png" alt="logo_a6Tools" width="200"/>
+  <img src="./public/images/logo_a6tools.png" alt="logo_a6Tools" width="400"/>
 </p>
 
 ## 🧾 Présentation du projet
