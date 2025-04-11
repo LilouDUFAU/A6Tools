@@ -1,6 +1,6 @@
 <nav>
     <ul class="flex flex-col p-4 gap-4">
-        <li class="hidden md:block"><a><img src="{{ asset('logo_a6tools.png') }}" alt="Logo" class="w-16 h-auto mb-2 md:mb-4"></a></li>
+        <li class="hidden md:flex justify-center"><a><img src="{{ asset('/images/logo_a6tools.png') }}" alt="Logo" class="w-64 h-auto mb-2 md:mb-4"></a></li>
         <li class="hover:bg-green-700 rounded-lg hover:px-2 hover:py-1 hover:text-white transition-all duration-300"><a href="/"><i class="fa-solid fa-house"></i> <span class="ml-2">Home</span></a></li>
         <li class="hover:bg-green-700 rounded-lg hover:px-2 hover:py-1 hover:text-white transition-all duration-300"><a href="/about"><i class="fa-solid fa-table"></i> <span class="ml-2">Dashboard</span></a></li>
         <li class="hover:bg-green-700 rounded-lg hover:px-2 hover:py-1 hover:text-white transition-all duration-300"><a href="/services"><i class="fa-solid fa-box-open"></i> <span class="ml-2">Gestock</span></a></li>
