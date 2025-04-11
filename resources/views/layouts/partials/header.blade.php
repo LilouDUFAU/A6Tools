@@ -9,8 +9,8 @@
     </form>
 
     <a href="/login" class="text-gray-700 hover:text-green-600">
-        <div class="flex items-center gap-4 p-4">
-            <p class="hidden md:block">Connexion</p>
+        <div class="hidden md:flex items-center gap-4 p-4">
+            <p class="">Connexion</p>
             <i class="fa-solid fa-circle-user text-2xl"></i>
         </div>
     </a>
