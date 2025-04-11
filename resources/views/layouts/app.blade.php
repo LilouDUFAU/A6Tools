@@ -7,13 +7,8 @@
     <script src="https://kit.fontawesome.com/40018cf627.js" crossorigin="anonymous"></script>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
-    <style>
-        body {
-            font-family: 'Poppins', sans-serif;
-        }
-    </style>
 </head>
-<body>
+<body class="font-[Poppins]">
     <main class="grid grid-cols-12">
         <!-- Burger Menu -->
         <div class="md:hidden col-span-12 bg-green-600 text-white p-4">
@@ -26,11 +21,11 @@
         </div>
 
         <!-- Aside pour md et lg -->
-        <aside class="hidden md:block col-start-1 col-span-2 border-r border-gray-300">
+        <aside class="hidden md:block col-start-1 md:col-span-3 lg:col-span-2 border-r border-gray-300">
             @include('layouts.partials.aside')
         </aside>
 
-        <section class="col-span-12 md:col-start-3 md:col-span-10 bg-gray-200 bg-gray-100">
+        <section class="col-span-12 md:col-start-4 md:col-span-9 lg:col-span-3 lg:col-span-10 bg-gray-200 bg-gray-100">
             <!-- header -->
             <header class="">
                 @include('layouts.partials.header')
