@@ -26,7 +26,7 @@ class Service extends Model
     //un service peut avoir plusieurs employes
     public function employes()
     {
-        return $this->hasMany(User::class, 'service_id','id');
+        return $this->hasMany(User::class, 'service_id', 'id');
     }
 
 
@@ -41,6 +41,6 @@ class Service extends Model
      */
     public static function getNomService()
     {
-        return self::orderBy('nom', 'asc')->get(['id', 'nom']);
+        return self::all()->sortBy('nom');
     }
 }
