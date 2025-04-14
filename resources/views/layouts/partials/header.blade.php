@@ -8,10 +8,24 @@
         </div>
     </form>
 
-    <a href="/login" class="hidden md:flex bg-green-600 text-white rounded-lg hover:bg-green-700 transition-all duration-300 items-center gap-2 px-2 py-1">
-        <div class="flex items-center gap-4 px-2 py-1 transition-all duration-300">
-            <i class="fa-solid fa-circle-user text-2xl text-white"></i>
-            <p class="font-semibold">Connexion</p>
+
+    @if (Route::has('login'))
+        <div>
+            @auth
+                <a href="{{ route('account') }}" class="hidden md:flex bg-green-600 text-white rounded-lg hover:bg-green-700 transition-all duration-300 items-center gap-2 px-2 py-1">
+                    <div class="flex items-center gap-4 px-2 py-1 transition-all duration-300">
+                        <i class="fa-solid fa-circle-user text-2xl text-white"></i>
+                        <span class="text-lg font-semibold"> Lilou </span> <!-- {{ Auth::user()->prenom }} -->
+                    </div>
+                </a>
+            @else
+                <a href="{{ route('login') }}" class="hidden md:flex bg-green-600 text-white rounded-lg hover:bg-green-700 transition-all duration-300 items-center gap-2 px-2 py-1">
+                    <div class="flex items-center gap-4 px-2 py-1 transition-all duration-300">
+                        <i class="fa-solid fa-circle-user text-2xl text-white"></i>
+                        <span class="text-lg font-semibold"> Connexion</span>
+                    </div>
+                </a>
+            @endauth
         </div>
-    </a>
+    @endif
 </div>
