@@ -80,10 +80,10 @@
 
                 <div class="mb-4">
                     <label for="service_id" class="block text-gray-700 text-sm font-bold mb-2">{{ __('Service') }}</label>
-                    <select id="service_id" name="service_id" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('service_id') border-red-500 @enderror" required>
+                    <select id="service_id" name="service_id" required>
                         <option value="">{{ __('Sélectionnez un service') }}</option>
                         @foreach(\App\Models\Service::getNomService() as $service)
-                            <option value="{{ $service->id }}" {{ old('service_id') == $service->id ? 'selected' : '' }}>{{ $service->nom }}</option>
+                            <option value="{{ $service->id }}">{{ $service->nom }}</option>
                         @endforeach
                     </select>
                     @error('service_id')
