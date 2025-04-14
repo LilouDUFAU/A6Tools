@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('reference'); // Référence du PCRenouv
             $table->integer('quantite'); // Quantité
             $table->text('caracteristiques'); // Caractéristiques du PCRenouv
-            $table->enum('emplacement', ['Mont de Marsan', 'Aire sur l\'Adour']); // Emplacement
+            $table->enum('emplacement', ["Mont de Marsan", "Aire sur Adour"]); // Emplacement
             $table->enum('type', ['portable', 'fixe']); // Type du PCRenouv
             $table->enum('statut', ['en stock', 'prêté']); // Statut du PCRenouv
             $table->unsignedBigInteger('employe_id'); // Clé étrangère vers la table users (employé)
