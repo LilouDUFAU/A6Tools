@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('prep_ateliers', function (Blueprint $table) {
-            $table->prepAtelierId();
+            $table->id();
             $table->text('notes'); // Notes concernant la préparation
             $table->unsignedBigInteger('commande_id'); // Clé étrangère vers la table commandes
             $table->unsignedBigInteger('employe_id'); // Clé étrangère vers la table users (employé qui prépare l'atelier)

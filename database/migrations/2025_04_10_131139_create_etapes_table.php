@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('etapes', function (Blueprint $table) {
-            $table->etapeId();
+            $table->id();
             $table->string('intitule'); // Intitulé de l'étape
             $table->unsignedBigInteger('preparation_id'); // Clé étrangère vers la table prep_atelier
             $table->timestamps(); // created_at, updated_at

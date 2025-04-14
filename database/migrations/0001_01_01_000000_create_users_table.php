@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('users', function (Blueprint $table) {
-            $table->userId();
+            $table->id();
             $table->string('nom');
             $table->string('prenom');
             $table->string('telephone');
@@ -22,10 +22,16 @@ return new class extends Migration
             $table->text('adresse_postale');
             $table->string('photo')->nullable();
             $table->date('date_naissance');
-            $table->foreignId('service_id')->constrained();  // clé étrangère vers la table services
-            $table->foreignId('role_id')->constrained(); // clé étrangère vers la table roles
+            $table->unsignedBigInteger('service_id');  // clé étrangère vers la table services
+            $table->unsignedBigInteger('role_id'); // clé étrangère vers la table roles
             $table->rememberToken();
             $table->timestamps();
+
+            // Clé étrangère vers la table services
+            $table->foreign('service_id')->references('id')->on('services')->onDelete('cascade');
+            // Clé étrangère vers la table roles
+            $table->foreign('role_id')->references('id')->on('roles')->onDelete('cascade');
+
         });
 
         Schema::create('password_reset_tokens', function (Blueprint $table) {

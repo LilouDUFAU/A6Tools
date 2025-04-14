@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('commandes', function (Blueprint $table) {
-            $table->commandeId();
+            $table->id();
             $table->string('intitule'); // Intitulé de la commande
             $table->decimal('prix_total', 10, 2); // Prix total de la commande
             $table->enum('etat', ['en_cours', 'terminée', 'annulée']); // Etat de la commande

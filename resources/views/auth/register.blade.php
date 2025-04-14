@@ -6,13 +6,53 @@
         <div class="bg-white shadow-md rounded px-8 py-6">
             <div class="text-lg font-bold mb-4">{{ __('Inscription') }}</div>
 
-            <form method="POST" action="{{ route('register') }}">
+            <form method="POST" action="{{ route('register') }}" enctype="multipart/form-data">
                 @csrf
 
                 <div class="mb-4">
-                    <label for="name" class="block text-gray-700 text-sm font-bold mb-2">{{ __('Nom') }}</label>
-                    <input id="name" type="text" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('name') border-red-500 @enderror" name="name" value="{{ old('name') }}" required autocomplete="name" autofocus>
-                    @error('name')
+                    <label for="nom" class="block text-gray-700 text-sm font-bold mb-2">{{ __('Nom') }}</label>
+                    <input id="nom" type="text" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('nom') border-red-500 @enderror" name="nom" value="{{ old('nom') }}" required autocomplete="nom" autofocus>
+                    @error('nom')
+                        <p class="text-red-500 text-xs italic mt-2">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <div class="mb-4">
+                    <label for="prenom" class="block text-gray-700 text-sm font-bold mb-2">{{ __('Prénom') }}</label>
+                    <input id="prenom" type="text" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('prenom') border-red-500 @enderror" name="prenom" value="{{ old('prenom') }}" required autocomplete="prenom">
+                    @error('prenom')
+                        <p class="text-red-500 text-xs italic mt-2">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <div class="mb-4">
+                    <label for="telephone" class="block text-gray-700 text-sm font-bold mb-2">{{ __('Téléphone') }}</label>
+                    <input id="telephone" type="text" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('telephone') border-red-500 @enderror" name="telephone" value="{{ old('telephone') }}" required autocomplete="telephone">
+                    @error('telephone')
+                        <p class="text-red-500 text-xs italic mt-2">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <div class="mb-4">
+                    <label for="adresse_postale" class="block text-gray-700 text-sm font-bold mb-2">{{ __('Adresse postale') }}</label>
+                    <input id="adresse_postale" type="text" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('adresse_postale') border-red-500 @enderror" name="adresse_postale" value="{{ old('adresse_postale') }}" required autocomplete="adresse_postale">
+                    @error('adresse_postale')
+                        <p class="text-red-500 text-xs italic mt-2">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <div class="mb-4">
+                    <label for="photo" class="block text-gray-700 text-sm font-bold mb-2">{{ __('Photo') }}</label>
+                    <input id="photo" type="file" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('photo') border-red-500 @enderror" name="photo" required>
+                    @error('photo')
+                        <p class="text-red-500 text-xs italic mt-2">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <div class="mb-4">
+                    <label for="date_naissance" class="block text-gray-700 text-sm font-bold mb-2">{{ __('Date de naissance') }}</label>
+                    <input id="date_naissance" type="date" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('date_naissance') border-red-500 @enderror" name="date_naissance" value="{{ old('date_naissance') }}" required>
+                    @error('date_naissance')
                         <p class="text-red-500 text-xs italic mt-2">{{ $message }}</p>
                     @enderror
                 </div>
@@ -36,6 +76,19 @@
                 <div class="mb-4">
                     <label for="password-confirm" class="block text-gray-700 text-sm font-bold mb-2">{{ __('Confirmer le mot de passe') }}</label>
                     <input id="password-confirm" type="password" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" name="password_confirmation" required autocomplete="new-password">
+                </div>
+
+                <div class="mb-4">
+                    <label for="service_id" class="block text-gray-700 text-sm font-bold mb-2">{{ __('Service') }}</label>
+                    <select id="service_id" name="service_id" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('service_id') border-red-500 @enderror" required>
+                        <option value="">{{ __('Sélectionnez un service') }}</option>
+                        @foreach(\App\Models\Service::getNomService() as $service)
+                            <option value="{{ $service->id }}" {{ old('service_id') == $service->id ? 'selected' : '' }}>{{ $service->nom }}</option>
+                        @endforeach
+                    </select>
+                    @error('service_id')
+                        <p class="text-red-500 text-xs italic mt-2">{{ $message }}</p>
+                    @enderror
                 </div>
 
                 <div class="flex items-center justify-between">

@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('permissions', function (Blueprint $table) {
-            $table->permissionId();
+            $table->id();
             $table->string('nom'); // Nom de la permission
             $table->text('description'); // Description de la permission
             $table->string('code'); // Code unique de la permission

@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('actions', function (Blueprint $table) {
-            $table->actionId();
+            $table->id();
             $table->enum('type', ['ajout', 'modification', 'suppression']); // Champ type en enum
             $table->text('description'); // description de l'action
             $table->unsignedBigInteger('employe_id'); // ID de l'employé

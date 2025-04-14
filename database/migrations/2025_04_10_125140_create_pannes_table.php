@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('pannes', function (Blueprint $table) {
-            $table->panneId();
+            $table->id();
             $table->enum('etat_client', ['ordi de pret', 'échangé', 'en attente']); // Etat de la panne vu par le client
             $table->string('categorie_materiel'); // Catégorie du matériel concerné par la panne
             $table->string('categorie_panne'); // Catégorie de la panne

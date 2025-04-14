@@ -28,4 +28,19 @@ class Service extends Model
     {
         return $this->hasMany(User::class, 'service_id','id');
     }
+
+
+    //////////////////////////////
+    ////fonctions utilitaires/////
+    //////////////////////////////
+
+    /**
+     * Récupère tous les services triés par nom.
+     *
+     * @return \Illuminate\Database\Eloquent\Collection
+     */
+    public static function getNomService()
+    {
+        return self::orderBy('nom', 'asc')->get(['id', 'nom']);
+    }
 }

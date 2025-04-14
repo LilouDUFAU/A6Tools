@@ -57,6 +57,7 @@ class RegisterController extends Controller
             'adresse_postale' => ['required', 'string', 'max:255'],
             'photo' => ['required', 'image', 'mimes:jpeg,png,jpg,gif,svg', 'max:2048'],
             'date_naissance' => ['required', 'date'],
+            'service_id' => ['required', 'exists:services,id'],
         ]);
     }
 
@@ -77,7 +78,7 @@ class RegisterController extends Controller
             'adresse_postale' => $data['adresse_postale'],
             'photo' => $data['photo']->store('photos', 'public'),
             'date_naissance' => $data['date_naissance'],
-            'serviceId' => $data['serviceId'],
+            'service_id' => $data['service_id'],
         ]);
     }
 
