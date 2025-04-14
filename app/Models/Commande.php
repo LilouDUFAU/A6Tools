@@ -23,6 +23,24 @@ class Commande extends Model
         'date_installation_prevue',
         'created_at',
     ];
+
+    /////////////////////////
+    /// ENUMS définis ici ///
+    /////////////////////////
+    const ETATS = [
+        'en_attente',
+        'en_cours',
+        'terminée',
+        'annulée',
+    ];
+
+    const URGENCES = [
+        'pas urgent',
+        'peu urgent',
+        'moyennement urgent',
+        'urgent',
+        'très urgent',
+    ];
     
     //////////////////////////////
     //relations entre les tables//
