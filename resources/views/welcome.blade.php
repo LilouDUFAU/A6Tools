@@ -8,7 +8,7 @@
         <p class="text-lg text-gray-600">Votre outil de gestion web collaboratif !</p>
     </div>
 
-    {{-- Navigation --}}
+    
     <div class="w-full max-w-4xl text-center">
         @if (Route::has('login'))
             <div class="flex items-center justify-center gap-6">
@@ -17,6 +17,7 @@
                     <!-- ajouter applications -->
                 @else
                     <a href="{{ route('login') }}" class="bg-green-600 text-white hover:bg-green-700 font-semibold py-2 px-4 rounded-lg shadow-md transition">Connexion</a>
+                    <a href="{{ route('register') }}" class="bg-green-600 text-white hover:bg-green-700 font-semibold py-2 px-4 rounded-lg shadow-md transition">Inscription ( à enlever → direction créée )</a>
                 @endauth
             </div>
         @endif
