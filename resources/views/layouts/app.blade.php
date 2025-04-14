@@ -25,7 +25,7 @@
             @include('layouts.partials.aside')
         </aside>
 
-        <section class="col-span-12 md:col-start-4 md:col-span-9 lg:col-span-3 lg:col-span-10 bg-gray-200 bg-gray-100">
+        <section class="col-span-12 md:col-start-4 md:col-span-9 lg:col-span-3 lg:col-span-10 bg-gray-100 bg-gray-100">
             <!-- header -->
             <header class="">
                 @include('layouts.partials.header')
