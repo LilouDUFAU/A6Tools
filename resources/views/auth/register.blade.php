@@ -78,11 +78,24 @@
                     <input id="password-confirm" type="password" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" name="password_confirmation" required autocomplete="new-password">
                 </div>
 
-                <div class="mb-4">
+                <!-- <div class="mb-4">
                     <label for="service_id" class="block text-gray-700 text-sm font-bold mb-2">{{ __('Service') }}</label>
                     <select id="service_id" name="service_id" required>
                         <option value="">{{ __('Sélectionnez un service') }}</option>
                         @foreach(\App\Models\Service::getNomService() as $service)
+                            <option value="{{ $service->id }}">{{ $service->nom }}</option>
+                        @endforeach
+                    </select>
+                    @error('service_id')
+                        <p class="text-red-500 text-xs italic mt-2">{{ $message }}</p>
+                    @enderror
+                </div> -->
+
+                <div class="mb-4">
+                    <label for="service_id" class="block text-gray-700 text-sm font-bold mb-2">{{ __('Service') }}</label>
+                    <select id="service_id" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('service_id') border-red-500 @enderror" name="service_id" required>
+                        <option value="">{{ __('Sélectionnez un service') }}</option>
+                        @foreach(\App\Models\Service::all() as $service)
                             <option value="{{ $service->id }}">{{ $service->nom }}</option>
                         @endforeach
                     </select>
