@@ -1,3 +1,4 @@
+<?php 
 use App\Http\Controllers\CommandeController;
 
 // Afficher la liste des commandes
