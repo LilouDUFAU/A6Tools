@@ -10,7 +10,7 @@
 
         @if (Route::has('login'))
             @auth
-            <a href="{{ route('account') }}" class="flex md:hidden hover:bg-green-700 rounded-lg hover:px-2 hover:py-1 hover:text-white transition-all duration-300 hover:font-semibold">
+            <a href="" class="flex md:hidden hover:bg-green-700 rounded-lg hover:px-2 hover:py-1 hover:text-white transition-all duration-300 hover:font-semibold">
                 <i class="fa-solid fa-circle-user"></i> <span class="ml-2">Lilou</span> <!-- {{ Auth::user()->prenom }} -->
             </a>
             @else
