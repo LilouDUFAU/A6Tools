@@ -5,7 +5,7 @@
     <div class="w-full max-w-4xl text-center mb-6 bg-white shadow-lg p-6 rounded-lg">
         {{-- Welcome Message --}}
         <h1 class="text-4xl font-bold text-gray-800 mb-4">Bienvenue sur A6Tools</h1>
-        <p class="text-lg text-gray-600">Votre plateforme pour des outils modernes et efficaces.</p>
+        <p class="text-lg text-gray-600">Votre outil de gestion web collaboratif !</p>
     </div>
 
     {{-- Navigation --}}
@@ -13,19 +13,10 @@
         @if (Route::has('login'))
             <div class="flex items-center justify-center gap-6">
                 @auth
-                    <a
-                        href="{{ url('/dashboard') }}"
-                        class="bg-green-600 text-white hover:bg-green-700 font-semibold py-2 px-4 rounded-lg shadow-md transition"
-                    >
-                        Accéder au tableau de bord
-                    </a>
+                    <a href="{{ url('/dashboard') }}" class="bg-green-600 text-white hover:bg-green-700 font-semibold py-2 px-4 rounded-lg shadow-md transition">Accéder au tableau de bord</a>
+                    <!-- ajouter applications -->
                 @else
-                    <a
-                        href="{{ route('login') }}"
-                        class="bg-green-600 text-white hover:bg-green-700 font-semibold py-2 px-4 rounded-lg shadow-md transition"
-                    >
-                        Connexion
-                    </a>
+                    <a href="{{ route('login') }}" class="bg-green-600 text-white hover:bg-green-700 font-semibold py-2 px-4 rounded-lg shadow-md transition">Connexion</a>
                 @endauth
             </div>
         @endif
