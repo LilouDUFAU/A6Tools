@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('p_c_renouvs', function (Blueprint $table) {
-            $table->id();
+            $table->PCRenouvId();
             $table->string('reference'); // Référence du PCRenouv
             $table->integer('quantite'); // Quantité
             $table->text('caracteristiques'); // Caractéristiques du PCRenouv

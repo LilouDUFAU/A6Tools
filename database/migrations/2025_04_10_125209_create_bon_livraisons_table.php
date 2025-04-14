@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('bon_livraisons', function (Blueprint $table) {
-            $table->id();
+            $table->bonLivraisonId();
             $table->enum('statut', ['en_attente', 'signé', 'annulé']); // Champ statut en enum
             $table->timestamp('date_signature')->nullable(); // Date de signature (peut être null si pas encore signé)
             $table->unsignedBigInteger('commande_id'); // ID de la commande associée

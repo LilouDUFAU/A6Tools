@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('stocks', function (Blueprint $table) {
-            $table->id();
+            $table->stockId();
             $table->enum('lieux', ['Mont de Marsan', 'Aire sur Adour']); // Définition du champ 'lieux' comme un enum avec les valeurs possibles
             $table->timestamps(); // created_at, updated_at
         });
