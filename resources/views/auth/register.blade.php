@@ -4,13 +4,13 @@
 <div class="h-screen flex items-center justify-center bg-gray-100">
     <div class="w-full max-w-md">
         <div class="bg-white shadow-md rounded px-8 py-6">
-            <div class="text-lg font-bold mb-4">{{ __('Register') }}</div>
+            <div class="text-lg font-bold mb-4">{{ __('Inscription') }}</div>
 
             <form method="POST" action="{{ route('register') }}">
                 @csrf
 
                 <div class="mb-4">
-                    <label for="name" class="block text-gray-700 text-sm font-bold mb-2">{{ __('Name') }}</label>
+                    <label for="name" class="block text-gray-700 text-sm font-bold mb-2">{{ __('Nom') }}</label>
                     <input id="name" type="text" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('name') border-red-500 @enderror" name="name" value="{{ old('name') }}" required autocomplete="name" autofocus>
                     @error('name')
                         <p class="text-red-500 text-xs italic mt-2">{{ $message }}</p>
@@ -18,7 +18,7 @@
                 </div>
 
                 <div class="mb-4">
-                    <label for="email" class="block text-gray-700 text-sm font-bold mb-2">{{ __('Email Address') }}</label>
+                    <label for="email" class="block text-gray-700 text-sm font-bold mb-2">{{ __('Adresse e-mail') }}</label>
                     <input id="email" type="email" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('email') border-red-500 @enderror" name="email" value="{{ old('email') }}" required autocomplete="email">
                     @error('email')
                         <p class="text-red-500 text-xs italic mt-2">{{ $message }}</p>
@@ -26,7 +26,7 @@
                 </div>
 
                 <div class="mb-4">
-                    <label for="password" class="block text-gray-700 text-sm font-bold mb-2">{{ __('Password') }}</label>
+                    <label for="password" class="block text-gray-700 text-sm font-bold mb-2">{{ __('Mot de passe') }}</label>
                     <input id="password" type="password" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('password') border-red-500 @enderror" name="password" required autocomplete="new-password">
                     @error('password')
                         <p class="text-red-500 text-xs italic mt-2">{{ $message }}</p>
@@ -34,13 +34,13 @@
                 </div>
 
                 <div class="mb-4">
-                    <label for="password-confirm" class="block text-gray-700 text-sm font-bold mb-2">{{ __('Confirm Password') }}</label>
+                    <label for="password-confirm" class="block text-gray-700 text-sm font-bold mb-2">{{ __('Confirmer le mot de passe') }}</label>
                     <input id="password-confirm" type="password" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" name="password_confirmation" required autocomplete="new-password">
                 </div>
 
                 <div class="flex items-center justify-between">
                     <button type="submit" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
-                        {{ __('Register') }}
+                        {{ __('Inscription') }}
                     </button>
                 </div>
             </form>
