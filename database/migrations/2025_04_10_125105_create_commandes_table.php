@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('intitule'); // Intitulé de la commande
             $table->decimal('prix_total', 10, 2); // Prix total de la commande
-            $table->enum('etat', ['en_cours', 'terminée', 'annulée']); // Etat de la commande
+            $table->enum('etat', ['en_attente','en_cours', 'terminée', 'annulée']); // Etat de la commande
             $table->enum('urgence', ['pas urgent', 'peu urgent', 'moyennement urgent', 'urgent', 'très urgent']); // Urgence
             $table->text('remarque')->nullable(); // Remarques sur la commande
             $table->date('date_livraison_fournisseur'); // Date de livraison fournisseur
