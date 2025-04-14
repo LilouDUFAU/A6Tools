@@ -22,8 +22,8 @@ return new class extends Migration
             $table->text('adresse_postale');
             $table->string('photo')->nullable();
             $table->date('date_naissance');
-            $table->unsignedBigInteger('service_id');  // clé étrangère vers la table services
-            $table->unsignedBigInteger('role_id'); // clé étrangère vers la table roles
+            $table->unsignedBigInteger('service_id')->default(1); 
+            $table->unsignedBigInteger('role_id')->default(1);
             $table->rememberToken();
             $table->timestamps();
 
