@@ -1,9 +1,52 @@
 @extends('layouts.app')
 
 @section('content')
+
+<h1 class="text-3xl font-bold mb-6 px-2 pt-10">Tableau de Bord des Commandes</h1>
+
+<h2 class="text-xl sm:text-2xl font-bold px-2 py-1">Nombre de commandes par état</h2>
+<div class="grid grid-cols-1 sm:grid-cols-4 gap-4 mb-6 px-2 py-1">
+    <div class="bg-green-600 text-white text-center py-4 rounded shadow-lg hover:bg-green-700">
+        <div class="text-2xl font-bold">{{ $commandes->where('etat', 'terminée')->count() }}</div>
+        <div>Terminée(s)</div>
+    </div>
+    <div class="bg-yellow-600 text-white text-center py-4 rounded shadow-lg hover:bg-yellow-700">
+        <div class="text-2xl font-bold">{{ $commandes->where('etat', 'en_cours')->count() }}</div>
+        <div>En cours</div>
+    </div>
+    <div class="bg-orange-600 text-white text-center py-4 rounded shadow-lg hover:bg-orange-700">
+        <div class="text-2xl font-bold">{{ $commandes->where('etat', 'en_attente')->count() }}</div>
+        <div>En attente</div>
+    </div>
+    <div class="bg-red-600 text-white text-center py-4 rounded shadow-lg hover:bg-red-700">
+        <div class="text-2xl font-bold">{{ $commandes->where('etat', 'annulé')->count() }}</div>
+        <div>Annulée(s)</div>
+    </div>
+</div>
+
+<h2 class="text-xl sm:text-2xl font-bold px-2 py-1">Nombre de commandes par urgence</h2>
+<div class="grid grid-cols-1 sm:grid-cols-4 gap-4 mb-6 px-2 py-1">
+    <div class="bg-green-600 text-white text-center py-4 rounded shadow-lg hover:bg-green-700">
+        <div class="text-2xl font-bold">{{ $commandes->where('urgence', 'peu urgent')->count() }}</div>
+        <div>Peu urgente(s)</div>
+    </div>
+    <div class="bg-yellow-600 text-white text-center py-4 rounded shadow-lg hover:bg-yellow-700">
+        <div class="text-2xl font-bold">{{ $commandes->where('urgence', 'moyennement urgent')->count() }}</div>
+        <div>Moyennement urgente(s)</div>
+    </div>
+    <div class="bg-orange-600 text-white text-center py-4 rounded shadow-lg hover:bg-orange-700">
+        <div class="text-2xl font-bold">{{ $commandes->where('urgence', 'urgent')->count() }}</div>
+        <div>Urgente(s)</div>
+    </div>
+    <div class="bg-red-600 text-white text-center py-4 rounded shadow-lg hover:bg-red-700">
+        <div class="text-2xl font-bold">{{ $commandes->where('urgence', 'très urgent')->count() }}</div>
+        <div>Très urgente(s)</div>
+    </div>
+</div>
+
 <div class="max-w-7xl mx-auto px-4 sm:px-6 md:px-8 py-6 min-h-screen">
     <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
-        <h1 class="text-xl sm:text-2xl font-bold">Liste des Commandes</h1>
+        <h2 class="text-xl sm:text-2xl font-bold">Liste des Commandes</h2>
         <a href="{{ route('commande.create') }}" class="mt-4 md:mt-0 bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 font-semibold">Nouvelle commande</a>
     </div>
 
