@@ -20,7 +20,7 @@ return new class extends Migration
             $table->text('remarque')->nullable(); // Remarques sur la commande
             $table->date('date_livraison_fournisseur'); // Date de livraison fournisseur
             $table->date('date_installation_prevue'); // Date d'installation prévue
-            $table->unsignedBigInteger('client_id'); // Clé étrangère vers la table clients
+            $table->unsignedBigInteger('client_id')->default(1); // Clé étrangère vers la table clients
             $table->unsignedBigInteger('employe_id'); // Clé étrangère vers la table users
             $table->timestamps(); // created_at, updated_at
 
