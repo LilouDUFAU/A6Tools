@@ -6,6 +6,7 @@ use App\Models\Commande;
 use App\Models\Client;
 use App\Models\User;
 use App\Models\Produit;
+use App\Models\Fournisseur;
 use Illuminate\Http\Request;
 
 class CommandeController extends Controller
@@ -74,21 +75,40 @@ class CommandeController extends Controller
         // Créer la commande
         $commande = Commande::create($validated);
 
-        // Ajouter les produits à la commande
+        // Ajouter les produits et leurs fournisseurs
         foreach ($request->input('produits', []) as $produitData) {
-            // Ajouter le produit à la table `produits` si ce produit n'existe pas déjà
+            // Ajouter ou récupérer le fournisseur
+            $fournisseur = null;
+            if (!empty($produitData['fournisseur']['nom'])) {
+                $fournisseur = Fournisseur::firstOrCreate(
+                    ['nom' => $produitData['fournisseur']['nom']],
+                    [
+                        'email' => $produitData['fournisseur']['email'] ?? null,
+                        'telephone' => $produitData['fournisseur']['telephone'] ?? null,
+                        'adresse_postale' => $produitData['fournisseur']['adresse_postale'] ?? null,
+                    ]
+                );
+            }
+
+            // Ajouter ou récupérer le produit
             $produit = Produit::firstOrCreate(
-                ['reference' => $produitData['reference']], // Utilisation de 'reference' comme critère unique
+                ['reference' => $produitData['reference']],
                 [
                     'nom' => $produitData['nom'],
-                    'description' => $produitData['description'],
-                    'caracteristiques_techniques' => $produitData['caracteristiques_techniques'],
-                    'quantite_stock' => $produitData['quantite_stock'] ?? 0, // Si non fourni, la quantité par défaut est 0
-                    'quantite_client' => $produitData['quantite'] ?? 0, // Quantité demandée par le client
-                    'prix' => $produitData['prix'], 
-                    'image' => $produitData['image'] ?? null, // Image est optionnelle
+                    'description' => $produitData['description'] ?? '',
+                    'caracteristiques_techniques' => $produitData['caracteristiques_techniques'] ?? '',
+                    'quantite_stock' => $produitData['quantite_stock'] ?? 0,
+                    'quantite_client' => $produitData['quantite'] ?? 0,
+                    'prix' => $produitData['prix'] ?? 0,
+                    'image' => $produitData['image'] ?? null,
                 ]
             );
+
+            // Lier le produit au fournisseur
+            if ($fournisseur) {
+                $produit->fournisseurs()->syncWithoutDetaching([$fournisseur->id]);
+            }
+
 
             $quantite_stock = $produit->quantite_stock;
             $quantite_client = $produit->quantite_client; // Quantité demandée par le client
