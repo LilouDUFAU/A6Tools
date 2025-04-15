@@ -21,6 +21,14 @@ class Client extends Model
         'type',
         'created_at',
     ];
+
+    /////////////////////////
+    /// ENUMS définis ici ///
+    /////////////////////////
+    const TYPES = [
+        'particulier',
+        'professionnel',
+    ];
     
     //////////////////////////////
     //relations entre les tables//
