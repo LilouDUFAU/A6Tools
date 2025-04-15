@@ -16,8 +16,8 @@ return new class extends Migration
             $table->string('nom'); // Nom du client
             $table->string('email')->unique(); // Email du client, unique
             $table->string('telephone'); // Téléphone du client
-            $table->string('adresse_postale'); // Adresse postale du client
-            $table->enum('type', ['particulier', 'entreprise']); // Type de client (particulier ou entreprise)
+            $table->string('adresse_postale')->nullable(); // Adresse postale du client
+            $table->enum('type', ['particulier', 'professionnel']); // Type de client (particulier ou entreprise)
             $table->timestamps(); // created_at, updated_at
         });
     }
