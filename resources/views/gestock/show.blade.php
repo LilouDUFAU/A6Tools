@@ -16,6 +16,23 @@
         <p><strong>Date d'installation prévue :</strong> {{ $commande->date_installation_prevue }}</p>
     </div>
 
+    <div class="bg-white shadow rounded p-6 space-y-4 mt-6">
+        <h2 class="text-xl font-bold mb-4">Produits de la commande</h2>
+        @if($commande->produits->isNotEmpty())
+            <ul class="list-disc pl-6">
+                @foreach($commande->produits as $produit)
+                    <li>
+                        <p><strong>Nom :</strong> {{ $produit->nom }}</p>
+                        <p><strong>Quantité :</strong> {{ $produit->quantite_stock }}</p>
+                        <p><strong>Prix unitaire :</strong> {{ $produit->prix }} €</p>
+                    </li>
+                @endforeach
+            </ul>
+        @else
+            <p>Aucun produit associé à cette commande.</p>
+        @endif
+    </div>
+
     <div class="mt-6">
         <a href="{{ route('commande.edit', $commande->id) }}" class="text-blue-600 hover:underline mr-4">Modifier</a>
         <a href="{{ route('commande.index') }}" class="text-gray-600 hover:underline">Retour à la liste</a>
