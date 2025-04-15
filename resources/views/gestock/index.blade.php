@@ -20,6 +20,7 @@
                     <th class="py-2 sm:py-3 px-2 sm:px-4">Client</th>
                     <th class="py-2 sm:py-3 px-2 sm:px-4">Prix Total</th>
                     <th class="py-2 sm:py-3 px-2 sm:px-4">État</th>
+                    <th class="py-2 sm:py-3 px-2 sm:px-4">Urgence</th>
                     <th class="py-2 sm:py-3 px-2 sm:px-4">Actions</th>
                 </tr>
             </thead>
@@ -28,9 +29,21 @@
                 <tr class="border-t hover:bg-gray-50">
                     <td class="py-2 sm:py-3 px-2 sm:px-4">{{ $commande->id }}</td>
                     <td class="py-2 sm:py-3 px-2 sm:px-4">{{ $commande->intitule }}</td>
-                    <td class="py-2 sm:py-3 px-2 sm:px-4">{{ $commande->client?->nom }}</td>
+                    <td class="py-2 sm:py-3 px-2 sm:px-4 text-center">{{ $commande->client ? $commande->client->nom : '/' }}</td>
                     <td class="py-2 sm:py-3 px-2 sm:px-4">{{ $commande->prix_total }} €</td>
                     <td class="py-2 sm:py-3 px-2 sm:px-4">{{ $commande->etat }}</td>
+                    <td class="py-2 sm:py-3 px-2 sm:px-4">
+                        <span class="
+                            @if($commande->urgence === 'pas urgent') text-green-800 
+                            @elseif($commande->urgence === 'peu urgent') text-green-500 
+                            @elseif($commande->urgence === 'moyennement urgent') text-yellow-500 
+                            @elseif($commande->urgence === 'urgent') text-orange-500 
+                            @elseif($commande->urgence === 'très urgent') text-red-500 
+                            @endif
+                            font-semibold">
+                            {{ $commande->urgence }}
+                        </span>
+                    </td>
                     <td class="py-2 sm:py-3 px-2 sm:px-4 space-x-2">
                         <a href="{{ route('commande.show', $commande->id) }}" class="text-green-600 hover:underline">Voir</a>
                         <a href="{{ route('commande.edit', $commande->id) }}" class="text-yellow-600 hover:underline">Modifier</a>
