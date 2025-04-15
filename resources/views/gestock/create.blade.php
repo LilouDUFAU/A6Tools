@@ -70,7 +70,7 @@
 
         <!-- Partie Produits -->
         <div class="border-l-4 border-green-600 pl-4">
-            <h2 class="text-2xl font-bold text-gray-800 mb-4">Produits</h2>
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Produit(s)</h2>
             <div class="space-y-6 mb-4" id="product-list">
                 <div class="product-item bg-gray-50 p-4 rounded-lg shadow-sm">
                     <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
