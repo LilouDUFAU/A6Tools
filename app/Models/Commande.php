@@ -22,6 +22,8 @@ class Commande extends Model
         'date_livraison_fournisseur',
         'date_installation_prevue',
         'created_at',
+        'client_id',
+        'employe_id',
     ];
 
     /////////////////////////
