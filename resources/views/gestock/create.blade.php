@@ -112,42 +112,54 @@
             <div class="space-y-6 mb-4" id="product-list">
             <div class="product-item bg-gray-50 p-4 rounded-lg shadow-sm">
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <div class="mb-4">
-                    <label for="produits_0_nom" class="block text-sm font-semibold text-gray-700">Nom</label>
-                    <input type="text" id="produits_0_nom" name="produits[0][nom]" class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1" required>
-                </div>
-                <div class="mb-4">
-                    <label for="produits_0_description" class="block text-sm font-semibold text-gray-700">Description</label>
-                    <textarea id="produits_0_description" name="produits[0][description]" rows="2" class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1"></textarea>
-                </div>
-                <div class="mb-4">
-                    <label for="produits_0_caracteristiques_techniques" class="block text-sm font-semibold text-gray-700">Caractéristiques Techniques</label>
-                    <textarea id="produits_0_caracteristiques_techniques" name="produits[0][caracteristiques_techniques]" rows="2" class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1"></textarea>
-                </div>
-                <div class="mb-4">
-                    <label for="produits_0_reference" class="block text-sm font-semibold text-gray-700">Référence</label>
-                    <input type="text" id="produits_0_reference" name="produits[0][reference]" class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1">
-                </div>
-                <div class="mb-4">
-                    <label for="produits_0_quantite_stock" class="block text-sm font-semibold text-gray-700">Quantité en Stock</label>
-                    <input type="number" id="produits_0_quantite_stock" name="produits[0][quantite_stock]" class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1">
-                </div>
-                <div class="mb-4">
-                    <label for="produits_0_quantite_client" class="block text-sm font-semibold text-gray-700">Quantité Client</label>
-                    <input type="number" id="produits_0_quantite_client" name="produits[0][quantite_client]" class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1">
-                </div>
-                <div class="mb-4">
-                    <label for="produits_0_prix" class="block text-sm font-semibold text-gray-700">Prix unitaire (€)</label>
-                    <input type="number" id="produits_0_prix" name="produits[0][prix]" step="0.01" class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1">
-                </div>
-                <div class="mb-4">
-                    <label for="produits_0_image" class="block text-sm font-semibold text-gray-700">Image</label>
-                    <input type="file" id="produits_0_image" name="produits[0][image]" class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1">
-                </div>
-                <div class="mb-4">
-                    <label for="produits_0_fournisseur" class="block text-sm font-semibold text-gray-700">Fournisseur</label>
-                    <input type="text" id="produits_0_fournisseur" name="produits[0][fournisseur]" class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1">
-                </div>
+                    <div class="mb-4">
+                        <label for="produits_0_nom" class="block text-sm font-semibold text-gray-700">Nom</label>
+                        <input type="text" id="produits_0_nom" name="produits[0][nom]" class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1" required>
+                    </div>
+                    <div class="mb-4">
+                        <label for="produits_0_description" class="block text-sm font-semibold text-gray-700">Description</label>
+                        <textarea id="produits_0_description" name="produits[0][description]" rows="2" class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1"></textarea>
+                    </div>
+                    <div class="mb-4">
+                        <label for="produits_0_caracteristiques_techniques" class="block text-sm font-semibold text-gray-700">Caractéristiques Techniques</label>
+                        <textarea id="produits_0_caracteristiques_techniques" name="produits[0][caracteristiques_techniques]" rows="2" class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1"></textarea>
+                    </div>
+                    <div class="mb-4">
+                        <label for="produits_0_reference" class="block text-sm font-semibold text-gray-700">Référence</label>
+                        <input type="text" id="produits_0_reference" name="produits[0][reference]" class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1">
+                    </div>
+                    <div class="mb-4">
+                        <label for="produits_0_quantite_stock" class="block text-sm font-semibold text-gray-700">Quantité en Stock</label>
+                        <input type="number" id="produits_0_quantite_stock" name="produits[0][quantite_stock]" class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1">
+                    </div>
+                    <div class="mb-4">
+                        <label for="produits_0_quantite_client" class="block text-sm font-semibold text-gray-700">Quantité Client</label>
+                        <input type="number" id="produits_0_quantite_client" name="produits[0][quantite_client]" class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1">
+                    </div>
+                    <div class="mb-4">
+                        <label for="produits_0_prix" class="block text-sm font-semibold text-gray-700">Prix unitaire (€)</label>
+                        <input type="number" id="produits_0_prix" name="produits[0][prix]" step="0.01" class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1">
+                    </div>
+                    <div class="mb-4">
+                        <label for="produits_0_image" class="block text-sm font-semibold text-gray-700">Image</label>
+                        <input type="file" id="produits_0_image" name="produits[0][image]" class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1">
+                    </div>
+                    <div class="mb-4">
+                        <label for="produits_0_fournisseur_nom" class="block text-sm font-semibold text-gray-700">Nom du Fournisseur</label>
+                        <input type="text" id="produits_0_fournisseur_nom" name="produits[0][fournisseur][nom]" class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1">
+                    </div>
+                    <div class="mb-4">
+                        <label for="produits_0_fournisseur_email" class="block text-sm font-semibold text-gray-700">Email du Fournisseur</label>
+                        <input type="email" id="produits_0_fournisseur_email" name="produits[0][fournisseur][email]" class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1">
+                    </div>
+                    <div class="mb-4">
+                        <label for="produits_0_fournisseur_telephone" class="block text-sm font-semibold text-gray-700">Téléphone du Fournisseur</label>
+                        <input type="text" id="produits_0_fournisseur_telephone" name="produits[0][fournisseur][telephone]" class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1">
+                    </div>
+                    <div class="mb-4">
+                        <label for="produits_0_fournisseur_adresse" class="block text-sm font-semibold text-gray-700">Adresse du Fournisseur</label>
+                        <input type="text" id="produits_0_fournisseur_adresse" name="produits[0][fournisseur][adresse_postale]" class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1">
+                    </div>
                 </div>
             </div>
             </div>
@@ -206,8 +218,20 @@
             <input type="file" id="produits_${productCount}_image" name="produits[${productCount}][image]" class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1">
             </div>
             <div class="mb-4">
-            <label for="produits_${productCount}_fournisseur" class="block text-sm font-semibold text-gray-700">Fournisseur</label>
-            <input type="text" id="produits_${productCount}_fournisseur" name="produits[${productCount}][fournisseur]" class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1">
+            <label for="produits_${productCount}_fournisseur_nom" class="block text-sm font-semibold text-gray-700">Nom du Fournisseur</label>
+            <input type="text" id="produits_${productCount}_fournisseur_nom" name="produits[${productCount}][fournisseur][nom]" class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1">
+            </div>
+            <div class="mb-4">
+            <label for="produits_${productCount}_fournisseur_email" class="block text-sm font-semibold text-gray-700">Email du Fournisseur</label>
+            <input type="email" id="produits_${productCount}_fournisseur_email" name="produits[${productCount}][fournisseur][email]" class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1">
+            </div>
+            <div class="mb-4">
+            <label for="produits_${productCount}_fournisseur_telephone" class="block text-sm font-semibold text-gray-700">Téléphone du Fournisseur</label>
+            <input type="text" id="produits_${productCount}_fournisseur_telephone" name="produits[${productCount}][fournisseur][telephone]" class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1">
+            </div>
+            <div class="mb-4">
+            <label for="produits_${productCount}_fournisseur_adresse" class="block text-sm font-semibold text-gray-700">Adresse du Fournisseur</label>
+            <input type="text" id="produits_${productCount}_fournisseur_adresse" name="produits[${productCount}][fournisseur][adresse_postale]" class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1">
             </div>
             </div>
         `;
