@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Commande;
 use App\Models\Client;
 use App\Models\User;
+use App\Models\Produit;
 use Illuminate\Http\Request;
 
 class CommandeController extends Controller
@@ -24,10 +25,11 @@ class CommandeController extends Controller
     public function create()
     {
         $clients = Client::all();
+        $types = Client::TYPES;
         $etats = Commande::ETATS;
         $urgences = Commande::URGENCES;
 
-        return view('gestock.create', compact('clients', 'etats', 'urgences'));
+        return view('gestock.create', compact('clients', 'types' , 'etats', 'urgences'));
     }
 
     /**
@@ -35,32 +37,79 @@ class CommandeController extends Controller
      */
     public function store(Request $request)
     {
-        // Ajout de l'employé connecté
+        // dd($request->all());
         $validated = $request->validate([
             'intitule' => 'required|string|max:255',
             'prix_total' => 'required|numeric',
             'etat' => 'required|string|max:255',
             'remarque' => 'nullable|string',
-            'urgence' => 'nullable|boolean',
+            'urgence' => 'nullable',
             'date_livraison_fournisseur' => 'nullable|date',
             'date_installation_prevue' => 'nullable|date',
             'client_id' => 'nullable|exists:clients,id',
         ]);
 
-        // Ajouter l'ID de l'employé connecté (auth()->user()->id)
         $validated['employe_id'] = auth()->user()->id;
 
-        Commande::create($validated);
+        // Nouveau client ?
+        if ($request->has('new_client.nom') && $request->input('new_client.nom')) {
+            $validatedClient = $request->validate([
+                'new_client.nom' => 'required|string|max:255',
+                'new_client.email' => 'required|email|unique:clients,email',
+                'new_client.telephone' => 'required|string|max:15',
+                'new_client.adresse_postale' => 'required|string|max:255',
+                'new_client.type' => 'required|string|max:255',
+            ]);
+        
+            $client = Client::create([
+                'nom' => $request->input('new_client.nom'),
+                'email' => $request->input('new_client.email'),
+                'telephone' => $request->input('new_client.telephone'),
+                'adresse_postale' => $request->input('new_client.adresse_postale'),
+                'type' => $request->input('new_client.type'),
+            ]);
+            $validated['client_id'] = $client->id;
+        }
 
+        // Créer la commande
+        $commande = Commande::create($validated);
+
+        // Ajouter les produits à la commande
+        foreach ($request->input('produits', []) as $produitData) {
+            // Ajouter le produit à la table `produits` si ce produit n'existe pas déjà
+            $produit = Produit::firstOrCreate(
+                ['reference' => $produitData['reference']], // Utilisation de 'reference' comme critère unique
+                [
+                    'nom' => $produitData['nom'],
+                    'description' => $produitData['description'],
+                    'caracteristiques_techniques' => $produitData['caracteristiques_techniques'],
+                    'quantite_stock' => $produitData['quantite_stock'] ?? 0, // Si non fourni, la quantité par défaut est 0
+                    'quantite_client' => $produitData['quantite'] ?? 0, // Quantité demandée par le client
+                    'prix' => $produitData['prix'], 
+                    'image' => $produitData['image'] ?? null, // Image est optionnelle
+                ]
+            );
+
+            $quantite_stock = $produit->quantite_stock;
+            $quantite_client = $produit->quantite_client; // Quantité demandée par le client
+
+            // Attacher le produit à la commande via la table pivot `commande_produit`
+            $commande->produits()->attach($produit->id, [
+                'quantite' => $quantite_stock + $quantite_client // Quantité totale 
+            ]);
+        }
+
+        // Retourner à la liste des commandes avec un message de succès
         return redirect()->route('commande.index')->with('success', 'Commande créée avec succès.');
     }
+
 
     /**
      * Affiche les détails d'une commande.
      */
     public function show(string $id)
     {
-        $commande = Commande::with(['client', 'employe'])->findOrFail($id);
+        $commande = Commande::with(['client', 'employe', 'produits'])->findOrFail($id);
         return view('gestock.show', compact('commande'));
     }
 
