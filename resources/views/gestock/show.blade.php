@@ -7,7 +7,7 @@
     <div class="bg-white shadow rounded p-6 space-y-4">
         <p><strong>Intitulé :</strong> {{ $commande->intitule }}</p>
         <p><strong>Client :</strong> {{ $commande->client?->nom }}</p>
-        <p><strong>Employé :</strong> {{ $commande->employe?->name }}</p>
+        <p><strong>Employé :</strong> {{ $commande->employe?->prenom }} {{ $commande->employe?->nom }}</p>
         <p><strong>Prix total :</strong> {{ $commande->prix_total }} €</p>
         <p><strong>État :</strong> {{ $commande->etat }}</p>
         <p><strong>Remarque :</strong> {{ $commande->remarque }}</p>
