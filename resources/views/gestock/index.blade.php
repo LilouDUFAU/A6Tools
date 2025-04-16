@@ -57,21 +57,21 @@
 
     <h2 class="text-2xl font-semibold px-4 py-2 text-gray-700">Nombre de commandes par urgence</h2>
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8 px-4">
-        <div class="filter-btn bg-green-600 text-white text-center py-6 rounded-lg shadow-md hover:bg-green-700" data-filter="peu urgent" data-type="urgence">
-            <div class="text-3xl font-bold">{{ $commandes->where('urgence', 'peu urgent')->count() }}</div>
-            <div class="text-lg">Peu urgente(s)</div>
+        <div class="filter-btn bg-green-600 text-white text-center py-6 rounded-lg shadow-md hover:bg-green-700" data-filter="pas urgent" data-type="urgence">
+            <div class="text-3xl font-bold">{{ $commandes->where('urgence', 'pas urgent')->count() }}</div>
+            <div class="text-lg">Pas urgent</div>
         </div>
-        <div class="filter-btn bg-yellow-600 text-white text-center py-6 rounded-lg shadow-md hover:bg-yellow-700" data-filter="moyennement urgent" data-type="urgence">
-            <div class="text-3xl font-bold">{{ $commandes->where('urgence', 'moyennement urgent')->count() }}</div>
-            <div class="text-lg">Moyennement urgente(s)</div>
+        <div class="filter-btn bg-yellow-600 text-white text-center py-6 rounded-lg shadow-md hover:bg-yellow-700" data-filter="peu urgent" data-type="urgence">
+            <div class="text-3xl font-bold">{{ $commandes->where('urgence', 'peu urgent')->count() }}</div>
+            <div class="text-lg">Peu urgent</div>
         </div>
         <div class="filter-btn bg-orange-600 text-white text-center py-6 rounded-lg shadow-md hover:bg-orange-700" data-filter="urgent" data-type="urgence">
             <div class="text-3xl font-bold">{{ $commandes->where('urgence', 'urgent')->count() }}</div>
-            <div class="text-lg">Urgente(s)</div>
+            <div class="text-lg">Urgent</div>
         </div>
         <div class="filter-btn bg-red-600 text-white text-center py-6 rounded-lg shadow-md hover:bg-red-700" data-filter="très urgent" data-type="urgence">
             <div class="text-3xl font-bold">{{ $commandes->where('urgence', 'très urgent')->count() }}</div>
-            <div class="text-lg">Très urgente(s)</div>
+            <div class="text-lg">Très urgent</div>
         </div>
     </div>
 
@@ -162,12 +162,14 @@
             // Toggle le filtre (ajouter/retirer)
             if (activeFilters[filterType].has(filterValue)) {
                 activeFilters[filterType].delete(filterValue);
-                this.classList.remove('ring-4', 'ring-blue-500'); // Retirer l'indication visuelle
+                this.classList.remove('ring-4', 'ring-blue-500');
             } else {
                 activeFilters[filterType].add(filterValue);
-                this.classList.add('ring-4', 'ring-blue-500'); // Ajouter l'indication visuelle
+                this.classList.add('ring-4', 'ring-blue-500');
             }
             
+            // Pour le débogage
+            console.log('Active filters:', activeFilters);
             applyFilters();
         });
     });
@@ -180,7 +182,9 @@
             const etat = row.getAttribute('data-etat').toLowerCase();
             const urgence = row.getAttribute('data-urgence').toLowerCase();
             
-            // Une ligne est visible si elle correspond à TOUS les types de filtres actifs
+            // Pour le débogage
+            console.log('Row data:', { lieux, etat, urgence });
+            
             let shouldShow = true;
 
             // Vérifier les filtres de lieu
@@ -194,7 +198,7 @@
             // Vérifier les filtres d'état
             if (activeFilters.etat.size > 0) {
                 const etatMatch = Array.from(activeFilters.etat).some(etatFilter => 
-                    etat.includes(etatFilter)
+                    etat === etatFilter // Changement ici : utilisation de l'égalité stricte
                 );
                 if (!etatMatch) shouldShow = false;
             }
@@ -202,7 +206,7 @@
             // Vérifier les filtres d'urgence
             if (activeFilters.urgence.size > 0) {
                 const urgenceMatch = Array.from(activeFilters.urgence).some(urgenceFilter => 
-                    urgence.includes(urgenceFilter)
+                    urgence === urgenceFilter // Changement ici : utilisation de l'égalité stricte
                 );
                 if (!urgenceMatch) shouldShow = false;
             }
@@ -231,6 +235,7 @@
             row.style.display = '';
         });
     });
-</script>
+    </script>
+</div>
 
 @endsection
