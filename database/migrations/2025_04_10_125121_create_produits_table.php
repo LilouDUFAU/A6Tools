@@ -14,8 +14,8 @@ return new class extends Migration
         Schema::create('produits', function (Blueprint $table) {
             $table->id();
             $table->string('nom'); // Nom du produit
-            $table->text('description'); // Description du produit
-            $table->text('caracteristiques_techniques'); // Caractéristiques techniques du produit
+            $table->text('description')->nullable(); // Description du produit
+            $table->text('caracteristiques_techniques')->nullable(); // Caractéristiques techniques du produit
             $table->string('reference')->unique(); // Référence unique pour le produit
             $table->decimal('prix', 8, 2); // Prix du produit
             $table->string('image')->nullable(); // URL de l'image du produit (optionnel)
