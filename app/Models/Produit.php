@@ -18,8 +18,6 @@ class Produit extends Model
         'description',
         'caracteristiques_techniques',
         'reference',
-        'quantite_stock',
-        'quantite_client',
         'prix',
         'image',
         'created_at',
@@ -38,7 +36,7 @@ class Produit extends Model
     //un produit peut etre contenu dans plusieurs commandes
     public function commandes()
     {
-        return $this->belongsToMany(Commande::class, 'commande_produit');
+        return $this->belongsToMany(Commande::class, 'commande_produit')->withPivot('quantite', 'quantite_stock', 'quantite_client');
     }
 
     //un produit peut etre fourni par un fournisseur
