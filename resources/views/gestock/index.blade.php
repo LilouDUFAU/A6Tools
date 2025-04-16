@@ -147,15 +147,32 @@
 </div>
 
 <script>
+    // Objet pour stocker l'état des filtres actifs
+    let activeFilters = {
+        lieu: new Set(),
+        etat: new Set(),
+        urgence: new Set()
+    };
+
     document.querySelectorAll('.filter-btn').forEach(button => {
         button.addEventListener('click', function() {
-            const filterValue = this.getAttribute('data-filter').toLowerCase(); // Convertir en minuscule
+            const filterValue = this.getAttribute('data-filter').toLowerCase();
             const filterType = this.getAttribute('data-type');
-            filterTable(filterValue, filterType);
+            
+            // Toggle le filtre (ajouter/retirer)
+            if (activeFilters[filterType].has(filterValue)) {
+                activeFilters[filterType].delete(filterValue);
+                this.classList.remove('ring-4', 'ring-blue-500'); // Retirer l'indication visuelle
+            } else {
+                activeFilters[filterType].add(filterValue);
+                this.classList.add('ring-4', 'ring-blue-500'); // Ajouter l'indication visuelle
+            }
+            
+            applyFilters();
         });
     });
 
-    function filterTable(filterValue, filterType) {
+    function applyFilters() {
         const rows = document.querySelectorAll('.commandes-row');
         
         rows.forEach(row => {
@@ -163,29 +180,55 @@
             const etat = row.getAttribute('data-etat').toLowerCase();
             const urgence = row.getAttribute('data-urgence').toLowerCase();
             
-            // Vérifier si la ligne correspond au filtre sélectionné
-            let isMatch = false;
-            if (filterType === 'lieu' && lieux.includes(filterValue)) {
-                isMatch = true;
-            } else if (filterType === 'etat' && etat.includes(filterValue)) {
-                isMatch = true;
-            } else if (filterType === 'urgence' && urgence.includes(filterValue)) {
-                isMatch = true;
+            // Une ligne est visible si elle correspond à TOUS les types de filtres actifs
+            let shouldShow = true;
+
+            // Vérifier les filtres de lieu
+            if (activeFilters.lieu.size > 0) {
+                const lieuMatch = Array.from(activeFilters.lieu).some(lieu => 
+                    lieux.includes(lieu)
+                );
+                if (!lieuMatch) shouldShow = false;
             }
 
-            // Appliquer ou supprimer le filtre sur la ligne
-            if (isMatch) {
-                row.style.display = '';  // Afficher la ligne
-            } else {
-                row.style.display = 'none';  // Cacher la ligne
+            // Vérifier les filtres d'état
+            if (activeFilters.etat.size > 0) {
+                const etatMatch = Array.from(activeFilters.etat).some(etatFilter => 
+                    etat.includes(etatFilter)
+                );
+                if (!etatMatch) shouldShow = false;
             }
+
+            // Vérifier les filtres d'urgence
+            if (activeFilters.urgence.size > 0) {
+                const urgenceMatch = Array.from(activeFilters.urgence).some(urgenceFilter => 
+                    urgence.includes(urgenceFilter)
+                );
+                if (!urgenceMatch) shouldShow = false;
+            }
+
+            // Appliquer la visibilité
+            row.style.display = shouldShow ? '' : 'none';
         });
     }
 
     document.getElementById('resetFilters').addEventListener('click', function() {
+        // Réinitialiser tous les filtres actifs
+        activeFilters = {
+            lieu: new Set(),
+            etat: new Set(),
+            urgence: new Set()
+        };
+        
+        // Retirer les indications visuelles des boutons
+        document.querySelectorAll('.filter-btn').forEach(button => {
+            button.classList.remove('ring-4', 'ring-blue-500');
+        });
+        
+        // Afficher toutes les lignes
         const rows = document.querySelectorAll('.commandes-row');
         rows.forEach(row => {
-            row.style.display = '';  // Afficher toutes les lignes
+            row.style.display = '';
         });
     });
 </script>
