@@ -18,8 +18,8 @@ return new class extends Migration
             $table->enum('etat', ['en_attente','en_cours', 'terminée', 'annulée']); // Etat de la commande
             $table->enum('urgence', ['pas urgent', 'peu urgent', 'moyennement urgent', 'urgent', 'très urgent']); // Urgence
             $table->text('remarque')->nullable(); // Remarques sur la commande
-            $table->date('date_livraison_fournisseur'); // Date de livraison fournisseur
-            $table->date('date_installation_prevue'); // Date d'installation prévue
+            $table->date('date_livraison_fournisseur')->nullable(); // Date de livraison fournisseur
+            $table->date('date_installation_prevue')->nullable(); // Date d'installation prévue
             $table->unsignedBigInteger('client_id')->nullable(); // Clé étrangère vers la table clients
             $table->unsignedBigInteger('employe_id'); // Clé étrangère vers la table users
             $table->timestamps(); // created_at, updated_at
