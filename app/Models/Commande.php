@@ -75,6 +75,6 @@ class Commande extends Model
     //une commande peut contenir plusieurs produits
     public function produits()
     {
-        return $this->belongsToMany(Produit::class, 'commande_produit');
+        return $this->belongsToMany(Produit::class, 'commande_produit')->withPivot('quantite', 'quantite_stock', 'quantite_client')->withTimestamps();
     }
 }
