@@ -51,9 +51,9 @@
                         @endphp
 
                         @if($stockProduitCommande)
-                            <p><strong>Site de stockage lié à cette commande :</strong> {{ $stockProduitCommande->lieux ?? '/' }}</p>
+                            <p><strong>Site lié à cette commande :</strong> {{ $stockProduitCommande->lieux ?? '/' }}</p>
                         @else
-                            <p>Aucun stock associé à ce produit pour cette commande.</p>
+                            <p>Aucun site associé à ce produit pour cette commande.</p>
                         @endif
 
                     </li>
