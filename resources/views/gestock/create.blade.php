@@ -51,7 +51,7 @@
             <div class="mb-4">
                 <label for="stock_id" class="block text-sm font-semibold text-gray-700">Choisir un site</label>
                 <select id="stock_id" name="stock_id" class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1" required>
-                    <option value="">-- Sélectionner un stock --</option>
+                    <option value="">-- Sélectionner un site --</option>
                     @foreach (\App\Models\Stock::all() as $stock)
                         <option value="{{ $stock->id }}">{{ ucfirst($stock->lieux) }}</option>
                     @endforeach
@@ -155,8 +155,8 @@
                         <input type="number" id="produits_0_prix" name="produits[0][prix]" step="0.01" class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1">
                     </div>
                     <div class="mb-4">
-                        <label for="produits_0_image" class="block text-sm font-semibold text-gray-700">Image</label>
-                        <input type="file" id="produits_0_image" name="produits[0][image]" class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1">
+                        <label for="produits_0_image" class="block text-sm font-semibold text-gray-700">Lien produit fournisseur</label>
+                        <input type="text" id="produits_0_lien_produit_fournisseur" name="produits[0][lien_produit_fournisseur]" class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1">
                     </div>
                     <div class="mb-4">
                         <label for="produits_0_fournisseur_nom" class="block text-sm font-semibold text-gray-700">Nom du Fournisseur</label>
@@ -228,8 +228,8 @@
             <input type="number" id="produits_${productCount}_prix" name="produits[${productCount}][prix]" step="0.01" class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1">
             </div>
             <div class="mb-4">
-            <label for="produits_${productCount}_image" class="block text-sm font-semibold text-gray-700">Image</label>
-            <input type="file" id="produits_${productCount}_image" name="produits[${productCount}][image]" class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1">
+            <label for="produits_${productCount}_lien_produit_fournisseur" class="block text-sm font-semibold text-gray-700">Lien produit fournisseur</label>
+            <input type="text" id="produits_${productCount}_lien_produit_fournisseur" name="produits[${productCount}][lien_produit_fournisseur]" class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1">
             </div>
             <div class="mb-4">
             <label for="produits_${productCount}_fournisseur_nom" class="block text-sm font-semibold text-gray-700">Nom du Fournisseur</label>
