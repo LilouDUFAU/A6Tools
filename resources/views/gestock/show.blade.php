@@ -28,6 +28,15 @@
                         <p><strong>Quantité stock :</strong> {{ $produit->pivot->quantite_stock ?? 0 }}</p>
                         <p><strong>Quantité client :</strong> {{ $produit->pivot->quantite_client ?? 0 }}</p>
                         <p><strong>Prix unitaire :</strong> {{ $produit->prix ?? '0' }} €</p>
+                        <p><strong>Lien produit fournisseur :</strong> 
+                            @if(!empty($produit->lien_produit_fournisseur))
+                                <a href="{{ $produit->lien_produit_fournisseur }}" target="_blank" class="text-blue-600 hover:underline">
+                                    Voir le produit
+                                </a>
+                            @else
+                                /
+                            @endif
+                        </p>
                         @if($produit->fournisseurs->isNotEmpty())
                             <p><strong>Fournisseurs :</strong></p>
                             <ul class="list-disc pl-6">
