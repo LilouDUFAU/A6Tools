@@ -110,7 +110,7 @@
                             ->distinct()
                             ->pluck('stocks.lieux');
                     @endphp
-                    <tr class="commandes-row border-t hover:bg-gray-50" data-lieux="{{ $lieuxStockCommande->implode(', ') }}" data-etat="{{ $commande->etat }}" data-urgence="{{ $commande->urgence }}">
+                    <tr class="commandes-row border-t hover:bg-gray-50" data-lieux="{{ $lieuxStockCommande->implode(', ') }}" data-etat="{{ $commande->etat }}" data-urgence="{{ strtolower($commande->urgence) }}"> <!-- Ajout de strtolower() -->
                         <td class="py-3 px-4">{{ $commande->id }}</td>
                         <td class="py-3 px-4">{{ $commande->intitule }}</td>
                         <td class="py-3 px-4 text-center">{{ $commande->client ? $commande->client->nom : '/' }}</td>
@@ -133,7 +133,6 @@
                         </td>
                         <td class="py-3 px-4 space-x-2">
                             <a href="{{ route('commande.show', $commande->id) }}" class="text-green-700 hover:underline">Voir</a>
-                            <!-- <a href="{{ route('commande.edit', $commande->id) }}" class="text-yellow-700 hover:underline">Modifier</a> -->
                             <form action="{{ route('commande.destroy', $commande->id) }}" method="POST" class="inline">
                                 @csrf @method('DELETE')
                                 <button type="submit" onclick="return confirm('Confirmer la suppression ?')" class="text-red-700 hover:underline">Supprimer</button>
@@ -150,7 +149,7 @@
 <script>
     document.querySelectorAll('.filter-btn').forEach(button => {
         button.addEventListener('click', function() {
-            const filterValue = this.getAttribute('data-filter');
+            const filterValue = this.getAttribute('data-filter').toLowerCase(); // Convertir en minuscule
             const filterType = this.getAttribute('data-type');
             filterTable(filterValue, filterType);
         });
@@ -164,19 +163,21 @@
             const etat = row.getAttribute('data-etat').toLowerCase();
             const urgence = row.getAttribute('data-urgence').toLowerCase();
             
+            // Vérifier si la ligne correspond au filtre sélectionné
             let isMatch = false;
-            if (filterType === 'lieu' && lieux.includes(filterValue.toLowerCase())) {
+            if (filterType === 'lieu' && lieux.includes(filterValue)) {
                 isMatch = true;
-            } else if (filterType === 'etat' && etat.includes(filterValue.toLowerCase())) {
+            } else if (filterType === 'etat' && etat.includes(filterValue)) {
                 isMatch = true;
-            } else if (filterType === 'urgence' && urgence.includes(filterValue.toLowerCase())) {
+            } else if (filterType === 'urgence' && urgence.includes(filterValue)) {
                 isMatch = true;
             }
 
+            // Appliquer ou supprimer le filtre sur la ligne
             if (isMatch) {
-                row.style.display = '';  
+                row.style.display = '';  // Afficher la ligne
             } else {
-                row.style.display = 'none';  
+                row.style.display = 'none';  // Cacher la ligne
             }
         });
     }
@@ -184,7 +185,7 @@
     document.getElementById('resetFilters').addEventListener('click', function() {
         const rows = document.querySelectorAll('.commandes-row');
         rows.forEach(row => {
-            row.style.display = '';  
+            row.style.display = '';  // Afficher toutes les lignes
         });
     });
 </script>
