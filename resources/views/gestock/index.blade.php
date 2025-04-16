@@ -5,7 +5,7 @@
 <div class="min-h-screen bg-gray-50">
     <h1 class="text-3xl font-bold mb-8 px-4 pt-10 text-gray-800">Tableau de Bord des Commandes</h1>
 
-    <h2 class="text-2xl font-semibold px-4 py-2 text-gray-700">Commandes par Lieu de Stockage</h2>
+    <h2 class="text-2xl font-semibold px-4 py-2 text-gray-700">Commandes par Site</h2>
     @php
         use Illuminate\Support\Facades\DB;
 
@@ -98,7 +98,7 @@
                         <th class="py-3 px-4">#</th>
                         <th class="py-3 px-4">Intitulé</th>
                         <th class="py-3 px-4">Client</th>
-                        <th class="py-3 px-4">Stock</th>
+                        <th class="py-3 px-4">Site</th>
                         <th class="py-3 px-4">Prix Total</th>
                         <th class="py-3 px-4">État</th>
                         <th class="py-3 px-4">Urgence</th>
