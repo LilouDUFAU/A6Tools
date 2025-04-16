@@ -136,10 +136,11 @@
                             </span>
                         </td>
                         <td class="py-3 px-4 space-x-2">
-                            <a href="{{ route('commande.show', $commande->id) }}" class="text-green-700 hover:underline">Voir</a>
                             <form action="{{ route('commande.destroy', $commande->id) }}" method="POST" class="inline">
                                 @csrf @method('DELETE')
-                                <button type="submit" onclick="return confirm('Confirmer la suppression ?')" class="text-red-700 hover:underline">Supprimer</button>
+                                <button type="button" class="text-green-700 hover:underline font-semibold" onclick="window.location.href='{{ route('commande.show', $commande->id) }}'">Détails</button>
+                                <button type="button" class="text-yellow-700 hover:underline font-semibold" onclick="window.location.href='{{ route('commande.edit', $commande->id) }}'">Modifier</button>
+                                <button type="submit" onclick="return confirm('Confirmer la suppression ?')" class="text-red-700 hover:underline font-semibold">Supprimer</button>
                             </form>
                         </td>
                     </tr>
