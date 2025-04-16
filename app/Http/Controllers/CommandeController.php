@@ -41,7 +41,6 @@ class CommandeController extends Controller
      */
     public function store(Request $request)
     {
-        // dd($request->all());
         $validated = $request->validate([
             'intitule' => 'required|string|max:255',
             'prix_total' => 'required|numeric',
@@ -85,10 +84,11 @@ class CommandeController extends Controller
             // Crée ou récupère un stock avec ce lieu
             $stock = Stock::firstOrCreate(['lieu' => $lieu]);
             
-            // Associe le stock à la commande
-            $commande->stocks()->syncWithoutDetaching([$stock->id]);
+            // Associe le stock à la commande, si le stock existe
+            if ($stock) {
+                $commande->stocks()->syncWithoutDetaching([$stock->id]);
+            }
         }
-
 
         // Ajouter les produits et leurs fournisseurs
         foreach ($request->input('produits', []) as $produitData) {
@@ -112,8 +112,6 @@ class CommandeController extends Controller
                     'nom' => $produitData['nom'],
                     'description' => $produitData['description'] ?? '',
                     'caracteristiques_techniques' => $produitData['caracteristiques_techniques'] ?? '',
-                    'quantite_stock' => $produitData['quantite_stock'] ?? 0,
-                    'quantite_client' => $produitData['quantite'] ?? 0,
                     'prix' => $produitData['prix'] ?? 0,
                     'image' => $produitData['image'] ?? null,
                 ]
@@ -123,53 +121,43 @@ class CommandeController extends Controller
                 'nom' => $produitData['nom'],
                 'description' => $produitData['description'] ?? '',
                 'caracteristiques_techniques' => $produitData['caracteristiques_techniques'] ?? '',
-                'quantite_stock' => $produitData['quantite_stock'] ?? 0,
-                'quantite_client' => $produitData['quantite'] ?? 0,
                 'prix' => $produitData['prix'] ?? 0,
                 'image' => $produitData['image'] ?? null,
             ])->save();
 
 
-            $quantite_stock = $produit->quantite_stock;
-            $quantite_client = $produit->quantite_client; // Quantité demandée par le client
-
-            $quantite_totale = $quantite_stock + $quantite_client; // Quantité totale
 
             // Lier le produit au fournisseur
             if ($fournisseur) {
                 $produit->fournisseurs()->syncWithoutDetaching([$fournisseur->id]);
             }
 
-            // Lier le produit au stock
-            // if ($stock) {
-            //     $produit->stocks()->syncWithoutDetaching([$stock->id]);
-            // }
+            // Attacher le produit à la commande via la table pivot `commande_produit`
+            $commande->produits()->attach($produit->id, [
+                'quantite' => $produitData['quantite_stock'] + $produitData['quantite_client'],
+                'quantite_stock' => $produitData['quantite_stock'],
+                'quantite_client' => $produitData['quantite_client'],
+            ]);
+
+            // Calculer la quantité totale (stock + client) et mettre à jour produit_stock
+            $quantite_totale = $produitData['quantite_stock'] + $produitData['quantite_client'];
 
             if ($request->has('stock_id')) {
                 $stockId = $request->input('stock_id');
-                
-                // Créer une nouvelle ligne dans la table produit_stock sans utiliser un modèle
                 DB::table('produit_stock')->insert([
                     'produit_id' => $produit->id,
                     'stock_id' => $stockId,
                     'commande_id' => $commande->id,
                     'quantite' => $quantite_totale, // Quantité totale (stock + quantité commandée)
-                    'created_at' => now(),          // Horodatage de la création
-                    'updated_at' => now(),          // Horodatage de la mise à jour
+                    'created_at' => now(), // Horodatage de la création
+                    'updated_at' => now(), // Horodatage de la mise à jour
                 ]);
             }
-
-
-            // Attacher le produit à la commande via la table pivot `commande_produit`
-            $commande->produits()->attach($produit->id, [
-                'quantite' => $quantite_totale // Quantité totale
-            ]);
         }
 
         // Retourner à la liste des commandes avec un message de succès
         return redirect()->route('commande.index')->with('success', 'Commande créée avec succès.');
     }
-
 
     /**
      * Affiche les détails d'une commande.
@@ -254,35 +242,35 @@ class CommandeController extends Controller
                     'nom' => $produitData['nom'],
                     'description' => $produitData['description'] ?? '',
                     'caracteristiques_techniques' => $produitData['caracteristiques_techniques'] ?? '',
-                    'quantite_stock' => $produitData['quantite_stock'] ?? 0,
-                    'quantite_client' => $produitData['quantite'] ?? 0,
                     'prix' => $produitData['prix'] ?? 0,
                     'image' => $produitData['image'] ?? null,
                 ]
             );
-
-            $quantite_stock = $produit->quantite_stock;
-            $quantite_client = $produit->quantite_client; // Quantité demandée par le client
-
-            $quantite_totale = $quantite_stock + $quantite_client; // Quantité totale
 
             // Lier le produit au fournisseur
             if ($fournisseur) {
                 $produit->fournisseurs()->syncWithoutDetaching([$fournisseur->id]);
             }
 
-            // Créer une nouvelle ligne dans la table produit_stock sans utiliser un modèle
+            // Attacher le produit à la commande via la table pivot `commande_produit`
+            $commande->produits()->attach($produit->id, [
+                'quantite' => $produitData['quantite_stock'] + $produitData['quantite_client'],
+                'quantite_stock' => $produitData['quantite_stock'],
+                'quantite_client' => $produitData['quantite_client'],
+            ]);
+
+            // Calculer la quantité totale (stock + client) et mettre à jour produit_stock
+            $quantite_totale = $produitData['quantite_stock'] + $produitData['quantite_client'];
+
             DB::table('produit_stock')->updateOrInsert(
-                ['produit_id' => $produit->id, 'commande_id' => $commande->id],
                 [
+                    'produit_id' => $produit->id,
                     'stock_id' => $stock->id,
-                    'quantite' => $quantite_totale,
-                    'updated_at' => now(),
+                ],
+                [
+                    'quantite' => DB::raw("quantite + $quantite_totale") // On incrémente la quantité totale dans produit_stock
                 ]
             );
-
-            // Attacher le produit à la commande via la table pivot `commande_produit`
-            $commande->produits()->syncWithoutDetaching([$produit->id => ['quantite' => $quantite_totale]]);
         }
 
         return redirect()->route('commande.index')->with('success', 'Commande mise à jour avec succès.');
