@@ -17,8 +17,6 @@ return new class extends Migration
             $table->text('description'); // Description du produit
             $table->text('caracteristiques_techniques'); // Caractéristiques techniques du produit
             $table->string('reference')->unique(); // Référence unique pour le produit
-            $table->integer('quantite_stock'); // Quantité disponible en stock
-            $table->integer('quantite_client'); // Quantité demandée par les clients
             $table->decimal('prix', 8, 2); // Prix du produit
             $table->string('image')->nullable(); // URL de l'image du produit (optionnel)
             $table->timestamps(); // created_at, updated_at
