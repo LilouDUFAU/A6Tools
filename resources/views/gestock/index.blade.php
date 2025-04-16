@@ -56,7 +56,7 @@
     </div>
 
     <h2 class="text-2xl font-semibold px-4 py-2 text-gray-700">Nombre de commandes par urgence</h2>
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8 px-4">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6 mb-8 px-4">
         <div class="filter-btn bg-green-600 text-white text-center py-6 rounded-lg shadow-md hover:bg-green-700" data-filter="pas urgent" data-type="urgence">
             <div class="text-3xl font-bold">{{ $commandes->where('urgence', 'pas urgent')->count() }}</div>
             <div class="text-lg">Pas urgent</div>
@@ -64,6 +64,10 @@
         <div class="filter-btn bg-yellow-600 text-white text-center py-6 rounded-lg shadow-md hover:bg-yellow-700" data-filter="peu urgent" data-type="urgence">
             <div class="text-3xl font-bold">{{ $commandes->where('urgence', 'peu urgent')->count() }}</div>
             <div class="text-lg">Peu urgent</div>
+        </div>
+        <div class="filter-btn bg-amber-600 text-white text-center py-6 rounded-lg shadow-md hover:bg-amber-700" data-filter="moyennement urgent" data-type="urgence">
+            <div class="text-3xl font-bold">{{ $commandes->where('urgence', 'moyennement urgent')->count() }}</div>
+            <div class="text-lg">moyennement urgent</div>
         </div>
         <div class="filter-btn bg-orange-600 text-white text-center py-6 rounded-lg shadow-md hover:bg-orange-700" data-filter="urgent" data-type="urgence">
             <div class="text-3xl font-bold">{{ $commandes->where('urgence', 'urgent')->count() }}</div>
