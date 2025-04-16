@@ -47,9 +47,9 @@
 
         <!-- Partie Stock -->
         <div class="border-l-4 border-green-600 pl-4">
-            <h2 class="text-2xl font-bold text-gray-800 mb-4">Stock</h2>
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Magasin</h2>
             <div class="mb-4">
-                <label for="stock_id" class="block text-sm font-semibold text-gray-700">Choisir un Stock</label>
+                <label for="stock_id" class="block text-sm font-semibold text-gray-700">Choisir un site</label>
                 <select id="stock_id" name="stock_id" class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1" required>
                     <option value="">-- Sélectionner un stock --</option>
                     @foreach (\App\Models\Stock::all() as $stock)
