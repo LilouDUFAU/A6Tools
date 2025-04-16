@@ -113,7 +113,7 @@ class CommandeController extends Controller
                     'description' => $produitData['description'] ?? '',
                     'caracteristiques_techniques' => $produitData['caracteristiques_techniques'] ?? '',
                     'prix' => $produitData['prix'] ?? 0,
-                    'image' => $produitData['image'] ?? null,
+                    'lien_produit_fournisseur' => $produitData['lien_produit_fournisseur'] ?? null,
                 ]
             );
 
@@ -122,7 +122,7 @@ class CommandeController extends Controller
                 'description' => $produitData['description'] ?? '',
                 'caracteristiques_techniques' => $produitData['caracteristiques_techniques'] ?? '',
                 'prix' => $produitData['prix'] ?? 0,
-                'image' => $produitData['image'] ?? null,
+                'lien_produit_fournisseur' => $produitData['lien_produit_fournisseur'] ?? null,
             ])->save();
 
 
