@@ -45,6 +45,20 @@
             </div>
         </div>
 
+        <!-- Partie Stock -->
+        <div class="border-l-4 border-green-600 pl-4">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Stock</h2>
+            <div class="mb-4">
+                <label for="stock_id" class="block text-sm font-semibold text-gray-700">Choisir un Stock</label>
+                <select id="stock_id" name="stock_id" class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1" required>
+                    <option value="">-- Sélectionner un stock --</option>
+                    @foreach (\App\Models\Stock::all() as $stock)
+                        <option value="{{ $stock->id }}">{{ ucfirst($stock->lieux) }}</option>
+                    @endforeach
+                </select>
+            </div>
+        </div>
+
         <!-- Partie Client -->
         <div class="border-l-4 border-green-600 pl-4">
             <h2 class="text-2xl font-bold text-gray-800 mb-4">Client</h2>
@@ -129,7 +143,7 @@
                         <input type="text" id="produits_0_reference" name="produits[0][reference]" class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1">
                     </div>
                     <div class="mb-4">
-                        <label for="produits_0_quantite_stock" class="block text-sm font-semibold text-gray-700">Quantité en Stock</label>
+                        <label for="produits_0_quantite_stock" class="block text-sm font-semibold text-gray-700">Quantité Stock</label>
                         <input type="number" id="produits_0_quantite_stock" name="produits[0][quantite_stock]" class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1">
                     </div>
                     <div class="mb-4">
