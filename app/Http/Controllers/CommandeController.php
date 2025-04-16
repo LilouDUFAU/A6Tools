@@ -185,10 +185,20 @@ class CommandeController extends Controller
      */
     public function edit(string $id)
     {
-        $commande = Commande::findOrFail($id);
+        // Récupérer la commande avec ses produits et son client
+        $commande = Commande::with(['produits', 'client'])->findOrFail($id);
+        
+        // Récupérer tous les clients et stocks disponibles
         $clients = Client::all();
+        $stocks = Stock::all(); // Tous les stocks
 
-        return view('gestock.edit', compact('commande', 'clients'));
+        // Récupérer les autres données pour le formulaire
+        $types = Client::TYPES;
+        $etats = Commande::ETATS;
+        $urgences = Commande::URGENCES;
+
+        // Renvoyer la vue avec les données nécessaires
+        return view('gestock.edit', compact('commande', 'clients', 'stocks', 'types', 'etats', 'urgences'));
     }
 
     /**
@@ -196,23 +206,84 @@ class CommandeController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        // Ajouter l'ID de l'employé connecté si il n'est pas dans la demande
         $validated = $request->validate([
             'intitule' => 'required|string|max:255',
             'prix_total' => 'required|numeric',
             'etat' => 'required|string|max:255',
             'remarque' => 'nullable|string',
-            'urgence' => 'nullable|boolean',
+            'urgence' => 'nullable|string|max:255',
             'date_livraison_fournisseur' => 'nullable|date',
             'date_installation_prevue' => 'nullable|date',
             'client_id' => 'nullable|exists:clients,id',
         ]);
 
-        // Ajouter l'ID de l'employé connecté (auth()->user()->id)
         $validated['employe_id'] = auth()->user()->id;
 
+        // Trouver la commande existante
         $commande = Commande::findOrFail($id);
         $commande->update($validated);
+
+        // Récupérer et associer un lieu de stockage
+        $lieu = $request->input('lieu');
+        $stock = null;
+        if (!empty($lieu)) {
+            $stock = Stock::firstOrCreate(['lieu' => $lieu]);
+            // Associe le stock à la commande
+            $commande->stocks()->syncWithoutDetaching([$stock->id]);
+        }
+
+        // Mettre à jour les produits associés à la commande
+        foreach ($request->input('produits', []) as $produitData) {
+            // Mettre à jour ou ajouter un fournisseur
+            $fournisseur = null;
+            if (!empty($produitData['fournisseur']['nom'])) {
+                $fournisseur = Fournisseur::firstOrCreate(
+                    ['nom' => $produitData['fournisseur']['nom']],
+                    [
+                        'email' => $produitData['fournisseur']['email'] ?? null,
+                        'telephone' => $produitData['fournisseur']['telephone'] ?? null,
+                        'adresse_postale' => $produitData['fournisseur']['adresse_postale'] ?? null,
+                    ]
+                );
+            }
+
+            // Mettre à jour ou créer un produit
+            $produit = Produit::firstOrCreate(
+                ['reference' => $produitData['reference']],
+                [
+                    'nom' => $produitData['nom'],
+                    'description' => $produitData['description'] ?? '',
+                    'caracteristiques_techniques' => $produitData['caracteristiques_techniques'] ?? '',
+                    'quantite_stock' => $produitData['quantite_stock'] ?? 0,
+                    'quantite_client' => $produitData['quantite'] ?? 0,
+                    'prix' => $produitData['prix'] ?? 0,
+                    'image' => $produitData['image'] ?? null,
+                ]
+            );
+
+            $quantite_stock = $produit->quantite_stock;
+            $quantite_client = $produit->quantite_client; // Quantité demandée par le client
+
+            $quantite_totale = $quantite_stock + $quantite_client; // Quantité totale
+
+            // Lier le produit au fournisseur
+            if ($fournisseur) {
+                $produit->fournisseurs()->syncWithoutDetaching([$fournisseur->id]);
+            }
+
+            // Créer une nouvelle ligne dans la table produit_stock sans utiliser un modèle
+            DB::table('produit_stock')->updateOrInsert(
+                ['produit_id' => $produit->id, 'commande_id' => $commande->id],
+                [
+                    'stock_id' => $stock->id,
+                    'quantite' => $quantite_totale,
+                    'updated_at' => now(),
+                ]
+            );
+
+            // Attacher le produit à la commande via la table pivot `commande_produit`
+            $commande->produits()->syncWithoutDetaching([$produit->id => ['quantite' => $quantite_totale]]);
+        }
 
         return redirect()->route('commande.index')->with('success', 'Commande mise à jour avec succès.');
     }
