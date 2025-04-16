@@ -24,9 +24,9 @@
                     <li class="border-b pb-4">
                         <p><strong>Nom :</strong> {{ $produit->nom ?? '/' }}</p>
                         <p><strong>Référence :</strong> {{ $produit->reference ?? '/' }}</p>
-                        <p><strong>Quantité totale :</strong> {{ ($produit->quantite_stock ?? 0) + ($produit->quantite_client ?? 0) }}</p>
-                        <p><strong>Quantité stock :</strong> {{ $produit->quantite_stock ?? '0' }}</p>
-                        <p><strong>Quantité client :</strong> {{ $produit->quantite_client ?? '0' }}</p>
+                        <p><strong>Quantité totale :</strong> {{ $produit->pivot->quantite ?? 0 }}</p>
+                        <p><strong>Quantité stock :</strong> {{ $produit->pivot->quantite_stock ?? 0 }}</p>
+                        <p><strong>Quantité client :</strong> {{ $produit->pivot->quantite_client ?? 0 }}</p>
                         <p><strong>Prix unitaire :</strong> {{ $produit->prix ?? '0' }} €</p>
                         @if($produit->fournisseurs->isNotEmpty())
                             <p><strong>Fournisseurs :</strong></p>
