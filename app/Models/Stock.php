@@ -17,6 +17,14 @@ class Stock extends Model
         'lieux',
         'created_at',
     ];
+
+    /////////////////////////
+    /// ENUMS définis ici ///
+    /////////////////////////
+    const LIEUX = [
+        'Mont de Marsan',
+        'Aire sur Adour',
+    ];
     
     //////////////////////////////
     //relations entre les tables//
@@ -27,4 +35,5 @@ class Stock extends Model
     {
         return $this->belongsToMany(Produit::class, 'produit_stock');
     }
+    
 }
