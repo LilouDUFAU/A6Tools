@@ -19,7 +19,7 @@ class Produit extends Model
         'caracteristiques_techniques',
         'reference',
         'prix',
-        'image',
+        'lien_produit_fournisseur',
         'created_at',
     ];
     
