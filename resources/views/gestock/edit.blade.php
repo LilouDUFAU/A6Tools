@@ -60,9 +60,16 @@
             <h2 class="text-2xl font-bold text-gray-800 mb-4">Magasin</h2>
             <div class="mb-4">
                 <label for="stock_id" class="block text-sm font-semibold text-gray-700">Choisir un site</label>
+                @php
+                    $stockProduitCommande = DB::table('produit_stock')
+                        ->join('stocks', 'produit_stock.stock_id', '=', 'stocks.id')
+                        ->where('produit_stock.commande_id', $commande->id)
+                        ->select('stocks.id')
+                        ->first();
+                @endphp
                 <select id="stock_id" name="stock_id" class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1" required>
                     @foreach ($stocks as $stock)
-                        <option value="{{ $stock->id }}" {{ $stock->id == $commande->stock_id ? 'selected' : '' }}>{{ $stock->lieux }}</option>
+                        <option value="{{ $stock->id }}" {{ $stock->id == ($stockProduitCommande->id ?? $commande->stock_id) ? 'selected' : '' }}>{{ $stock->lieux }}</option>
                     @endforeach
                 </select>
             </div>
