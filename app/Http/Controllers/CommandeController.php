@@ -317,6 +317,14 @@ class CommandeController extends Controller
     public function destroy(string $id)
     {
         $commande = Commande::findOrFail($id);
+
+        // Détacher tous les produits de la commande (table commande_produit)
+        $commande->produits()->detach();
+
+        // Supprimer les entrées dans produit_stock associées à cette commande
+        DB::table('produit_stock')->where('commande_id', $commande->id)->delete();
+
+        // Supprimer la commande elle-même
         $commande->delete();
 
         return redirect()->route('commande.index')->with('success', 'Commande supprimée avec succès.');
