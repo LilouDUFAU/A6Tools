@@ -30,8 +30,8 @@ class Commande extends Model
     /// ENUMS définis ici ///
     /////////////////////////
     const ETATS = [
-        'en_attente',
-        'en_cours',
+        'en attente',
+        'en cours',
         'terminée',
         'annulée',
     ];
