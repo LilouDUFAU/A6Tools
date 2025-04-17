@@ -41,12 +41,12 @@
             <div class="text-3xl font-bold">{{ $commandes->where('etat', 'terminée')->count() }}</div>
             <div class="text-lg">Terminée(s)</div>
         </div>
-        <div class="filter-btn bg-yellow-600 text-white text-center py-6 rounded-lg shadow-md hover:bg-yellow-700" data-filter="en_cours" data-type="etat">
-            <div class="text-3xl font-bold">{{ $commandes->where('etat', 'en_cours')->count() }}</div>
+        <div class="filter-btn bg-yellow-600 text-white text-center py-6 rounded-lg shadow-md hover:bg-yellow-700" data-filter="en cours" data-type="etat">
+            <div class="text-3xl font-bold">{{ $commandes->where('etat', 'en cours')->count() }}</div>
             <div class="text-lg">En cours</div>
         </div>
-        <div class="filter-btn bg-orange-600 text-white text-center py-6 rounded-lg shadow-md hover:bg-orange-700" data-filter="en_attente" data-type="etat">
-            <div class="text-3xl font-bold">{{ $commandes->where('etat', 'en_attente')->count() }}</div>
+        <div class="filter-btn bg-orange-600 text-white text-center py-6 rounded-lg shadow-md hover:bg-orange-700" data-filter="en attente" data-type="etat">
+            <div class="text-3xl font-bold">{{ $commandes->where('etat', 'en attente')->count() }}</div>
             <div class="text-lg">En attente</div>
         </div>
         <div class="filter-btn bg-red-600 text-white text-center py-6 rounded-lg shadow-md hover:bg-red-700" data-filter="annulé" data-type="etat">
