@@ -7,6 +7,8 @@
     <div class="bg-white shadow rounded p-6 space-y-4">
         <p><strong>Intitulé :</strong> {{ $commande->intitule ?? '/' }}</p>
         <p><strong>Client :</strong> {{ $commande->client?->nom ?? '/' }}</p>
+        <p><strong>Telephone client :</strong> {{ $commande->client?->telephone ?? '/' }}</p>
+        <p><strong>Email client :</strong> {{ $commande->client?->email ?? '/' }}</p>
         <p><strong>Employé :</strong> {{ $commande->employe?->prenom ?? '/' }} {{ $commande->employe?->nom ?? '/' }}</p>
         <p><strong>Prix total :</strong> {{ $commande->prix_total ?? '0' }} €</p>
         <p><strong>État :</strong> {{ $commande->etat ?? '/' }}</p>
@@ -21,6 +23,7 @@
         @if($commande->produits->isNotEmpty())
             <ul class="list-disc pl-6">
                 @foreach($commande->produits as $produit)
+                <h3 class="text-lg font-semibold mb-2 underline">Produit {{ $loop->iteration }}</h3>
                     <li class="border-b pb-4">
                         <p><strong>Nom :</strong> {{ $produit->nom ?? '/' }}</p>
                         <p><strong>Référence :</strong> {{ $produit->reference ?? '/' }}</p>
@@ -37,18 +40,25 @@
                                 /
                             @endif
                         </p>
-                        @if($produit->fournisseurs->isNotEmpty())
-                            <p><strong>Fournisseurs :</strong></p>
+                        @php
+                            $fournisseurProduitCommande = DB::table('fournisseur_produit')
+                                ->join('fournisseurs', 'fournisseur_produit.fournisseur_id', '=', 'fournisseurs.id')
+                                ->where('fournisseur_produit.produit_id', $produit->id)
+                                ->where('fournisseur_produit.commande_id', $commande->id)
+                                ->select('fournisseurs.nom', 'fournisseurs.email')
+                                ->first();
+                        @endphp
+
+                        @if($fournisseurProduitCommande)
+                            <p><strong>Fournisseur :</strong></p>
                             <ul class="list-disc pl-6">
-                                @foreach($produit->fournisseurs as $fournisseur)
-                                    <li>
-                                        <p><strong>Nom :</strong> {{ $fournisseur->nom ?? '/' }}</p>
-                                        <p><strong>Email :</strong> {{ $fournisseur->email ?? '/' }}</p>
-                                    </li>
-                                @endforeach
+                                <li>
+                                    <p><strong>Nom :</strong> {{ $fournisseurProduitCommande->nom ?? '/' }}</p>
+                                    <p><strong>Email :</strong> {{ $fournisseurProduitCommande->email ?? '/' }}</p>
+                                </li>
                             </ul>
                         @else
-                            <p>Aucun fournisseur associé à ce produit.</p>
+                            <p>Aucun fournisseur associé à ce produit pour cette commande.</p>
                         @endif
                         @php
                             $stockProduitCommande = DB::table('produit_stock')
