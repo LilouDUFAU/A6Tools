@@ -37,23 +37,23 @@
 
     <h2 class="text-2xl font-semibold px-4 py-2 text-gray-700">Nombre de commandes par état</h2>
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6 mb-8 px-4">
-        <div class="filter-btn bg-green-600 text-white text-center py-6 rounded-lg shadow-md hover:bg-green-700" data-filter="terminée" data-type="etat">
+        <div class="filter-btn bg-green-600 text-white text-center py-6 rounded-lg shadow-md hover:bg-green-700" data-filter="A faire" data-type="etat">
             <div class="text-3xl font-bold">{{ $commandes->where('etat', 'A faire')->count() }}</div>
             <div class="text-lg">A faire</div>
         </div>
-        <div class="filter-btn bg-yellow-600 text-white text-center py-6 rounded-lg shadow-md hover:bg-yellow-700" data-filter="en cours" data-type="etat">
+        <div class="filter-btn bg-yellow-600 text-white text-center py-6 rounded-lg shadow-md hover:bg-yellow-700" data-filter="Commandé" data-type="etat">
             <div class="text-3xl font-bold">{{ $commandes->where('etat', 'Commandé')->count() }}</div>
             <div class="text-lg">Commandé</div>
         </div>
-        <div class="filter-btn bg-amber-600 text-white text-center py-6 rounded-lg shadow-md hover:bg-amber-700" data-filter="en attente" data-type="etat">
+        <div class="filter-btn bg-amber-600 text-white text-center py-6 rounded-lg shadow-md hover:bg-amber-700" data-filter="Reçu" data-type="etat">
             <div class="text-3xl font-bold">{{ $commandes->where('etat', 'Reçu')->count() }}</div>
             <div class="text-lg">Reçu</div>
         </div>
-        <div class="filter-btn bg-orange-600 text-white text-center py-6 rounded-lg shadow-md hover:bg-orange-700" data-filter="annulé" data-type="etat">
+        <div class="filter-btn bg-orange-600 text-white text-center py-6 rounded-lg shadow-md hover:bg-orange-700" data-filter="Prévenu" data-type="etat">
             <div class="text-3xl font-bold">{{ $commandes->where('etat', 'Prévenu')->count() }}</div>
             <div class="text-lg">Prévenu</div>
         </div>
-        <div class="filter-btn bg-red-600 text-white text-center py-6 rounded-lg shadow-md hover:bg-red-700" data-filter="annulé" data-type="etat">
+        <div class="filter-btn bg-red-600 text-white text-center py-6 rounded-lg shadow-md hover:bg-red-700" data-filter="Délais" data-type="etat">
             <div class="text-3xl font-bold">{{ $commandes->where('etat', 'Délais')->count() }}</div>
             <div class="text-lg">Délais</div>
         </div>
