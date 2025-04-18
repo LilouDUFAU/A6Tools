@@ -84,7 +84,126 @@
     </div>
 
     <button id="resetFilters" class="bg-gray-600 text-white px-6 py-3 rounded-lg shadow-md hover:bg-gray-700 mb-8 mx-4">Réinitialiser les filtres</button>
+    <button id="groupByArticle" class="bg-blue-600 text-white px-6 py-3 rounded-lg shadow-md hover:bg-blue-700 mb-8 mx-4">Grouper par Article</button>
+    <button id="groupByFournisseur" class="bg-purple-600 text-white px-6 py-3 rounded-lg shadow-md hover:bg-purple-700 mb-8 mx-4">Grouper par Fournisseur</button>
 
+    <div id="grouped-fournisseurs" class="hidden mx-auto px-4 sm:px-6 md:px-8 py-6">
+        <h2 class="text-2xl font-semibold text-gray-800 mb-4">Commandes et Articles par Fournisseur</h2>
+        <div class="overflow-x-auto">
+            <table class="min-w-full bg-white shadow-md rounded-lg">
+                <thead>
+                    <tr class="bg-gray-100 text-left text-sm font-semibold text-gray-700">
+                        <th class="py-3 px-4">Fournisseur</th>
+                        <th class="py-3 px-4">Article</th>
+                        <th class="py-3 px-4">Quantité</th>
+                    </tr>
+                </thead>
+                <tbody id="grouped-fournisseurs-table">
+                    @php
+                        $fournisseursData = DB::table('produit_stock')
+                            ->join('produits', 'produit_stock.produit_id', '=', 'produits.id')
+                            ->join('fournisseur_produit', function ($join) {
+                                $join->on('produits.id', '=', 'fournisseur_produit.produit_id')
+                                     ->on('produit_stock.commande_id', '=', 'fournisseur_produit.commande_id');
+                            })
+                            ->join('fournisseurs', 'fournisseur_produit.fournisseur_id', '=', 'fournisseurs.id')
+                            ->select(
+                                'fournisseurs.nom as fournisseur',
+                                'produits.nom as article',
+                                'produit_stock.quantite as quantite'
+                            )
+                            ->orderBy('fournisseurs.nom')
+                            ->get();
+                    @endphp
+                    @foreach($fournisseursData as $data)
+                    <tr class="border-t hover:bg-gray-50">
+                        <td class="py-3 px-4">{{ $data->fournisseur }}</td>
+                        <td class="py-3 px-4">{{ $data->article }}</td>
+                        <td class="py-3 px-4">{{ $data->quantite }}</td>
+                    </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div id="grouped-fournisseurs" class="hidden mx-auto px-4 sm:px-6 md:px-8 py-6">
+        <h2 class="text-2xl font-semibold text-gray-800 mb-4">Commandes et Articles par Fournisseur</h2>
+        <div class="overflow-x-auto">
+            <table class="min-w-full bg-white shadow-md rounded-lg">
+                <thead>
+                    <tr class="bg-gray-100 text-left text-sm font-semibold text-gray-700">
+                        <th class="py-3 px-4">Fournisseur</th>
+                        <th class="py-3 px-4">Commande</th>
+                        <th class="py-3 px-4">Article</th>
+                        <th class="py-3 px-4">Quantité</th>
+                    </tr>
+                </thead>
+                <tbody id="grouped-fournisseurs-table">
+                    @php
+                        $fournisseursData = DB::table('produit_stock')
+                            ->join('produits', 'produit_stock.produit_id', '=', 'produits.id')
+                            ->join('fournisseur_produit', 'produits.id', '=', 'fournisseur_produit.produit_id')
+                            ->join('fournisseurs', 'fournisseur_produit.fournisseur_id', '=', 'fournisseurs.id')
+                            ->select('fournisseurs.nom as fournisseur', 'produit_stock.commande_id as commande', 'produits.nom as article', 'produit_stock.quantite as quantite')
+                            ->orderBy('fournisseurs.nom')
+                            ->get();
+                    @endphp
+                    @foreach($fournisseursData as $data)
+                    <tr class="border-t hover:bg-gray-50">
+                        <td class="py-3 px-4">{{ $data->fournisseur }}</td>
+                        <td class="py-3 px-4">{{ $data->commande }}</td>
+                        <td class="py-3 px-4">{{ $data->article }}</td>
+                        <td class="py-3 px-4">{{ $data->quantite }}</td>
+                    </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('groupByFournisseur').addEventListener('click', function() {
+            const groupedFournisseursSection = document.getElementById('grouped-fournisseurs');
+            groupedFournisseursSection.classList.toggle('hidden');
+        });
+    </script>
+
+    <div id="grouped-articles" class="hidden mx-auto px-4 sm:px-6 md:px-8 py-6">
+        <h2 class="text-2xl font-semibold text-gray-800 mb-4">Quantité Totale par Article</h2>
+        <div class="overflow-x-auto">
+            <table class="min-w-full bg-white shadow-md rounded-lg">
+                <thead>
+                    <tr class="bg-gray-100 text-left text-sm font-semibold text-gray-700">
+                        <th class="py-3 px-4">Article</th>
+                        <th class="py-3 px-4">Quantité Totale</th>
+                    </tr>
+                </thead>
+                <tbody id="grouped-articles-table">
+                    @php
+                        $articlesQuantities = DB::table('produit_stock')
+                            ->join('produits', 'produit_stock.produit_id', '=', 'produits.id')
+                            ->select('produits.nom as article', DB::raw('SUM(produit_stock.quantite) as quantite_totale'))
+                            ->groupBy('produits.nom')
+                            ->get();
+                    @endphp
+                    @foreach($articlesQuantities as $article)
+                    <tr class="border-t hover:bg-gray-50">
+                        <td class="py-3 px-4">{{ $article->article }}</td>
+                        <td class="py-3 px-4">{{ $article->quantite_totale }}</td>
+                    </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('groupByArticle').addEventListener('click', function() {
+            const groupedArticlesSection = document.getElementById('grouped-articles');
+            groupedArticlesSection.classList.toggle('hidden');
+        });
+    </script>
     <div class="mx-auto px-4 sm:px-6 md:px-8 py-6">
         <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
             <h2 class="text-2xl font-semibold text-gray-800">Liste des Commandes</h2>
