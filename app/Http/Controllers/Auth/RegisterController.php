@@ -54,9 +54,7 @@ class RegisterController extends Controller
             'telephone' => ['required', 'string', 'max:14', 'min:8'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
-            'adresse_postale' => ['required', 'string', 'max:255'],
-            'photo' => ['required', 'image', 'mimes:jpeg,png,jpg,gif,svg', 'max:2048'],
-            'date_naissance' => ['required', 'date'],
+            'photo' => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif,svg', 'max:2048'],
             'service_id' => ['required', 'exists:services,id'],
         ]);
     }
@@ -75,9 +73,7 @@ class RegisterController extends Controller
         'telephone' => $data['telephone'],
         'email' => $data['email'],
         'password' => Hash::make($data['password']),
-        'adresse_postale' => $data['adresse_postale'],
-        'photo' => $data['photo']->store('photos', 'public'),
-        'date_naissance' => $data['date_naissance'],
+        'photo' => isset($data['photo']) ? $data['photo']->store('photos', 'public') : null,
         'service_id' => $data['service_id'],
     ]);
 }
