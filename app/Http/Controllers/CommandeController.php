@@ -28,136 +28,98 @@ class CommandeController extends Controller
     public function create()
     {
         $clients = Client::all();
-        $types = Client::TYPES;
+        $fournisseurs = Fournisseur::all();
         $etats = Commande::ETATS;
         $urgences = Commande::URGENCES;
         $stocks = Stock::LIEUX;
 
-        return view('gestock.create', compact('clients', 'types' , 'etats', 'urgences', 'stocks'));
+        return view('gestock.create', compact('clients', 'etats', 'urgences', 'stocks', 'fournisseurs'));
     }
 
     /**
      * Enregistre une nouvelle commande.
      */
     public function store(Request $request)
-{
-    $validated = $request->validate([
-        'intitule' => 'required|string|max:255',
-        'prix_total' => 'required|numeric',
-        'etat' => 'required|string|max:255',
-        'remarque' => 'nullable|string',
-        'urgence' => 'nullable',
-        'date_livraison_fournisseur' => 'nullable|date',
-        'date_installation_prevue' => 'nullable|date',
-        'client_id' => 'nullable|exists:clients,id',
-    ]);
-
-    $validated['employe_id'] = auth()->user()->id;
-
-    // Priorité au client existant
-    if ($request->filled('client_id')) {
-        $validated['client_id'] = $request->input('client_id');
-    } elseif ($request->filled('new_client.nom')) {
-        $validatedClient = $request->validate([
-            'new_client.nom' => 'required|string|max:255',
-            'new_client.email' => 'required|email|unique:clients,email',
-            'new_client.telephone' => 'required|string|max:15',
-            'new_client.adresse_postale' => 'required|string|max:255',
-            'new_client.type' => 'required|string|max:255',
+    {
+        // Validation basique
+        $validated = $request->validate([
+            'etat' => 'required|string|max:255',
+            'remarque' => 'nullable|string',
+            'delai_installation' => 'nullable|integer',
+            'date_installation_prevue' => 'nullable|date',
+            'reference_devis' => 'nullable|string|max:255',
+            'urgence' => 'required|string|max:255',
+            'stock_id' => 'required|exists:stocks,id',
         ]);
 
-        $client = Client::create([
-            'nom' => $request->input('new_client.nom'),
-            'email' => $request->input('new_client.email'),
-            'telephone' => $request->input('new_client.telephone'),
-            'adresse_postale' => $request->input('new_client.adresse_postale'),
-            'type' => $request->input('new_client.type'),
-        ]);
+        $validated['employe_id'] = auth()->id();
 
-        $validated['client_id'] = $client->id;
-    } else {
-        $validated['client_id'] = null;
-    }
-
-    // Créer la commande
-    $commande = Commande::create($validated);
-
-    // Récupère le lieu sélectionné dans le formulaire
-    $lieu = $request->input('lieu');
-    $stock = null;
-    if (!empty($lieu)) {
-        $stock = Stock::firstOrCreate(['lieu' => $lieu]);
-        if ($stock) {
-            $commande->stocks()->syncWithoutDetaching([$stock->id]);
+        // CLIENT
+        if ($request->filled('client_id')) {
+            $validated['client_id'] = $request->input('client_id');
+        } elseif ($request->filled('new_client.nom')) {
+            $client = Client::create([
+                'nom' => $request->input('new_client.nom'),
+                'code_client' => $request->input('new_client.code_client'),
+            ]);
+            $validated['client_id'] = $client->id;
         }
-    }
 
-    // Ajouter les produits et leurs fournisseurs
-    foreach ($request->input('produits', []) as $produitData) {
-        // Ajouter ou récupérer le fournisseur
-        $fournisseur = null;
-        if (!empty($produitData['fournisseur']['nom'])) {
-            $fournisseur = Fournisseur::firstOrCreate(
-                ['nom' => $produitData['fournisseur']['nom']],
+        // COMMANDE
+        $commande = Commande::create($validated);
+
+        // FOURNISSEUR
+        $fournisseur_id = null;
+        if ($request->filled('fournisseur_id')) {
+            $fournisseur_id = $request->input('fournisseur_id');
+        } elseif ($request->filled('new_fournisseur.nom')) {
+            $fournisseur = Fournisseur::create([
+                'nom' => $request->input('new_fournisseur.nom'),
+            ]);
+            $fournisseur_id = $fournisseur->id;
+        }
+
+        // PRODUIT
+        $produitData = $request->input('produit');
+        if (!empty($produitData)) {
+            $produit = Produit::firstOrCreate(
+                ['reference' => $produitData['reference']],
                 [
-                    'email' => $produitData['fournisseur']['email'] ?? null,
-                    'telephone' => $produitData['fournisseur']['telephone'] ?? null,
-                    'adresse_postale' => $produitData['fournisseur']['adresse_postale'] ?? null,
+                    'nom' => $produitData['nom'],
+                    'prix_referencement' => $produitData['prix_referencement'] ?? 0,
+                    'lien_produit_fournisseur' => $produitData['lien_produit_fournisseur'] ?? null,
+                    'date_livraison_fournisseur' => $produitData['date_livraison_fournisseur'] ?? null,
                 ]
             );
-        }
 
-        // Ajouter ou récupérer le produit
-        $produit = Produit::firstOrCreate(
-            ['reference' => $produitData['reference']],
-            [
-                'nom' => $produitData['nom'],
-                'description' => $produitData['description'] ?? '',
-                'caracteristiques_techniques' => $produitData['caracteristiques_techniques'] ?? '',
-                'prix' => $produitData['prix'] ?? 0,
-                'lien_produit_fournisseur' => $produitData['lien_produit_fournisseur'] ?? null,
-            ]
-        );
+            // Attacher fournisseur au produit
+            if ($fournisseur_id) {
+                $produit->fournisseurs()->syncWithoutDetaching([
+                    $fournisseur_id => ['commande_id' => $commande->id]
+                ]);
+            }
 
-        $produit->fill([
-            'nom' => $produitData['nom'],
-            'description' => $produitData['description'] ?? '',
-            'caracteristiques_techniques' => $produitData['caracteristiques_techniques'] ?? '',
-            'prix' => $produitData['prix'] ?? 0,
-            'lien_produit_fournisseur' => $produitData['lien_produit_fournisseur'] ?? null,
-        ])->save();
-
-        // Lier le produit au fournisseur
-        if ($fournisseur) {
-            $produit->fournisseurs()->syncWithoutDetaching([
-                $fournisseur->id => ['commande_id' => $commande->id]
+            // Attacher produit à la commande
+            $commande->produits()->attach($produit->id, [
+                'quantite_totale' => $produitData['quantite_totale'] ?? 0,
+                'quantite_client' => $produitData['quantite_client'] ?? 0,
+                'quantite_stock' => ($produitData['quantite_totale'] ?? 0) - ($produitData['quantite_client'] ?? 0),
             ]);
-        }
 
-        // Attacher le produit à la commande
-        $commande->produits()->attach($produit->id, [
-            'quantite' => $produitData['quantite_stock'] + $produitData['quantite_client'],
-            'quantite_stock' => $produitData['quantite_stock'],
-            'quantite_client' => $produitData['quantite_client'],
-        ]);
-
-        // Mettre à jour produit_stock
-        $quantite_totale = $produitData['quantite_stock'] + $produitData['quantite_client'];
-
-        if ($request->has('stock_id')) {
+            // Enregistrer dans produit_stock
             DB::table('produit_stock')->insert([
                 'produit_id' => $produit->id,
                 'stock_id' => $request->input('stock_id'),
                 'commande_id' => $commande->id,
-                'quantite' => $quantite_totale,
+                'quantite' => $produitData['quantite_totale'] ?? 0,
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);
         }
+
+        return redirect()->route('commande.index')->with('success', 'Commande créée avec succès.');
     }
 
-    return redirect()->route('commande.index')->with('success', 'Commande créée avec succès.');
-}
 
 
     /**
@@ -165,7 +127,10 @@ class CommandeController extends Controller
      */
     public function show(string $id)
     {
-        $commande = Commande::with(['client', 'employe', 'produits'])->findOrFail($id);
+        // Récupère la commande avec les relations client, employé et produits associés
+        $commande = Commande::with(['client', 'employe', 'produits.fournisseurs', 'produits.stocks'])->findOrFail($id);
+        
+        // Retourner la vue avec la commande et ses relations
         return view('gestock.show', compact('commande'));
     }
 
@@ -175,140 +140,127 @@ class CommandeController extends Controller
     public function edit(string $id)
     {
         // Récupérer la commande avec ses produits et son client
-        $commande = Commande::with(['produits', 'client'])->findOrFail($id);
+        $commande = Commande::with(['produits' => function($query) {
+            $query->withPivot('quantite_totale', 'quantite_client', 'quantite_stock');
+        }, 'client'])->findOrFail($id);
         
-        // Récupérer tous les clients et stocks disponibles
+        // Récupérer tous les clients, fournisseurs, stocks et produits disponibles
         $clients = Client::all();
-        $stocks = Stock::all(); // Tous les stocks
+        $stocks = Stock::all();
+        $fournisseurs = Fournisseur::all();
+        $produits = Produit::all(); // Si vous avez besoin de lister tous les produits
 
         // Récupérer les autres données pour le formulaire
-        $types = Client::TYPES;
         $etats = Commande::ETATS;
         $urgences = Commande::URGENCES;
 
         // Renvoyer la vue avec les données nécessaires
-        return view('gestock.edit', compact('commande', 'clients', 'stocks', 'types', 'etats', 'urgences'));
+        return view('gestock.edit', compact('commande', 'clients', 'stocks', 'etats', 'urgences', 'fournisseurs', 'produits'));
     }
+
 
     /**
      * Met à jour une commande existante.
      */
     public function update(Request $request, $id)
     {
-        // Validation des données
+        // Validation des données de base
         $validated = $request->validate([
-            'intitule' => 'required|string|max:255',
-            'prix_total' => 'required|numeric',
             'etat' => 'required|string|max:255',
             'remarque' => 'nullable|string',
-            'urgence' => 'nullable',
-            'date_livraison_fournisseur' => 'nullable|date',
+            'delai_installation' => 'nullable|integer',
             'date_installation_prevue' => 'nullable|date',
-            'client_id' => 'nullable|exists:clients,id',
+            'reference_devis' => 'nullable|string|max:255',
+            'urgence' => 'required|string|max:255',
             'stock_id' => 'required|exists:stocks,id',
         ]);
 
         $commande = Commande::findOrFail($id);
+        $validated['employe_id'] = auth()->id();
         $commande->update($validated);
 
-        // Mise à jour du client
-        if ($request->has('client')) {
-            $clientData = $request->input('client');
-            if (!empty($clientData['id'])) {
-                $client = Client::find($clientData['id']);
-                if ($client) {
-                    $client->update([
-                        'nom' => $clientData['nom'],
-                        'email' => $clientData['email'],
-                        'telephone' => $clientData['telephone'],
-                        'adresse_postale' => $clientData['adresse_postale'],
-                        'type' => $clientData['type'],
-                    ]);
-                }
-            }
+        // CLIENT
+        if ($request->filled('client_id')) {
+            // Si un client est sélectionné, on le met à jour
+            $client = Client::findOrFail($request->input('client_id'));
+            $client->update([
+                'nom' => $request->input('new_client.nom', $client->nom),
+                'code_client' => $request->input('new_client.code_client', $client->code_client),
+            ]);
+            $commande->client_id = $client->id;
+        } elseif ($request->filled('new_client.nom')) {
+            // Si un nouveau client est fourni, on le crée
+            $client = Client::create([
+                'nom' => $request->input('new_client.nom'),
+                'code_client' => $request->input('new_client.code_client'),
+            ]);
+            $commande->client_id = $client->id;
         }
 
-        // Gestion du stock
-        if ($request->has('stock_id')) {
-            $newStockId = $request->input('stock_id');
-            
-            // Supprimer les anciennes relations stock pour cette commande
-            DB::table('produit_stock')
-                ->where('commande_id', $commande->id)
-                ->delete();
-            
-            // Mise à jour des produits et leurs stocks
-            foreach ($request->input('produits', []) as $produitData) {
-                $produit = Produit::findOrFail($produitData['id']);
-                
-                // Mise à jour du produit
-                $produit->update([
+        // Fournisseur
+        $fournisseur_id = null;
+        if ($request->filled('fournisseur_id')) {
+            // Si un fournisseur est sélectionné, on le met à jour
+            $fournisseur = Fournisseur::findOrFail($request->input('fournisseur_id'));
+            $fournisseur->update([
+                'nom' => $request->input('new_fournisseur.nom', $fournisseur->nom),
+            ]);
+            $fournisseur_id = $fournisseur->id;
+        } elseif ($request->filled('new_fournisseur.nom')) {
+            // Si un nouveau fournisseur est fourni, on le crée
+            $fournisseur = Fournisseur::create([
+                'nom' => $request->input('new_fournisseur.nom'),
+            ]);
+            $fournisseur_id = $fournisseur->id;
+        }
+
+        // Supprimer les anciennes données liées au produit
+        DB::table('produit_stock')->where('commande_id', $commande->id)->delete();
+        $commande->produits()->detach();
+
+        // PRODUIT (1 seul)
+        $produitData = $request->input('produit');
+        if (!empty($produitData)) {
+            $produit = Produit::firstOrCreate(
+                ['reference' => $produitData['reference']],
+                [
                     'nom' => $produitData['nom'],
-                    'description' => $produitData['description'] ?? '',
-                    'caracteristiques_techniques' => $produitData['caracteristiques_techniques'] ?? '',
-                    'prix' => $produitData['prix'] ?? 0,
-                    'reference' => $produitData['reference'],
+                    'prix_referencement' => $produitData['prix_referencement'] ?? 0,
                     'lien_produit_fournisseur' => $produitData['lien_produit_fournisseur'] ?? null,
-                ]);
+                    'date_livraison_fournisseur' => $produitData['date_livraison_fournisseur'] ?? null,
+                ]
+            );
 
-                // Mise à jour du fournisseur
-                if (!empty($produitData['fournisseur'])) {
-                    $fournisseurData = $produitData['fournisseur'];
-                    $fournisseur = null;
-                    
-                    if (!empty($fournisseurData['id'])) {
-                        $fournisseur = Fournisseur::find($fournisseurData['id']);
-                        if ($fournisseur) {
-                            $fournisseur->update([
-                                'nom' => $fournisseurData['nom'],
-                                'email' => $fournisseurData['email'],
-                                'telephone' => $fournisseurData['telephone'],
-                                'adresse_postale' => $fournisseurData['adresse_postale'],
-                            ]);
-                        }
-                    } else if (!empty($fournisseurData['nom'])) {
-                        $fournisseur = Fournisseur::firstOrCreate(
-                            ['nom' => $fournisseurData['nom']],
-                            [
-                                'email' => $fournisseurData['email'] ?? null,
-                                'telephone' => $fournisseurData['telephone'] ?? null,
-                                'adresse_postale' => $fournisseurData['adresse_postale'] ?? null,
-                            ]
-                        );
-                    }
-
-                    if ($fournisseur) {
-                        $produit->fournisseurs()->syncWithoutDetaching([
-                            $fournisseur->id => ['commande_id' => $commande->id]
-                        ]);
-                    }
-                }
-
-                // Mise à jour de la relation produit-commande
-                $commande->produits()->syncWithoutDetaching([
-                    $produit->id => [
-                        'quantite' => $produitData['quantite_stock'] + $produitData['quantite_client'],
-                        'quantite_stock' => $produitData['quantite_stock'],
-                        'quantite_client' => $produitData['quantite_client'],
-                    ]
-                ]);
-
-                // Création de la nouvelle relation stock
-                $quantite_totale = $produitData['quantite_stock'] + $produitData['quantite_client'];
-                DB::table('produit_stock')->insert([
-                    'produit_id' => $produit->id,
-                    'stock_id' => $newStockId,
-                    'commande_id' => $commande->id,
-                    'quantite' => $quantite_totale,
-                    'created_at' => now(),
-                    'updated_at' => now(),
+            // Lier le fournisseur (si fourni)
+            if ($fournisseur_id) {
+                $produit->fournisseurs()->syncWithoutDetaching([
+                    $fournisseur_id => ['commande_id' => $commande->id]
                 ]);
             }
+
+            // Lier le produit à la commande (1 produit)
+            $commande->produits()->attach($produit->id, [
+                'quantite_totale' => $produitData['quantite_totale'] ?? 0,
+                'quantite_client' => $produitData['quantite_client'] ?? 0,
+                'quantite_stock' => ($produitData['quantite_totale'] ?? 0) - ($produitData['quantite_client'] ?? 0),
+            ]);
+
+            // Insérer dans produit_stock
+            DB::table('produit_stock')->insert([
+                'produit_id' => $produit->id,
+                'stock_id' => $request->input('stock_id'),
+                'commande_id' => $commande->id,
+                'quantite' => $produitData['quantite_totale'] ?? 0,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
         }
+
+        // Sauvegarder la commande après modifications
+        $commande->save();
 
         return redirect()->route('commande.index')->with('success', 'Commande mise à jour avec succès.');
     }
-
 
 
     /**
