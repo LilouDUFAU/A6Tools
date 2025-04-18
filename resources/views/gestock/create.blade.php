@@ -10,19 +10,11 @@
         <!-- Partie Commande -->
         <div class="border-l-4 border-green-600 pl-4">
             <h2 class="text-2xl font-bold text-gray-800 mb-4">Commande</h2>
-            <div class="mb-4">
-                <label for="intitule" class="block text-sm font-semibold text-gray-700">Intitulé</label>
-                <input type="text" id="intitule" name="intitule" class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1" required>
-            </div>
-
-            <div class="mb-4">
-                <label for="prix_total" class="block text-sm font-semibold text-gray-700">Prix total (€)</label>
-                <input type="number" id="prix_total" name="prix_total" step="0.01" class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1" required>
-            </div>
 
             <div class="mb-4">
                 <label for="etat" class="block text-sm font-semibold text-gray-700">État</label>
                 <select id="etat" name="etat" class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1" required>
+                    <option value="">-- Sélectionner un état --</option>
                     @foreach ($etats as $etat)
                         <option value="{{ $etat }}">{{ ucfirst($etat) }}</option>
                     @endforeach
@@ -35,13 +27,28 @@
             </div>
 
             <div class="mb-4">
-                <label for="date_livraison_fournisseur" class="block text-sm font-semibold text-gray-700">Date de livraison fournisseur</label>
-                <input type="date" id="date_livraison_fournisseur" name="date_livraison_fournisseur" class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1">
+                <label for="delai_installation" class="block text-sm font-semibold text-gray-700">Délai d'installation prévu (en jours)</label>
+                <input type="number" id="delai_installation" name="delai_installation" class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1">
             </div>
 
             <div class="mb-4">
                 <label for="date_installation_prevue" class="block text-sm font-semibold text-gray-700">Date d'installation prévue</label>
                 <input type="date" id="date_installation_prevue" name="date_installation_prevue" class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1">
+            </div>
+
+            <div class="mb-4">
+                <label for="reference_devis" class="block text-sm font-semibold text-gray-700">Référence devis de la commande</label>
+                <input type="text" id="reference_devis" name="reference_devis" class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1">
+            </div>
+
+            <div class="mb-4">
+                <label for="urgence" class="block text-sm font-semibold text-gray-700">Urgence</label>
+                <select id="urgence" name="urgence" class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1" required>
+                    <option value="">-- Sélectionner une urgence --</option>    
+                    @foreach ($urgences as $urgence)
+                        <option value="{{ $urgence }}">{{ ucfirst($urgence) }}</option>
+                    @endforeach
+                </select>
             </div>
         </div>
 
@@ -63,197 +70,201 @@
         <div class="border-l-4 border-green-600 pl-4">
             <h2 class="text-2xl font-bold text-gray-800 mb-4">Client</h2>
             <div class="mb-4">
-                <label for="client_id" class="block text-sm font-semibold text-gray-700">Client</label>
-                <div class="flex space-x-2">
-                    <select id="client_id" name="client_id" class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1">
-                        <option value="">-- Choisir un client --</option>
-                        @foreach($clients as $client)
-                            <option value="{{ $client->id }}">{{ $client->nom }}</option>
-                        @endforeach
-                    </select>
-                    <button type="button" onclick="toggleNewClientForm()" class="bg-green-600 text-white px-4 py-2 rounded-lg shadow hover:bg-green-700 focus:ring-2 focus:ring-green-500">Ajouter</button>
+                <label class="block text-sm font-semibold text-gray-700">Client</label>
+                <div class="relative w-full">
+                    <div class="relative">
+                        <input
+                            type="text"
+                            id="client_search"
+                            placeholder="Rechercher un client..."
+                            class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 pl-10 pr-4 py-2"
+                        >
+                        <input type="hidden" id="client_id" name="client_id">
+                        <div class="absolute left-3 top-1/2 transform -translate-y-1/4 text-gray-400">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                        </div>
+                    </div>
+                    <div id="search_results" class="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-60 overflow-y-auto hidden"></div>
+                </div>
+                <div class="mt-2">
+                    <button type="button" onclick="toggleNewClientForm()" class="text-green-600 hover:text-green-800 font-medium text-sm flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+                        Ajouter un nouveau client
+                    </button>
                 </div>
             </div>
 
-            <div id="new-client-form" class="mb-4 hidden">
+            <div id="new-client-form" class="mb-4 hidden bg-gray-50 p-4 rounded-lg">
                 <h3 class="text-lg font-semibold text-gray-700 mb-2">Nouveau Client</h3>
                 <div class="mb-4">
                     <label for="new_client_nom" class="block text-sm font-semibold text-gray-700">Nom</label>
                     <input type="text" id="new_client_nom" name="new_client[nom]" class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1">
                 </div>
                 <div class="mb-4">
-                    <label for="new_client_email" class="block text-sm font-semibold text-gray-700">Email</label>
-                    <input type="email" id="new_client_email" name="new_client[email]" class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1">
-                </div>
-                <div class="mb-4">
-                    <label for="new_client_telephone" class="block text-sm font-semibold text-gray-700">Téléphone</label>
-                    <input type="text" id="new_client_telephone" name="new_client[telephone]" class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1">
-                </div>
-                <div class="mb-4">
-                    <label for="new_client_adresse_postale" class="block text-sm font-semibold text-gray-700">Adresse Postale</label>
-                    <input type="text" id="new_client_adresse_postale" name="new_client[adresse_postale]" class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1">
-                </div>
-                <div class="mb-4">
-                    <label for="new_client_type" class="block text-sm font-semibold text-gray-700">Type</label>
-                    <select id="new_client_type" name="new_client[type]" class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1">
-                        @foreach ($types as $type)
-                            <option value="{{ $type }}">{{ ucfirst($type) }}</option>
-                        @endforeach
-                    </select>
+                    <label for="code_client" class="block text-sm font-semibold text-gray-700">Code client</label>
+                    <input type="text" id="code_client" name="new_client[code_client]" class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1">
                 </div>
             </div>
 
-<script>
-    function toggleNewClientForm() {
-        const form = document.getElementById('new-client-form');
-        form.classList.toggle('hidden');
-    }
-</script>
-
-            <div class="mb-4">
-                <label for="urgence" class="block text-sm font-semibold text-gray-700">Urgence</label>
-                <select id="urgence" name="urgence" class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1" required>
-                    @foreach ($urgences as $urgence)
-                        <option value="{{ $urgence }}">{{ ucfirst($urgence) }}</option>
-                    @endforeach
-                </select>
+            <div id="selected_client" class="mb-6 p-4 bg-green-50 rounded-lg border border-green-200 hidden">
+                <h3 class="font-medium text-green-800">Client sélectionné</h3>
+                <p id="selected_client_info" class="text-green-700"></p>
             </div>
         </div>
 
-        <!-- Partie Produits -->
+        <!-- Partie Produit -->
         <div class="border-l-4 border-green-600 pl-4">
-            <h2 class="text-2xl font-bold text-gray-800 mb-4">Produit(s)</h2>
-            <div class="space-y-6 mb-4" id="product-list">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Produit</h2>
             <div class="product-item bg-gray-50 p-4 rounded-lg shadow-sm">
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
                     <div class="mb-4">
-                        <label for="produits_0_nom" class="block text-sm font-semibold text-gray-700">Nom</label>
-                        <input type="text" id="produits_0_nom" name="produits[0][nom]" class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1" required>
+                        <label for="produit_nom" class="block text-sm font-semibold text-gray-700">Nom</label>
+                        <input type="text" id="produit_nom" name="produit[nom]" class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1" required>
                     </div>
                     <div class="mb-4">
-                        <label for="produits_0_description" class="block text-sm font-semibold text-gray-700">Description</label>
-                        <textarea id="produits_0_description" name="produits[0][description]" rows="2" class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1"></textarea>
+                        <label for="produit_reference" class="block text-sm font-semibold text-gray-700">Référence produit</label>
+                        <input type="text" id="produit_reference" name="produit[reference]" class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1">
                     </div>
                     <div class="mb-4">
-                        <label for="produits_0_caracteristiques_techniques" class="block text-sm font-semibold text-gray-700">Caractéristiques Techniques</label>
-                        <textarea id="produits_0_caracteristiques_techniques" name="produits[0][caracteristiques_techniques]" rows="2" class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1"></textarea>
+                        <label for="produit_prix_referencement" class="block text-sm font-semibold text-gray-700">Prix de réferencement</label>
+                        <input type="number" id="produit_prix_referencement" name="produit[prix_referencement]" step="0.01" class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1">
                     </div>
                     <div class="mb-4">
-                        <label for="produits_0_reference" class="block text-sm font-semibold text-gray-700">Référence</label>
-                        <input type="text" id="produits_0_reference" name="produits[0][reference]" class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1">
+                        <label for="produit_lien_produit_fournisseur" class="block text-sm font-semibold text-gray-700">Lien produit fournisseur</label>
+                        <input type="text" id="produit_lien_produit_fournisseur" name="produit[lien_produit_fournisseur]" class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1">
                     </div>
                     <div class="mb-4">
-                        <label for="produits_0_quantite_stock" class="block text-sm font-semibold text-gray-700">Quantité Stock</label>
-                        <input type="number" id="produits_0_quantite_stock" name="produits[0][quantite_stock]" class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1">
+                        <label for="produit_date_livraison_fournisseur" class="block text-sm font-semibold text-gray-700">Date de Livraison Fournisseur</label>
+                        <input type="date" id="produit_date_livraison_fournisseur" name="produit[date_livraison_fournisseur]" class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1">
                     </div>
                     <div class="mb-4">
-                        <label for="produits_0_quantite_client" class="block text-sm font-semibold text-gray-700">Quantité Client</label>
-                        <input type="number" id="produits_0_quantite_client" name="produits[0][quantite_client]" class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1">
+                        <label for="produit_quantite_totale" class="block text-sm font-semibold text-gray-700">Quantité totale</label>
+                        <input type="number" id="produit_quantite_totale" name="produit[quantite_totale]" class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1">
                     </div>
                     <div class="mb-4">
-                        <label for="produits_0_prix" class="block text-sm font-semibold text-gray-700">Prix unitaire (€)</label>
-                        <input type="number" id="produits_0_prix" name="produits[0][prix]" step="0.01" class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1">
-                    </div>
-                    <div class="mb-4">
-                        <label for="produits_0_image" class="block text-sm font-semibold text-gray-700">Lien produit fournisseur</label>
-                        <input type="text" id="produits_0_lien_produit_fournisseur" name="produits[0][lien_produit_fournisseur]" class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1">
-                    </div>
-                    <div class="mb-4">
-                        <label for="produits_0_fournisseur_nom" class="block text-sm font-semibold text-gray-700">Nom du Fournisseur</label>
-                        <input type="text" id="produits_0_fournisseur_nom" name="produits[0][fournisseur][nom]" class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1">
-                    </div>
-                    <div class="mb-4">
-                        <label for="produits_0_fournisseur_email" class="block text-sm font-semibold text-gray-700">Email du Fournisseur</label>
-                        <input type="email" id="produits_0_fournisseur_email" name="produits[0][fournisseur][email]" class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1">
-                    </div>
-                    <div class="mb-4">
-                        <label for="produits_0_fournisseur_telephone" class="block text-sm font-semibold text-gray-700">Téléphone du Fournisseur</label>
-                        <input type="text" id="produits_0_fournisseur_telephone" name="produits[0][fournisseur][telephone]" class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1">
-                    </div>
-                    <div class="mb-4">
-                        <label for="produits_0_fournisseur_adresse" class="block text-sm font-semibold text-gray-700">Adresse du Fournisseur</label>
-                        <input type="text" id="produits_0_fournisseur_adresse" name="produits[0][fournisseur][adresse_postale]" class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1">
+                        <label for="produit_quantite_client" class="block text-sm font-semibold text-gray-700">Quantité Client</label>
+                        <input type="number" id="produit_quantite_client" name="produit[quantite_client]" class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1">
                     </div>
                 </div>
             </div>
+        </div>
+
+        <!-- Partie Fournisseur -->
+        <div class="border-l-4 border-green-600 pl-4">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Fournisseur</h2>
+            <div class="mb-4">
+                <label for="fournisseur_id" class="block text-sm font-semibold text-gray-700">Fournisseur</label>
+                <div class="flex space-x-2">
+                    <select id="fournisseur_id" name="fournisseur_id" class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1">
+                        <option value="">-- Choisir un fournisseur --</option>
+                        @foreach($fournisseurs as $fournisseur)
+                            <option value="{{ $fournisseur->id }}">{{ $fournisseur->nom }}</option>
+                        @endforeach
+                    </select>
+                    <button type="button" onclick="toggleNewSupplierForm()" class="bg-green-600 text-white px-4 py-2 rounded-lg shadow hover:bg-green-700 focus:ring-2 focus:ring-green-500">Ajouter</button>
+                </div>
             </div>
 
-            <!-- Bouton pour ajouter un produit -->
-            <div class="text-right mt-4" id="add-product-button-container">
-            <button type="button" onclick="addProduct()" class="bg-green-600 text-white px-4 py-2 rounded-lg shadow hover:bg-green-700 focus:ring-2 focus:ring-green-500">Ajouter un produit</button>
+            <div id="new-supplier-form" class="mb-4 hidden bg-gray-50 p-4 rounded-lg">
+                <h3 class="text-lg font-semibold text-gray-700 mb-2">Nouveau Fournisseur</h3>
+                <div class="mb-4">
+                    <label for="new_fournisseur_nom" class="block text-sm font-semibold text-gray-700">Nom</label>
+                    <input type="text" id="new_fournisseur_nom" name="new_fournisseur[nom]" class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1">
+                </div>
             </div>
         </div>
 
-        <button type="submit" class="w-full bg-green-600 text-white px-6 py-3 rounded-lg shadow hover:bg-green-700 focus:ring-2 focus:ring-green-500">Enregistrer</button>
-        </form>
-    </div>
+        <button type="submit" class="w-full bg-green-600 text-white px-6 py-3 rounded-lg shadow hover:bg-green-700 focus:ring-2 focus:ring-green-500 flex items-center justify-center">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+            Enregistrer
+        </button>
+    </form>
+</div>
 
-    <script>
-        let productCount = 1;
+<script>
+let clients = @json($clients);
+let searchTimeout;
 
-        function addProduct() {
-        const productList = document.getElementById('product-list');
-        const addProductButtonContainer = document.getElementById('add-product-button-container');
+function toggleNewClientForm() {
+    const form = document.getElementById('new-client-form');
+    form.classList.toggle('hidden');
+}
+
+function toggleNewSupplierForm() {
+    const form = document.getElementById('new-supplier-form');
+    form.classList.toggle('hidden');
+}
+
+function highlightMatch(text, query) {
+    if (!query.trim()) return text;
+    const regex = new RegExp(`(${query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
+    return text.replace(regex, '<span class="bg-yellow-200 font-medium">$1</span>');
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('client_search');
+    const searchResults = document.getElementById('search_results');
+    const clientIdInput = document.getElementById('client_id');
+    const selectedClientDiv = document.getElementById('selected_client');
+    const selectedClientInfo = document.getElementById('selected_client_info');
+
+    searchInput.addEventListener('input', function(e) {
+        clearTimeout(searchTimeout);
+        const query = e.target.value.toLowerCase();
+
+        searchTimeout = setTimeout(() => {
+            if (query.trim() === '') {
+                searchResults.classList.add('hidden');
+                return;
+            }
+
+            const filtered = clients
+                .filter(client => client.nom.toLowerCase().includes(query))
+                .slice(0, 10);
+
+            searchResults.innerHTML = '';
+            
+            if (filtered.length > 0) {
+                const ul = document.createElement('ul');
+                filtered.forEach(client => {
+                    const li = document.createElement('li');
+                    li.className = 'px-4 py-2 hover:bg-gray-100 cursor-pointer transition-colors duration-150';
+                    li.innerHTML = highlightMatch(client.nom, query);
+                    li.onclick = () => selectClient(client);
+                    ul.appendChild(li);
+                });
+                searchResults.appendChild(ul);
+                searchResults.classList.remove('hidden');
+            } else {
+                searchResults.innerHTML = `
+                    <div class="p-4 text-gray-500">
+                        <p class="text-sm">Aucun client trouvé</p>
+                        <button onclick="toggleNewClientForm()" class="mt-2 text-green-600 hover:text-green-800 font-semibold text-sm flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+                            Ajouter un nouveau client
+                        </button>
+                    </div>
+                `;
+                searchResults.classList.remove('hidden');
+            }
+        }, 300);
+    });
+
+    function selectClient(client) {
+        searchInput.value = client.nom;
+        clientIdInput.value = client.id;
+        searchResults.classList.add('hidden');
         
-        const newProduct = document.createElement('div');
-        newProduct.classList.add('product-item', 'bg-gray-50', 'p-4', 'rounded-lg', 'shadow-sm', 'mt-4');
-        newProduct.innerHTML = `
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div class="mb-4">
-            <label for="produits_${productCount}_nom" class="block text-sm font-semibold text-gray-700">Nom</label>
-            <input type="text" id="produits_${productCount}_nom" name="produits[${productCount}][nom]" class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1" required>
-            </div>
-            <div class="mb-4">
-            <label for="produits_${productCount}_description" class="block text-sm font-semibold text-gray-700">Description</label>
-            <textarea id="produits_${productCount}_description" name="produits[${productCount}][description]" rows="2" class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1"></textarea>
-            </div>
-            <div class="mb-4">
-            <label for="produits_${productCount}_caracteristiques_techniques" class="block text-sm font-semibold text-gray-700">Caractéristiques Techniques</label>
-            <textarea id="produits_${productCount}_caracteristiques_techniques" name="produits[${productCount}][caracteristiques_techniques]" rows="2" class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1"></textarea>
-            </div>
-            <div class="mb-4">
-            <label for="produits_${productCount}_reference" class="block text-sm font-semibold text-gray-700">Référence</label>
-            <input type="text" id="produits_${productCount}_reference" name="produits[${productCount}][reference]" class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1">
-            </div>
-            <div class="mb-4">
-            <label for="produits_${productCount}_quantite_stock" class="block text-sm font-semibold text-gray-700">Quantité en Stock</label>
-            <input type="number" id="produits_${productCount}_quantite_stock" name="produits[${productCount}][quantite_stock]" class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1">
-            </div>
-            <div class="mb-4">
-            <label for="produits_${productCount}_quantite_client" class="block text-sm font-semibold text-gray-700">Quantité Client</label>
-            <input type="number" id="produits_${productCount}_quantite_client" name="produits[${productCount}][quantite_client]" class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1">
-            </div>
-            <div class="mb-4">
-            <label for="produits_${productCount}_prix" class="block text-sm font-semibold text-gray-700">Prix unitaire (€)</label>
-            <input type="number" id="produits_${productCount}_prix" name="produits[${productCount}][prix]" step="0.01" class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1">
-            </div>
-            <div class="mb-4">
-            <label for="produits_${productCount}_lien_produit_fournisseur" class="block text-sm font-semibold text-gray-700">Lien produit fournisseur</label>
-            <input type="text" id="produits_${productCount}_lien_produit_fournisseur" name="produits[${productCount}][lien_produit_fournisseur]" class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1">
-            </div>
-            <div class="mb-4">
-            <label for="produits_${productCount}_fournisseur_nom" class="block text-sm font-semibold text-gray-700">Nom du Fournisseur</label>
-            <input type="text" id="produits_${productCount}_fournisseur_nom" name="produits[${productCount}][fournisseur][nom]" class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1">
-            </div>
-            <div class="mb-4">
-            <label for="produits_${productCount}_fournisseur_email" class="block text-sm font-semibold text-gray-700">Email du Fournisseur</label>
-            <input type="email" id="produits_${productCount}_fournisseur_email" name="produits[${productCount}][fournisseur][email]" class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1">
-            </div>
-            <div class="mb-4">
-            <label for="produits_${productCount}_fournisseur_telephone" class="block text-sm font-semibold text-gray-700">Téléphone du Fournisseur</label>
-            <input type="text" id="produits_${productCount}_fournisseur_telephone" name="produits[${productCount}][fournisseur][telephone]" class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1">
-            </div>
-            <div class="mb-4">
-            <label for="produits_${productCount}_fournisseur_adresse" class="block text-sm font-semibold text-gray-700">Adresse du Fournisseur</label>
-            <input type="text" id="produits_${productCount}_fournisseur_adresse" name="produits[${productCount}][fournisseur][adresse_postale]" class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1">
-            </div>
-            </div>
-        `;
-        
-        productList.appendChild(newProduct);
-        productList.appendChild(addProductButtonContainer);
-        productCount++;
+        selectedClientInfo.textContent = `${client.nom} (ID: ${client.id})`;
+        selectedClientDiv.classList.remove('hidden');
+    }
+
+    // Close dropdown when clicking outside
+    document.addEventListener('click', function(e) {
+        if (!searchInput.contains(e.target) && !searchResults.contains(e.target)) {
+            searchResults.classList.add('hidden');
         }
-    </script>
-
+    });
+});
+</script>
 @endsection
