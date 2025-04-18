@@ -14,9 +14,6 @@ return new class extends Migration
         Schema::create('fournisseurs', function (Blueprint $table) {
             $table->id();
             $table->string('nom'); // Nom du fournisseur
-            $table->string('email')->nullable(); // Email du fournisseur
-            $table->string('telephone')->nullable(); // Téléphone du fournisseur
-            $table->string('adresse_postale')->nullable(); // Adresse postale du fournisseur
             $table->timestamps(); // created_at, updated_at
         });
     }

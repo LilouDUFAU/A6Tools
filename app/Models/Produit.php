@@ -15,12 +15,10 @@ class Produit extends Model
     /////////////////////////
     protected $fillable = [
         'nom',
-        'description',
-        'caracteristiques_techniques',
         'reference',
-        'prix',
+        'prix_referencement',
         'lien_produit_fournisseur',
-        'created_at',
+        'date_livraison_fournisseur',
     ];
     
     //////////////////////////////

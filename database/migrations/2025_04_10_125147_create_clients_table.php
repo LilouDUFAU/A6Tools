@@ -14,10 +14,7 @@ return new class extends Migration
         Schema::create('clients', function (Blueprint $table) {
             $table->id();
             $table->string('nom'); // Nom du client
-            $table->string('email')->unique(); // Email du client, unique
-            $table->string('telephone'); // Téléphone du client
-            $table->string('adresse_postale')->nullable(); // Adresse postale du client
-            $table->enum('type', ['particulier', 'professionnel']); // Type de client (particulier ou entreprise)
+            $table->string('code_client')->unique(); // Code client unique
             $table->timestamps(); // created_at, updated_at
         });
     }

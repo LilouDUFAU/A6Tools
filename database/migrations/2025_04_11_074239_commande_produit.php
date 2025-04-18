@@ -15,9 +15,9 @@ return new class extends Migration
             $table->id();
             $table->foreignId('commande_id')->constrained()->onDelete('cascade');
             $table->foreignId('produit_id')->constrained()->onDelete('cascade');
-            $table->integer('quantite'); // Quantité de produit dans la commande
-            $table->integer('quantite_stock');
-            $table->integer('quantite_client');
+            $table->integer('quantite_totale'); // Quantité de produit dans la commande
+            $table->integer('quantite_stock'); // Quantité totale de produit commandé
+            $table->integer('quantite_client')->nullable(); // Quantité de produit commandé par le client
             $table->timestamps();
         });
     }

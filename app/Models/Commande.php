@@ -14,14 +14,12 @@ class Commande extends Model
     //attributs de la table//
     /////////////////////////
     protected $fillable = [
-        'intitule',
-        'prix_total',
         'etat',
         'urgence',
         'remarque',
-        'date_livraison_fournisseur',
+        'delai_installation',
         'date_installation_prevue',
-        'created_at',
+        'reference_devis',
         'client_id',
         'employe_id',
     ];
@@ -30,16 +28,15 @@ class Commande extends Model
     /// ENUMS définis ici ///
     /////////////////////////
     const ETATS = [
-        'en attente',
-        'en cours',
-        'terminée',
-        'annulée',
+        'A faire',
+        'Commandé', 
+        'Reçu', 
+        'Prévenu', 
+        'Délais'
     ];
 
     const URGENCES = [
         'pas urgent',
-        'peu urgent',
-        'moyennement urgent',
         'urgent',
         'très urgent',
     ];

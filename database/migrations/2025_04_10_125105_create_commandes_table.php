@@ -13,13 +13,12 @@ return new class extends Migration
     {
         Schema::create('commandes', function (Blueprint $table) {
             $table->id();
-            $table->string('intitule'); // Intitulé de la commande
-            $table->decimal('prix_total', 10, 2); // Prix total de la commande
-            $table->enum('etat', ['en attente','en cours', 'terminée', 'annulée']); // Etat de la commande
+            $table->enum('etat', ['A faire','Commandé', 'Reçu', 'Prévenu', 'Délais']); // Etat de la commande
             $table->enum('urgence', ['pas urgent', 'peu urgent', 'moyennement urgent', 'urgent', 'très urgent']); // Urgence
             $table->text('remarque')->nullable(); // Remarques sur la commande
-            $table->date('date_livraison_fournisseur')->nullable(); // Date de livraison fournisseur
+            $table->date('delai_installation')->nullable(); // Date de livraison fournisseur
             $table->date('date_installation_prevue')->nullable(); // Date d'installation prévue
+            $table->string('reference_devis')->nullable(); // Référence du devis
             $table->unsignedBigInteger('client_id')->nullable(); // Clé étrangère vers la table clients
             $table->unsignedBigInteger('employe_id'); // Clé étrangère vers la table users
             $table->timestamps(); // created_at, updated_at

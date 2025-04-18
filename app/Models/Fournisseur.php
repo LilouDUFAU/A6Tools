@@ -14,11 +14,7 @@ class Fournisseur extends Model
     //attributs de la table//
     /////////////////////////
     protected $fillable = [
-        'nom',
-        'email',
-        'telephone',
-        'adresse_postale',
-        'created_at',
+        'nom'
     ];
 
     //////////////////////////////

@@ -36,22 +36,26 @@
     </div>
 
     <h2 class="text-2xl font-semibold px-4 py-2 text-gray-700">Nombre de commandes par état</h2>
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8 px-4">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6 mb-8 px-4">
         <div class="filter-btn bg-green-600 text-white text-center py-6 rounded-lg shadow-md hover:bg-green-700" data-filter="terminée" data-type="etat">
-            <div class="text-3xl font-bold">{{ $commandes->where('etat', 'terminée')->count() }}</div>
-            <div class="text-lg">Terminée(s)</div>
+            <div class="text-3xl font-bold">{{ $commandes->where('etat', 'A faire')->count() }}</div>
+            <div class="text-lg">A faire</div>
         </div>
         <div class="filter-btn bg-yellow-600 text-white text-center py-6 rounded-lg shadow-md hover:bg-yellow-700" data-filter="en cours" data-type="etat">
-            <div class="text-3xl font-bold">{{ $commandes->where('etat', 'en cours')->count() }}</div>
-            <div class="text-lg">En cours</div>
+            <div class="text-3xl font-bold">{{ $commandes->where('etat', 'Commandé')->count() }}</div>
+            <div class="text-lg">Commandé</div>
         </div>
-        <div class="filter-btn bg-orange-600 text-white text-center py-6 rounded-lg shadow-md hover:bg-orange-700" data-filter="en attente" data-type="etat">
-            <div class="text-3xl font-bold">{{ $commandes->where('etat', 'en attente')->count() }}</div>
-            <div class="text-lg">En attente</div>
+        <div class="filter-btn bg-amber-600 text-white text-center py-6 rounded-lg shadow-md hover:bg-amber-700" data-filter="en attente" data-type="etat">
+            <div class="text-3xl font-bold">{{ $commandes->where('etat', 'Reçu')->count() }}</div>
+            <div class="text-lg">Reçu</div>
+        </div>
+        <div class="filter-btn bg-orange-600 text-white text-center py-6 rounded-lg shadow-md hover:bg-orange-700" data-filter="annulé" data-type="etat">
+            <div class="text-3xl font-bold">{{ $commandes->where('etat', 'Prévenu')->count() }}</div>
+            <div class="text-lg">Prévenu</div>
         </div>
         <div class="filter-btn bg-red-600 text-white text-center py-6 rounded-lg shadow-md hover:bg-red-700" data-filter="annulé" data-type="etat">
-            <div class="text-3xl font-bold">{{ $commandes->where('etat', 'annulé')->count() }}</div>
-            <div class="text-lg">Annulée(s)</div>
+            <div class="text-3xl font-bold">{{ $commandes->where('etat', 'Délais')->count() }}</div>
+            <div class="text-lg">Délais</div>
         </div>
     </div>
 
@@ -117,7 +121,7 @@
                     <tr class="commandes-row border-t hover:bg-gray-50" data-lieux="{{ $lieuxStockCommande->implode(', ') }}" data-etat="{{ $commande->etat }}" data-urgence="{{ strtolower($commande->urgence) }}"> <!-- Ajout de strtolower() -->
                         <td class="py-3 px-4">{{ $commande->id }}</td>
                         <td class="py-3 px-4">{{ $commande->intitule }}</td>
-                        <td class="py-3 px-4 text-center">{{ $commande->client ? $commande->client->nom : '/' }}</td>
+                        <td class="py-3 px-4">{{ $commande->client ? $commande->client->nom : '/' }}</td>
                         <td class="py-3 px-4">
                             {{ $lieuxStockCommande->implode(', ') ?: 'Non défini' }}
                         </td>

@@ -14,11 +14,10 @@ return new class extends Migration
         Schema::create('produits', function (Blueprint $table) {
             $table->id();
             $table->string('nom'); // Nom du produit
-            $table->text('description', 1000)->nullable(); // Description du produit
-            $table->text('caracteristiques_techniques', 1000)->nullable(); // Caractéristiques techniques du produit
             $table->string('reference')->unique(); // Référence unique pour le produit
-            $table->decimal('prix', 8, 2); // Prix du produit
+            $table->decimal('prix_referencement', 8, 2); // Prix du produit
             $table->string('lien_produit_fournisseur', 1000)->nullable(); // URL de l'image du produit (optionnel)
+            $table->date('date_livraison_fournisseur')->nullable(); // Date de livraison du produit par le fournisseur (optionnel)
             $table->timestamps(); // created_at, updated_at
         });
     }

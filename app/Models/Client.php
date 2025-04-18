@@ -15,19 +15,7 @@ class Client extends Model
     /////////////////////////
     protected $fillable = [
         'nom',
-        'email',
-        'telephone',
-        'adresse_postale',
-        'type',
-        'created_at',
-    ];
-
-    /////////////////////////
-    /// ENUMS définis ici ///
-    /////////////////////////
-    const TYPES = [
-        'particulier',
-        'professionnel',
+        'code_client',
     ];
     
     //////////////////////////////
