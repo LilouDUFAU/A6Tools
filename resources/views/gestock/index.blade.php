@@ -100,10 +100,9 @@
                 <thead>
                     <tr class="bg-gray-100 text-left text-sm font-semibold text-gray-700">
                         <th class="py-3 px-4">#</th>
-                        <th class="py-3 px-4">Intitulé</th>
                         <th class="py-3 px-4">Client</th>
+                        <th class="py-3 px-4">Fournisseur</th>
                         <th class="py-3 px-4">Site</th>
-                        <th class="py-3 px-4">Prix Total</th>
                         <th class="py-3 px-4">État</th>
                         <th class="py-3 px-4">Urgence</th>
                         <th class="py-3 px-4">Actions</th>
@@ -118,14 +117,29 @@
                             ->distinct()
                             ->pluck('stocks.lieux');
                     @endphp
-                    <tr class="commandes-row border-t hover:bg-gray-50" data-lieux="{{ $lieuxStockCommande->implode(', ') }}" data-etat="{{ $commande->etat }}" data-urgence="{{ strtolower($commande->urgence) }}"> <!-- Ajout de strtolower() -->
+                    <tr class="commandes-row border-t hover:bg-gray-50" data-lieux="{{ $lieuxStockCommande->implode(', ') }}" data-etat="{{ $commande->etat }}" data-urgence="{{ strtolower($commande->urgence) }}">
                         <td class="py-3 px-4">{{ $commande->id }}</td>
-                        <td class="py-3 px-4">{{ $commande->intitule }}</td>
                         <td class="py-3 px-4">{{ $commande->client ? $commande->client->nom : '/' }}</td>
+                        @php
+                            // Supposons que vous avez une relation entre commande et produit
+                            $produits = $commande->produits; // Remplacez ceci par la bonne relation ou logique pour récupérer les produits
+                            $fournisseurProduitCommande = null;
+
+                            foreach ($produits as $produit) {
+                                // Utilisez les bonnes relations ou identifiants pour accéder au fournisseur
+                                $fournisseurProduitCommande = DB::table('fournisseur_produit')
+                                    ->join('fournisseurs', 'fournisseur_produit.fournisseur_id', '=', 'fournisseurs.id')
+                                    ->where('fournisseur_produit.produit_id', $produit->id)  // Assurez-vous que le produit a bien un ID
+                                    ->where('fournisseur_produit.commande_id', $commande->id)
+                                    ->select('fournisseurs.nom')
+                                    ->first();
+                                break;  // Si vous ne voulez que le premier fournisseur, sinon continuez avec la logique adaptée
+                            }
+                        @endphp
+                        <td class="py-3 px-4">{{ $fournisseurProduitCommande ? $fournisseurProduitCommande->nom : '/' }}</td>
                         <td class="py-3 px-4">
                             {{ $lieuxStockCommande->implode(', ') ?: 'Non défini' }}
                         </td>
-                        <td class="py-3 px-4">{{ $commande->prix_total }} €</td>
                         <td class="py-3 px-4">{{ $commande->etat }}</td>
                         <td class="py-3 px-4">
                             <span class="
