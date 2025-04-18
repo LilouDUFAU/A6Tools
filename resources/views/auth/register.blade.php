@@ -26,33 +26,17 @@
                 </div>
 
                 <div class="mb-4">
-                    <label for="telephone" class="block text-gray-700 text-sm font-bold mb-2">{{ __('Téléphone') }}</label>
-                    <input id="telephone" type="text" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('telephone') border-red-500 @enderror" name="telephone" value="{{ old('telephone') }}" required autocomplete="telephone">
-                    @error('telephone')
-                        <p class="text-red-500 text-xs italic mt-2">{{ $message }}</p>
-                    @enderror
-                </div>
-
-                <div class="mb-4">
-                    <label for="adresse_postale" class="block text-gray-700 text-sm font-bold mb-2">{{ __('Adresse postale') }}</label>
-                    <input id="adresse_postale" type="text" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('adresse_postale') border-red-500 @enderror" name="adresse_postale" value="{{ old('adresse_postale') }}" required autocomplete="adresse_postale">
-                    @error('adresse_postale')
-                        <p class="text-red-500 text-xs italic mt-2">{{ $message }}</p>
-                    @enderror
-                </div>
-
-                <div class="mb-4">
                     <label for="photo" class="block text-gray-700 text-sm font-bold mb-2">{{ __('Photo') }}</label>
-                    <input id="photo" type="file" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('photo') border-red-500 @enderror" name="photo" required>
+                    <input id="photo" type="file" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('photo') border-red-500 @enderror" name="photo">
                     @error('photo')
                         <p class="text-red-500 text-xs italic mt-2">{{ $message }}</p>
                     @enderror
                 </div>
 
                 <div class="mb-4">
-                    <label for="date_naissance" class="block text-gray-700 text-sm font-bold mb-2">{{ __('Date de naissance') }}</label>
-                    <input id="date_naissance" type="date" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('date_naissance') border-red-500 @enderror" name="date_naissance" value="{{ old('date_naissance') }}" required>
-                    @error('date_naissance')
+                    <label for="telephone" class="block text-gray-700 text-sm font-bold mb-2">{{ __('Téléphone') }}</label>
+                    <input id="telephone" type="text" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('telephone') border-red-500 @enderror" name="telephone" value="{{ old('telephone') }}" required autocomplete="telephone">
+                    @error('telephone')
                         <p class="text-red-500 text-xs italic mt-2">{{ $message }}</p>
                     @enderror
                 </div>
@@ -77,19 +61,6 @@
                     <label for="password-confirm" class="block text-gray-700 text-sm font-bold mb-2">{{ __('Confirmer le mot de passe') }}</label>
                     <input id="password-confirm" type="password" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" name="password_confirmation" required autocomplete="new-password">
                 </div>
-
-                <!-- <div class="mb-4">
-                    <label for="service_id" class="block text-gray-700 text-sm font-bold mb-2">{{ __('Service') }}</label>
-                    <select id="service_id" name="service_id" required>
-                        <option value="">{{ __('Sélectionnez un service') }}</option>
-                        @foreach(\App\Models\Service::getNomService() as $service)
-                            <option value="{{ $service->id }}">{{ $service->nom }}</option>
-                        @endforeach
-                    </select>
-                    @error('service_id')
-                        <p class="text-red-500 text-xs italic mt-2">{{ $message }}</p>
-                    @enderror
-                </div> -->
 
                 <div class="mb-4">
                     <label for="service_id" class="block text-gray-700 text-sm font-bold mb-2">{{ __('Service') }}</label>
