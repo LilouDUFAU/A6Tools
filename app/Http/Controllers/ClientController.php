@@ -8,7 +8,7 @@ use Illuminate\Http\Request;
 class ClientController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Afficher tous les clients.
      */
     public function index()
     {
@@ -17,25 +17,21 @@ class ClientController extends Controller
     }
 
     /**
-     * Show the form for creating a new resource.
+     * Afficher le formulaire de création d'un client.
      */
     public function create()
     {
-        $types = Client::TYPES;
-        return view('clients.create', compact('types'));
+        return view('clients.create');
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Enregistrer un nouveau client.
      */
     public function store(Request $request)
     {
         $validated = $request->validate([
             'nom' => 'required|string|max:255',
-            'email' => 'required|email|unique:clients,email',
-            'telephone' => 'required|string|max:20',
-            'adresse_postale' => 'required|string|max:255',
-            'type' => 'required|in:' . implode(',', Client::TYPES),
+            'code_client' => 'required|string|max:255|unique:clients,code_client',
         ]);
 
         Client::create($validated);
@@ -44,7 +40,7 @@ class ClientController extends Controller
     }
 
     /**
-     * Display the specified resource.
+     * Afficher un client spécifique.
      */
     public function show(string $id)
     {
@@ -53,17 +49,16 @@ class ClientController extends Controller
     }
 
     /**
-     * Show the form for editing the specified resource.
+     * Afficher le formulaire d'édition d'un client.
      */
     public function edit(string $id)
     {
         $client = Client::findOrFail($id);
-        $types = Client::TYPES;
-        return view('clients.edit', compact('client', 'types'));
+        return view('clients.edit', compact('client'));
     }
 
     /**
-     * Update the specified resource in storage.
+     * Mettre à jour les informations d'un client.
      */
     public function update(Request $request, string $id)
     {
@@ -71,10 +66,7 @@ class ClientController extends Controller
 
         $validated = $request->validate([
             'nom' => 'required|string|max:255',
-            'email' => 'required|email|unique:clients,email,' . $client->id,
-            'telephone' => 'required|string|max:20',
-            'adresse_postale' => 'required|string|max:255',
-            'type' => 'required|in:' . implode(',', Client::TYPES),
+            'code_client' => 'required|string|max:255|unique:clients,code_client,' . $client->id,
         ]);
 
         $client->update($validated);
@@ -83,7 +75,7 @@ class ClientController extends Controller
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Supprimer un client.
      */
     public function destroy(string $id)
     {
