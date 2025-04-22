@@ -28,9 +28,9 @@
             </div>
 
             <div class="mb-4">
-                <label for="caracteristique" class="block text-gray-700 font-bold mb-2">Caractéristique</label>
-                <input type="text" name="caracteristique" id="caracteristique"
-                    value="{{ old('caracteristique', $pcrenouv->caracteristique) }}"
+                <label for="caracteristiques" class="block text-gray-700 font-bold mb-2">Caractéristique</label>
+                <input type="text" name="caracteristiques" id="caracteristiques"
+                    value="{{ old('caracteristiques', $pcrenouv->caracteristiques) }}"
                     class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1"
                     maxlength="255">
             </div>
