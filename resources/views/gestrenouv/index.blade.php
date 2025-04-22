@@ -3,7 +3,7 @@
 @section('content')
 
 <div class="container mx-auto py-8 px-4 sm:px-6 lg:px-8">
-    <h1 class="text-2xl sm:text-4xl font-extrabold mb-6 text-gray-900 text-center sm:text-left">Tableau de Bord des PCRenouv</h1>
+<h1 class="text-3xl font-bold mb-8 px-4 pt-10 text-gray-800">Tableau de Bord des PCRenouvs</h1>
 
     <h2 class="text-xl sm:text-2xl font-semibold px-2 sm:px-4 py-2 text-gray-700">Nombre de commandes par Site</h2>
     {{-- Filtres par lieu --}}
@@ -44,9 +44,10 @@
     @endforeach
     </div>
 
-    <div class="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4">
-        <button id="resetFilters" class="bg-gray-500 text-white px-4 py-2 rounded-md shadow hover:bg-gray-600 w-full sm:w-auto">Réinitialiser les filtres</button>
-        <a href="{{ route('gestrenouv.create') }}" class="bg-green-600 text-white px-4 py-2 rounded-md shadow hover:bg-green-600 w-full sm:w-auto text-center">Ajouter un PCRenouv</a>
+
+    <div class="flex justify-between items-center mb-4 px-4">
+        <button id="resetFilters" class="bg-gray-600 text-white px-6 py-3 rounded-lg shadow-md hover:bg-gray-700">Réinitialiser les filtres</button>
+        <a href="{{ route('gestrenouv.create') }}" class="bg-green-600 text-white px-6 py-3 rounded-lg shadow-md hover:bg-green-700">Ajouter un PCRenouv</a>
     </div>
 
     <div class="bg-white shadow rounded-lg p-4 sm:p-6">
