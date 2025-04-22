@@ -19,6 +19,7 @@ class PCRenouv extends Model
         'caracteristiques',
         'type',
         'statut',
+        'employe_id',
     ];
     
     /////////////////////////
@@ -46,6 +47,6 @@ class PCRenouv extends Model
     // un pcrenouv peut etre stocke dans un magasin
     public function stocks()
     {
-        return $this->belongsToMany(Stock::class, 'pcrenouv_stock');
+        return $this->belongsToMany(Stock::class, 'pcrenouv_stock', 'pcrenouv_id', 'stock_id')->withPivot('quantite');
     }
 }
