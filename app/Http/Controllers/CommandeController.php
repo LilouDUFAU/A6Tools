@@ -92,11 +92,25 @@ class CommandeController extends Controller
                 ]
             );
 
-            // Attacher fournisseur au produit
+            // Attacher fournisseur au produit via la table pivot fournisseur_produit
             if ($fournisseur_id) {
-                $produit->fournisseurs()->syncWithoutDetaching([
-                    $fournisseur_id => ['commande_id' => $commande->id]
-                ]);
+                // Vérification de l'existence de la relation fournisseur-produit pour la commande actuelle
+                $exists = DB::table('fournisseur_produit')
+                    ->where('fournisseur_id', $fournisseur_id)
+                    ->where('produit_id', $produit->id)
+                    ->where('commande_id', $commande->id)
+                    ->exists();
+
+                if (!$exists) {
+                    // Lier fournisseur au produit avec la commande
+                    DB::table('fournisseur_produit')->insert([
+                        'fournisseur_id' => $fournisseur_id,
+                        'produit_id' => $produit->id,
+                        'commande_id' => $commande->id,
+                        'created_at' => now(),
+                        'updated_at' => now(),
+                    ]);
+                }
             }
 
             // Attacher produit à la commande
@@ -120,8 +134,6 @@ class CommandeController extends Controller
         return redirect()->route('commande.index')->with('success', 'Commande créée avec succès.');
     }
 
-
-
     /**
      * Affiche les détails d'une commande.
      */
@@ -129,7 +141,7 @@ class CommandeController extends Controller
     {
         // Récupère la commande avec les relations client, employé et produits associés
         $commande = Commande::with(['client', 'employe', 'produits.fournisseurs', 'produits.stocks'])->findOrFail($id);
-        
+
         // Retourner la vue avec la commande et ses relations
         return view('gestock.show', compact('commande'));
     }
@@ -143,7 +155,7 @@ class CommandeController extends Controller
         $commande = Commande::with(['produits' => function($query) {
             $query->withPivot('quantite_totale', 'quantite_client', 'quantite_stock');
         }, 'client'])->findOrFail($id);
-        
+
         // Récupérer tous les clients, fournisseurs, stocks et produits disponibles
         $clients = Client::all();
         $stocks = Stock::all();
@@ -157,7 +169,6 @@ class CommandeController extends Controller
         // Renvoyer la vue avec les données nécessaires
         return view('gestock.edit', compact('commande', 'clients', 'stocks', 'etats', 'urgences', 'fournisseurs', 'produits'));
     }
-
 
     /**
      * Met à jour une commande existante.
@@ -181,13 +192,10 @@ class CommandeController extends Controller
 
         // CLIENT
         if ($request->filled('client_id')) {
-            // Si un client est sélectionné, on le met à jour
             $client = Client::findOrFail($request->input('client_id'));
-            // Vérification que 'nom' et 'code_client' ne sont pas nulls
             $clientNom = $request->input('new_client.nom');
             $clientCodeClient = $request->input('new_client.code_client');
 
-            // Si 'nom' ou 'code_client' est null, ne pas mettre à jour
             if ($clientNom !== null && $clientCodeClient !== null) {
                 $client->update([
                     'nom' => $clientNom,
@@ -195,15 +203,12 @@ class CommandeController extends Controller
                 ]);
                 $commande->client_id = $client->id;
             } else {
-                // Si le client a des valeurs invalides, ne pas mettre à jour
                 $commande->client_id = null;
             }
         } elseif ($request->filled('new_client.nom')) {
-            // Si un nouveau client est fourni, on le crée
             $clientNom = $request->input('new_client.nom');
             $clientCodeClient = $request->input('new_client.code_client');
 
-            // Vérification que 'nom' et 'code_client' ne sont pas nulls
             if ($clientNom && $clientCodeClient) {
                 $client = Client::create([
                     'nom' => $clientNom,
@@ -211,25 +216,21 @@ class CommandeController extends Controller
                 ]);
                 $commande->client_id = $client->id;
             } else {
-                // Si le client a des valeurs invalides, ne pas créer
                 $commande->client_id = null;
             }
         } else {
-            // Si aucun client n'est fourni, on met le client_id à null
             $commande->client_id = null;
         }
 
         // Fournisseur
         $fournisseur_id = null;
         if ($request->filled('fournisseur_id')) {
-            // Si un fournisseur est sélectionné, on le met à jour
             $fournisseur = Fournisseur::findOrFail($request->input('fournisseur_id'));
             $fournisseur->update([
                 'nom' => $request->input('new_fournisseur.nom', $fournisseur->nom),
             ]);
             $fournisseur_id = $fournisseur->id;
         } elseif ($request->filled('new_fournisseur.nom')) {
-            // Si un nouveau fournisseur est fourni, on le crée
             $fournisseur = Fournisseur::create([
                 'nom' => $request->input('new_fournisseur.nom'),
             ]);
@@ -255,19 +256,29 @@ class CommandeController extends Controller
 
             // Lier le fournisseur (si fourni)
             if ($fournisseur_id) {
-                $produit->fournisseurs()->syncWithoutDetaching([
-                    $fournisseur_id => ['commande_id' => $commande->id]
-                ]);
+                $exists = DB::table('fournisseur_produit')
+                    ->where('fournisseur_id', $fournisseur_id)
+                    ->where('produit_id', $produit->id)
+                    ->where('commande_id', $commande->id)
+                    ->exists();
+
+                if (!$exists) {
+                    DB::table('fournisseur_produit')->insert([
+                        'fournisseur_id' => $fournisseur_id,
+                        'produit_id' => $produit->id,
+                        'commande_id' => $commande->id,
+                        'created_at' => now(),
+                        'updated_at' => now(),
+                    ]);
+                }
             }
 
-            // Lier le produit à la commande (1 produit)
             $commande->produits()->attach($produit->id, [
                 'quantite_totale' => $produitData['quantite_totale'] ?? 0,
                 'quantite_client' => $produitData['quantite_client'] ?? 0,
                 'quantite_stock' => ($produitData['quantite_totale'] ?? 0) - ($produitData['quantite_client'] ?? 0),
             ]);
 
-            // Insérer dans produit_stock
             DB::table('produit_stock')->insert([
                 'produit_id' => $produit->id,
                 'stock_id' => $request->input('stock_id'),
@@ -278,13 +289,10 @@ class CommandeController extends Controller
             ]);
         }
 
-        // Sauvegarder la commande après modifications
         $commande->save();
 
         return redirect()->route('commande.index')->with('success', 'Commande mise à jour avec succès.');
     }
-
-
 
     /**
      * Supprime une commande.
