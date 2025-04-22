@@ -2,7 +2,7 @@
 
 @section('content')
 
-<div class="min-h-screen bg-gray-50">
+<div class="min-h-screen">
     <h1 class="text-3xl font-bold mb-8 px-4 pt-10 text-gray-800">Tableau de Bord des Commandes</h1>
 
     {{-- Filtres et Statistiques --}}
