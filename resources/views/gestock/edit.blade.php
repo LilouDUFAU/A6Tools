@@ -198,7 +198,15 @@
         </script>
         </div>
 
-        <button type="submit" class="w-full bg-green-600 text-white px-6 py-3 rounded-lg shadow hover:bg-green-700  ">Mettre à jour</button>
+        <button type="submit"
+                class="w-full bg-green-600 text-white px-6 py-3 rounded-lg shadow hover:bg-green-700 focus:ring-2 focus:ring-green-500 flex items-center justify-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none"
+                    viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M5 13l4 4L19 7" />
+                </svg>
+                Mettre à jour
+            </button>
     </form>
     <div class="text-right mt-4 p-4">
         <a href="{{ route('commande.index') }}" class="text-gray-500 hover:underline">Retour</a>
