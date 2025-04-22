@@ -17,12 +17,22 @@ class PCRenouv extends Model
         'reference',
         'quantite',
         'caracteristiques',
-        'emplacement',
         'type',
         'statut',
-        'created_at',
     ];
     
+    /////////////////////////
+    /// ENUMS définis ici ///
+    /////////////////////////
+    const TYPE = [
+        'portable',
+        'fixe',
+    ];
+    const STATUT = [
+        'en stock',
+        'prêté',
+    ];
+
     //////////////////////////////
     //relations entre les tables//
     //////////////////////////////
@@ -31,5 +41,11 @@ class PCRenouv extends Model
     public function employe()
     {
         return $this->belongsTo(User::class, 'employe_id', 'id');
+    }
+
+    // un pcrenouv peut etre stocke dans un magasin
+    public function stocks()
+    {
+        return $this->belongsToMany(Stock::class, 'pcrenouv_stock');
     }
 }
