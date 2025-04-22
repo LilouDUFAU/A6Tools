@@ -39,7 +39,7 @@ class Stock extends Model
     //un stock peut contenir plusieurs pcrenouv
     public function pcrenouv()
     {
-        return $this->belongsToMany(Produit::class, 'pcrenouv_stock');
+        return $this->belongsToMany(PCRenouv::class, 'pcrenouv_stock', 'stock_id', 'pcrenouv_id')->withPivot('quantite');    
     }
     
 }
