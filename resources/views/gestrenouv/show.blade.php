@@ -19,7 +19,7 @@
 
         <div class="mb-4">
             <p class="text-gray-700 font-bold">Caractéristique :</p>
-            <p class="text-gray-900">{{ $pcrenouv->caracteristique ?? 'N/A' }}</p>
+            <p class="text-gray-900">{{ $pcrenouv->caracteristiques ?? 'N/A' }}</p>
         </div>
 
         <div class="mb-4">
