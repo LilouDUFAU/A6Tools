@@ -19,11 +19,11 @@
             ->distinct()->pluck('commande_id');
     @endphp
     <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-8 px-4">
-        <div class="filter-btn bg-gradient-to-r from-green-700 to-yellow-600 text-white text-center py-6 rounded-lg shadow-md" data-filter="mont de marsan" data-type="lieu">
+        <div class="filter-btn bg-gradient-to-r from-green-700 to-yellow-600 text-white text-center py-6 rounded-lg shadow-md hover:shadow-lg hover:scale-105 transition-all duration-300 cursor-pointer" data-filter="mont de marsan" data-type="lieu">
             <div class="text-3xl font-bold">{{ $commandesMontDeMarsan->count() }}</div>
             <div class="text-lg">Mont de Marsan</div>
         </div>
-        <div class="filter-btn bg-gradient-to-r from-orange-600 to-red-600 text-white text-center py-6 rounded-lg shadow-md" data-filter="aire sur adour" data-type="lieu">
+        <div class="filter-btn bg-gradient-to-r from-orange-600 to-red-600 text-white text-center py-6 rounded-lg shadow-md hover:shadow-lg hover:scale-105 transition-all duration-300 cursor-pointer" data-filter="aire sur adour" data-type="lieu">
             <div class="text-3xl font-bold">{{ $commandesAireSurAdour->count() }}</div>
             <div class="text-lg">Aire sur Adour</div>
         </div>
@@ -32,7 +32,7 @@
     <h2 class="text-2xl font-semibold px-4 py-2 text-gray-700">Nombre de commandes par état</h2>
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6 mb-8 px-4">
         @foreach(['A faire'=>'green','Commandé'=>'yellow','Reçu'=>'amber','Prévenu'=>'orange','Délais'=>'red'] as $etat => $color)
-        <div class="filter-btn bg-{{$color}}-600 text-white text-center py-6 rounded-lg shadow-md" data-filter="{{ strtolower($etat) }}" data-type="etat">
+        <div class="filter-btn bg-{{$color}}-600 text-white text-center py-6 rounded-lg shadow-md hover:shadow-lg hover:scale-105 transition-all duration-300 cursor-pointer" data-filter="{{ strtolower($etat) }}" data-type="etat">
             <div class="text-3xl font-bold">{{ $commandes->where('etat', $etat)->count() }}</div>
             <div class="text-lg">{{ $etat }}</div>
         </div>
@@ -42,7 +42,7 @@
     <h2 class="text-2xl font-semibold px-4 py-2 text-gray-700">Nombre de commandes par urgence</h2>
     <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-8 px-4">
         @foreach(['pas urgent'=>'green','urgent'=>'orange'] as $urgence => $color)
-        <div class="filter-btn bg-{{$color}}-600 text-white text-center py-6 rounded-lg shadow-md" data-filter="{{ $urgence }}" data-type="urgence">
+        <div class="filter-btn bg-{{$color}}-600 text-white text-center py-6 rounded-lg shadow-md hover:shadow-lg hover:scale-105 transition-all duration-300 cursor-pointer" data-filter="{{ $urgence }}" data-type="urgence">
             <div class="text-3xl font-bold">{{ $commandes->where('urgence', $urgence)->count() }}</div>
             <div class="text-lg">{{ ucfirst($urgence) }}</div>
         </div>
@@ -51,12 +51,12 @@
 
     <div class="flex justify-between items-center mb-4 px-4">
         <div class="flex flex-wrap gap-4 mb-8 px-4">
-            <button id="resetFilters" class="bg-gray-600 text-white px-6 py-3 rounded-lg shadow-md">Réinitialiser les filtres</button>
-            <button id="groupDefault" class="bg-indigo-600 text-white px-6 py-3 rounded-lg shadow-md">Vue par Défaut</button>
-            <button id="groupByArticle" class="bg-blue-600 text-white px-6 py-3 rounded-lg shadow-md">Grouper par Article</button>
-            <button id="groupByFournisseur" class="bg-purple-600 text-white px-6 py-3 rounded-lg shadow-md">Grouper par Fournisseur</button>
+            <button id="resetFilters" class="bg-gray-600 text-white px-6 py-3 rounded-lg shadow-md hover:bg-gray-700 hover:shadow-lg transition-all duration-300">Réinitialiser les filtres</button>
+            <button id="groupDefault" class="bg-indigo-600 text-white px-6 py-3 rounded-lg shadow-md hover:bg-indigo-700 hover:shadow-lg transition-all duration-300">Vue par Défaut</button>
+            <button id="groupByArticle" class="bg-blue-600 text-white px-6 py-3 rounded-lg shadow-md hover:bg-blue-700 hover:shadow-lg transition-all duration-300">Grouper par Article</button>
+            <button id="groupByFournisseur" class="bg-purple-600 text-white px-6 py-3 rounded-lg shadow-md hover:bg-purple-700 hover:shadow-lg transition-all duration-300">Grouper par Fournisseur</button>
         </div>
-        <a href="{{ route('commande.create') }}" class="bg-green-600 text-white px-6 py-3 rounded-lg shadow-md">Ajouter une Commande</a>
+        <a href="{{ route('commande.create') }}" class="bg-green-600 text-white px-6 py-3 rounded-lg shadow-md hover:bg-green-700 hover:shadow-lg transition-all duration-300">Ajouter une Commande</a>
     </div>
         
 
@@ -105,9 +105,9 @@
             "<form action='".route('commande.destroy',$c->id)."' method='POST' class='inline'>".
             "<input type='hidden' name='_token' value='{$csrf}'>".
             "<input type='hidden' name='_method' value='DELETE'>".
-            "<button type='button' class='text-green-700 hover:underline font-semibold mr-2' onclick=\"window.location.href='".route('commande.show',$c->id)."'\">Détails</button>".
-            "<button type='button' class='text-yellow-700 hover:underline font-semibold mr-2' onclick=\"window.location.href='".route('commande.edit',$c->id)."'\">Modifier</button>".
-            "<button type='submit' onclick=\"return confirm('Confirmer la suppression ?')\" class='text-red-700 hover:underline font-semibold'>Supprimer</button>".
+            "<button type='button' class='text-green-700 hover:text-green-900 hover:font-bold font-semibold mr-2 transition-all duration-300' onclick=\"window.location.href='".route('commande.show',$c->id)."'\">Détails</button>".
+            "<button type='button' class='text-yellow-700 hover:text-yellow-900 hover:font-bold font-semibold mr-2 transition-all duration-300' onclick=\"window.location.href='".route('commande.edit',$c->id)."'\">Modifier</button>".
+            "<button type='submit' onclick=\"return confirm('Confirmer la suppression ?')\" class='text-red-700 hover:text-red-900 hover:font-bold font-semibold transition-all duration-300'>Supprimer</button>".
             "</form>";
         return ['id'=>$c->id,'client'=>$c->client?->nom?:'<strong>Pas de client<strong>','fournisseur'=>$fourn,'lieux'=>$lieux?:'Non défini','produits'=>$produits,'etat'=>strtolower($c->etat),'urgence'=>strtolower($c->urgence),'actions'=>$actions];
     });
