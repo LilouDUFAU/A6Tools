@@ -38,7 +38,6 @@ class Commande extends Model
     const URGENCES = [
         'pas urgent',
         'urgent',
-        'très urgent',
     ];
     
     //////////////////////////////
