@@ -5,7 +5,7 @@
     <h1 class="text-3xl font-extrabold text-gray-800 mb-8">Détails du PCRenouv</h1>
 
     <div class="border-l-4 border-green-600 pl-4 mb-8">
-        <h2 class="text-2xl font-bold text-gray-800 mb-4">Commande</h2>
+        <h2 class="text-2xl font-bold text-gray-800 mb-4">PCRenouv</h2>
         
         <div class="mb-4">
             <p class="text-gray-700 font-bold">Référence :</p>
