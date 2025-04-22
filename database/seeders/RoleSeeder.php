@@ -13,8 +13,8 @@ class RoleSeeder extends Seeder
     public function run(): void
     {
         DB::table('roles')->insert([
-            ['id' => 1, 'nom' => 'admin', 'description' => 'Role permettant d\'administrer le système', 'created_at' => now(), 'updated_at' => now()],
-            ['id' => 2, 'nom' => 'user', 'description' => 'Role permettant d\'utiliser les fonctionnalités de base du système', 'created_at' => now(), 'updated_at' => now()],
+            ['id' => 1, 'nom' => 'user', 'description' => 'Role permettant d\'utiliser les fonctionnalités de base du système', 'created_at' => now(), 'updated_at' => now()],
+            ['id' => 2, 'nom' => 'admin', 'description' => 'Role permettant d\'administrer le système', 'created_at' => now(), 'updated_at' => now()],
         ]);
     }
 }
