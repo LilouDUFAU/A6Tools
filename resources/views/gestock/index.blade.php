@@ -41,7 +41,7 @@
 
     <h2 class="text-2xl font-semibold px-4 py-2 text-gray-700">Nombre de commandes par urgence</h2>
     <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-8 px-4">
-        @foreach(['pas urgent'=>'green','urgent'=>'orange'] as $urgence => $color)
+        @foreach(['pas urgent'=>'green','urgent'=>'red'] as $urgence => $color)
         <div class="filter-btn bg-{{$color}}-600 text-white text-center py-6 rounded-lg shadow-md hover:bg-{{$color}}-700 cursor-pointer" data-filter="{{ $urgence }}" data-type="urgence">
             <div class="text-3xl font-bold">{{ $commandes->where('urgence', $urgence)->count() }}</div>
             <div class="text-lg">{{ ucfirst($urgence) }}</div>
