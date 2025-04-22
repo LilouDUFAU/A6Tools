@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('reference'); // Référence du PCRenouv
             $table->integer('quantite'); // Quantité
-            $table->text('caracteristiques')->nullable(); // Caractéristiques du PCRenouv
+            $table->string('caracteristiques', 5000)->nullable(); // Caractéristiques du PCRenouv
             $table->enum('type', ['portable', 'fixe']); // Type du PCRenouv
             $table->enum('statut', ['en stock', 'prêté']); // Statut du PCRenouv
             $table->unsignedBigInteger('employe_id'); // Clé étrangère vers la table users (employé)
