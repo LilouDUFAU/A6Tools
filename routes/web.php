@@ -24,13 +24,13 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('/commandes/{id}', [CommandeController::class, 'destroy'])->name('commande.destroy');
 
     // Routes pour PCRenouvController accessibles uniquement aux utilisateurs connectés
-    Route::get('/pcrenouv', [PCRenouvController::class, 'index'])->name('pcrenouv.index');
-    Route::get('/pcrenouv/create', [PCRenouvController::class, 'create'])->name('pcrenouv.create');
-    Route::post('/pcrenouv', [PCRenouvController::class, 'store'])->name('pcrenouv.store');
-    Route::get('/pcrenouv/{id}', [PCRenouvController::class, 'show'])->name('pcrenouv.show');
-    Route::get('/pcrenouv/{id}/edit', [PCRenouvController::class, 'edit'])->name('pcrenouv.edit');
-    Route::put('/pcrenouv/{id}', [PCRenouvController::class, 'update'])->name('pcrenouv.update');
-    Route::delete('/pcrenouv/{id}', [PCRenouvController::class, 'destroy'])->name('pcrenouv.destroy');
+    Route::get('/pcrenouv', [PCRenouvController::class, 'index'])->name('gestrenouv.index');
+    Route::get('/pcrenouv/create', [PCRenouvController::class, 'create'])->name('gestrenouv.create');
+    Route::post('/pcrenouv', [PCRenouvController::class, 'store'])->name('gestrenouv.store');
+    Route::get('/pcrenouv/{id}', [PCRenouvController::class, 'show'])->name('gestrenouv.show');
+    Route::get('/pcrenouv/{id}/edit', [PCRenouvController::class, 'edit'])->name('gestrenouv.edit');
+    Route::put('/pcrenouv/{id}', [PCRenouvController::class, 'update'])->name('gestrenouv.update');
+    Route::delete('/pcrenouv/{id}', [PCRenouvController::class, 'destroy'])->name('gestrenouv.destroy');
 });
 
 Route::middleware(['auth', 'admin'])->group(function () {
