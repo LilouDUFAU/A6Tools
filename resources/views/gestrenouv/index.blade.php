@@ -9,7 +9,7 @@
     {{-- Filtres par lieu --}}
     <div class='grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 mb-8 px-2 sm:px-4'>
     @foreach(['Mont de Marsan', 'Aire sur Adour'] as $lieu)
-    <div class="filter-btn {{ $lieu === 'Mont de Marsan' ? 'bg-green-700 hover:bg-green-800 ring-blue-500' : 'bg-red-700 hover:bg-red-800 ring-blue-500' }} text-white text-center py-4 sm:py-6 rounded-lg shadow-md cursor-pointer ring-4" data-filter="{{ strtolower($lieu) }}" data-type="lieu">
+    <div class="filter-btn {{ $lieu === 'Mont de Marsan' ? 'bg-green-600 hover:bg-green-700 ring-blue-500' : 'bg-red-700 hover:bg-red-800 ring-blue-500' }} text-white text-center py-4 sm:py-6 rounded-lg shadow-md cursor-pointer" data-filter="{{ strtolower($lieu) }}" data-type="lieu">
         <div class="text-2xl sm:text-3xl font-bold">
             {{ $pcrenouvs->filter(fn($r) => optional($r->stocks->first())->lieux === $lieu)->count() }}
         </div>
@@ -22,7 +22,7 @@
     {{-- Filtres par type --}}
     <div class='grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 mb-8 px-2 sm:px-4'>
     @foreach(App\Models\PCRenouv::TYPES as $type)
-    <div class="filter-btn {{ $loop->index % 2 === 0 ? 'bg-green-700 hover:bg-green-800 ring-blue-500' : 'bg-red-700 hover:bg-red-800 ring-blue-500' }} text-white text-center py-4 sm:py-6 rounded-lg shadow-md cursor-pointer ring-4" data-filter="{{ strtolower($type) }}" data-type="type">
+    <div class="filter-btn {{ $loop->index % 2 === 0 ? 'bg-green-600 hover:bg-green-700 ring-blue-500' : 'bg-red-700 hover:bg-red-800 ring-blue-500' }} text-white text-center py-4 sm:py-6 rounded-lg shadow-md cursor-pointer" data-filter="{{ strtolower($type) }}" data-type="type">
         <div class="text-2xl sm:text-3xl font-bold">
             {{ $pcrenouvs->filter(fn($r) => strtolower($r->type) === strtolower($type))->count() }}
         </div>
@@ -35,7 +35,7 @@
     {{-- Filtres par statut --}}
     <div class='grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 mb-8 px-2 sm:px-4'>
     @foreach(App\Models\PCRenouv::STATUTS as $statut)
-    <div class="filter-btn {{ $loop->index % 2 === 0 ? 'bg-green-700 hover:bg-green-800 ring-blue-500' : 'bg-red-700 hover:bg-red-800 ring-blue-500' }} text-white text-center py-4 sm:py-6 rounded-lg shadow-md cursor-pointer ring-4" data-filter="{{ strtolower($statut) }}" data-type="statut">
+    <div class="filter-btn {{ $loop->index % 2 === 0 ? 'bg-green-600 hover:bg-green-700 ring-blue-500' : 'bg-red-700 hover:bg-red-800 ring-blue-500' }} text-white text-center py-4 sm:py-6 rounded-lg shadow-md cursor-pointer" data-filter="{{ strtolower($statut) }}" data-type="statut">
         <div class="text-2xl sm:text-3xl font-bold">
             {{ $pcrenouvs->filter(fn($r) => strtolower($r->statut) === strtolower($statut))->count() }}
         </div>
