@@ -183,18 +183,40 @@ class CommandeController extends Controller
         if ($request->filled('client_id')) {
             // Si un client est sélectionné, on le met à jour
             $client = Client::findOrFail($request->input('client_id'));
-            $client->update([
-                'nom' => $request->input('new_client.nom', $client->nom),
-                'code_client' => $request->input('new_client.code_client', $client->code_client),
-            ]);
-            $commande->client_id = $client->id;
+            // Vérification que 'nom' et 'code_client' ne sont pas nulls
+            $clientNom = $request->input('new_client.nom');
+            $clientCodeClient = $request->input('new_client.code_client');
+
+            // Si 'nom' ou 'code_client' est null, ne pas mettre à jour
+            if ($clientNom !== null && $clientCodeClient !== null) {
+                $client->update([
+                    'nom' => $clientNom,
+                    'code_client' => $clientCodeClient,
+                ]);
+                $commande->client_id = $client->id;
+            } else {
+                // Si le client a des valeurs invalides, ne pas mettre à jour
+                $commande->client_id = null;
+            }
         } elseif ($request->filled('new_client.nom')) {
             // Si un nouveau client est fourni, on le crée
-            $client = Client::create([
-                'nom' => $request->input('new_client.nom'),
-                'code_client' => $request->input('new_client.code_client'),
-            ]);
-            $commande->client_id = $client->id;
+            $clientNom = $request->input('new_client.nom');
+            $clientCodeClient = $request->input('new_client.code_client');
+
+            // Vérification que 'nom' et 'code_client' ne sont pas nulls
+            if ($clientNom && $clientCodeClient) {
+                $client = Client::create([
+                    'nom' => $clientNom,
+                    'code_client' => $clientCodeClient,
+                ]);
+                $commande->client_id = $client->id;
+            } else {
+                // Si le client a des valeurs invalides, ne pas créer
+                $commande->client_id = null;
+            }
+        } else {
+            // Si aucun client n'est fourni, on met le client_id à null
+            $commande->client_id = null;
         }
 
         // Fournisseur
@@ -261,6 +283,7 @@ class CommandeController extends Controller
 
         return redirect()->route('commande.index')->with('success', 'Commande mise à jour avec succès.');
     }
+
 
 
     /**
