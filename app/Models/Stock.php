@@ -35,5 +35,11 @@ class Stock extends Model
     {
         return $this->belongsToMany(Produit::class, 'produit_stock');
     }
+
+    //un stock peut contenir plusieurs pcrenouv
+    public function pcrenouv()
+    {
+        return $this->belongsToMany(Produit::class, 'pcrenouv_stock');
+    }
     
 }
