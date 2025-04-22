@@ -50,7 +50,7 @@
     </div>
 
     <div class="flex justify-between items-center mb-4 px-4">
-        <div class="flex flex-wrap gap-4 mb-8 px-4">
+        <div class="flex flex-wrap gap-4">
             <button id="resetFilters" class="bg-gray-600 text-white px-6 py-3 rounded-lg shadow-md hover:bg-gray-700 hover:shadow-lg transition-all duration-300">Réinitialiser les filtres</button>
             <button id="groupDefault" class="bg-indigo-600 text-white px-6 py-3 rounded-lg shadow-md hover:bg-indigo-700 hover:shadow-lg transition-all duration-300">Vue par Défaut</button>
             <button id="groupByArticle" class="bg-blue-600 text-white px-6 py-3 rounded-lg shadow-md hover:bg-blue-700 hover:shadow-lg transition-all duration-300">Grouper par Article</button>
@@ -109,7 +109,7 @@
             "<button type='button' class='text-yellow-700 hover:text-yellow-900 hover:font-bold font-semibold mr-2 transition-all duration-300' onclick=\"window.location.href='".route('commande.edit',$c->id)."'\">Modifier</button>".
             "<button type='submit' onclick=\"return confirm('Confirmer la suppression ?')\" class='text-red-700 hover:text-red-900 hover:font-bold font-semibold transition-all duration-300'>Supprimer</button>".
             "</form>";
-        return ['id'=>$c->id,'client'=>$c->client?->nom?:'<strong>Pas de client<strong>','fournisseur'=>$fourn,'lieux'=>$lieux?:'Non défini','produits'=>$produits,'etat'=>strtolower($c->etat),'urgence'=>strtolower($c->urgence),'actions'=>$actions];
+        return ['id'=>$c->id,'client'=>$c->client?->nom?:'<p class="text-red-500">Pas de client</p>','fournisseur'=>$fourn,'lieux'=>$lieux?:'Non défini','produits'=>$produits,'etat'=>strtolower($c->etat),'urgence'=>strtolower($c->urgence),'actions'=>$actions];
     });
 @endphp
 
