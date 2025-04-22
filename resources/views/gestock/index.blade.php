@@ -49,12 +49,16 @@
         @endforeach
     </div>
 
-    <div class="flex flex-wrap gap-4 mb-8 px-4">
-        <button id="resetFilters" class="bg-gray-600 text-white px-6 py-3 rounded-lg shadow-md">Réinitialiser les filtres</button>
-        <button id="groupDefault" class="bg-indigo-600 text-white px-6 py-3 rounded-lg shadow-md">Vue par Défaut</button>
-        <button id="groupByArticle" class="bg-blue-600 text-white px-6 py-3 rounded-lg shadow-md">Grouper par Article</button>
-        <button id="groupByFournisseur" class="bg-purple-600 text-white px-6 py-3 rounded-lg shadow-md">Grouper par Fournisseur</button>
+    <div class="flex justify-between items-center mb-4 px-4">
+        <div class="flex flex-wrap gap-4 mb-8 px-4">
+            <button id="resetFilters" class="bg-gray-600 text-white px-6 py-3 rounded-lg shadow-md">Réinitialiser les filtres</button>
+            <button id="groupDefault" class="bg-indigo-600 text-white px-6 py-3 rounded-lg shadow-md">Vue par Défaut</button>
+            <button id="groupByArticle" class="bg-blue-600 text-white px-6 py-3 rounded-lg shadow-md">Grouper par Article</button>
+            <button id="groupByFournisseur" class="bg-purple-600 text-white px-6 py-3 rounded-lg shadow-md">Grouper par Fournisseur</button>
+        </div>
+        <a href="{{ route('commande.create') }}" class="bg-green-600 text-white px-6 py-3 rounded-lg shadow-md">Ajouter une Commande</a>
     </div>
+        
 
     <div class="mx-auto px-4 sm:px-6 md:px-8 py-6">
         <h2 id="table-title" class="text-2xl font-semibold text-gray-800 mb-4">Liste des Commandes</h2>
@@ -105,7 +109,7 @@
             "<button type='button' class='text-yellow-700 hover:underline font-semibold mr-2' onclick=\"window.location.href='".route('commande.edit',$c->id)."'\">Modifier</button>".
             "<button type='submit' onclick=\"return confirm('Confirmer la suppression ?')\" class='text-red-700 hover:underline font-semibold'>Supprimer</button>".
             "</form>";
-        return ['id'=>$c->id,'client'=>$c->client?->nom?:'/','fournisseur'=>$fourn,'lieux'=>$lieux?:'Non défini','produits'=>$produits,'etat'=>strtolower($c->etat),'urgence'=>strtolower($c->urgence),'actions'=>$actions];
+        return ['id'=>$c->id,'client'=>$c->client?->nom?:'<strong>Pas de client<strong>','fournisseur'=>$fourn,'lieux'=>$lieux?:'Non défini','produits'=>$produits,'etat'=>strtolower($c->etat),'urgence'=>strtolower($c->urgence),'actions'=>$actions];
     });
 @endphp
 
@@ -181,8 +185,9 @@
         données.forEach(cmd => {
             if (filtreOK(cmd)) {
                 cmd.produits.forEach(p => {
-                    const key = cmd.fournisseur + '|' + p.nom;
-                    if (!agg[key]) agg[key] = {fournisseur: cmd.fournisseur, produit: p.nom, quantite: 0};
+                    const fournisseur = cmd.fournisseur || 'Non défini';
+                    const key = fournisseur + '|' + p.nom;
+                    if (!agg[key]) agg[key] = {fournisseur: fournisseur, produit: p.nom, quantite: 0};
                     agg[key].quantite += p.quantite;
                 });
             }
