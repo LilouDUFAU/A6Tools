@@ -24,11 +24,11 @@ class PCRenouv extends Model
     /////////////////////////
     /// ENUMS définis ici ///
     /////////////////////////
-    const TYPE = [
+    const TYPES = [
         'portable',
         'fixe',
     ];
-    const STATUT = [
+    const STATUTS = [
         'en stock',
         'prêté',
     ];
