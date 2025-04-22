@@ -4,14 +4,14 @@
         <a href="{{ route('welcome') }}" class="flex md:hidden hover:bg-green-700 rounded-lg hover:px-2 hover:py-1 hover:text-white transition-all duration-300 hover:font-semibold"><i class="fa-solid fa-house"></i> <span class="ml-2">Accueil</span></a>
         <a href="" class="hover:bg-green-700 rounded-lg hover:px-2 hover:py-1 hover:text-white transition-all duration-300 hover:font-semibold"><i class="fa-solid fa-table"></i> <span class="ml-2">Dashboard</span></a>
         <a href="{{ route('commande.index') }}" class="hover:bg-green-700 rounded-lg hover:px-2 hover:py-1 hover:text-white transition-all duration-300 hover:font-semibold"><i class="fa-solid fa-box-open"></i> <span class="ml-2">Gestock</span></a>
-        <a href="" class="hover:bg-green-700 rounded-lg hover:px-2 hover:py-1 hover:text-white transition-all duration-300 hover:font-semibold"><i class="fa-solid fa-desktop"></i> <span class="ml-2">GestRenouv</span></a>
+        <a href="{{ route('pcrenouv.index') }}" class="hover:bg-green-700 rounded-lg hover:px-2 hover:py-1 hover:text-white transition-all duration-300 hover:font-semibold"><i class="fa-solid fa-desktop"></i> <span class="ml-2">GestRenouv</span></a>
         <a href="" class="hover:bg-green-700 rounded-lg hover:px-2 hover:py-1 hover:text-white transition-all duration-300 hover:font-semibold"><i class="fa-solid fa-wrench"></i> <span class="ml-2">GestAtelier</span></a>
         <a href="" class="hover:bg-green-700 rounded-lg hover:px-2 hover:py-1 hover:text-white transition-all duration-300 hover:font-semibold"><i class="fa-solid fa-bolt"></i> <span class="ml-2">GestSAV</span></a>
 
         @if (Route::has('login'))
             @auth
             <a href="" class="flex md:hidden hover:bg-green-700 rounded-lg hover:px-2 hover:py-1 hover:text-white transition-all duration-300 hover:font-semibold">
-                <i class="fa-solid fa-circle-user"></i> <span class="ml-2">Lilou</span> <!-- {{ Auth::user()->prenom }} -->
+                <i class="fa-solid fa-circle-user"></i> <span class="ml-2">{{ Auth::user()->prenom }}</span> 
             </a>
             @else
             <a href="{{ route('login') }}" class="flex md:hidden  hover:bg-green-700 rounded-lg hover:px-2 hover:py-1 hover:text-white transition-all duration-300 hover:font-semibold flex items-center gap-2">

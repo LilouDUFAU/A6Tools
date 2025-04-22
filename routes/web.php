@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AccountController;
 use App\Http\Controllers\CommandeController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\PCRenouvController; // Assurez-vous d'importer le contrôleur
 
 Route::get('/', function () {
     return view('welcome');
@@ -21,4 +22,22 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/commandes/{id}/edit', [CommandeController::class, 'edit'])->name('commande.edit');
     Route::put('/commandes/{id}', [CommandeController::class, 'update'])->name('commande.update');
     Route::delete('/commandes/{id}', [CommandeController::class, 'destroy'])->name('commande.destroy');
+
+    // Routes pour PCRenouvController accessibles uniquement aux utilisateurs connectés
+    Route::get('/pcrenouv', [PCRenouvController::class, 'index'])->name('pcrenouv.index');
+    Route::get('/pcrenouv/create', [PCRenouvController::class, 'create'])->name('pcrenouv.create');
+    Route::post('/pcrenouv', [PCRenouvController::class, 'store'])->name('pcrenouv.store');
+    Route::get('/pcrenouv/{id}', [PCRenouvController::class, 'show'])->name('pcrenouv.show');
+    Route::get('/pcrenouv/{id}/edit', [PCRenouvController::class, 'edit'])->name('pcrenouv.edit');
+    Route::put('/pcrenouv/{id}', [PCRenouvController::class, 'update'])->name('pcrenouv.update');
+    Route::delete('/pcrenouv/{id}', [PCRenouvController::class, 'destroy'])->name('pcrenouv.destroy');
+});
+
+Route::middleware(['auth', 'admin'])->group(function () {
+    Route::get('/admin', [AccountController::class, 'index'])->name('admin.index');
+    Route::get('/admin/create', [AccountController::class, 'create'])->name('admin.create');
+    Route::post('/admin', [AccountController::class, 'store'])->name('admin.store');
+    Route::get('/admin/{id}/edit', [AccountController::class, 'edit'])->name('admin.edit');
+    Route::put('/admin/{id}', [AccountController::class, 'update'])->name('admin.update');
+    Route::delete('/admin/{id}', [AccountController::class, 'destroy'])->name('admin.destroy');
 });
