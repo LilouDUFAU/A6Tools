@@ -19,7 +19,7 @@
             ->distinct()->pluck('commande_id');
     @endphp
     <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-8 px-4">
-        <div class="filter-btn bg-gradient-to-r from-green-700 to-yellow-600 text-white text-center py-6 rounded-lg shadow-md hover:shadow-lg hover:scale-105 transition-all duration-300 cursor-pointer" data-filter="mont de marsan" data-type="lieu">
+        <div class="filter-btn bg-green-600 text-white text-center py-6 rounded-lg shadow-md hover:shadow-lg hover:scale-105 transition-all duration-300 cursor-pointer" data-filter="mont de marsan" data-type="lieu">
             <div class="text-3xl font-bold">{{ $commandesMontDeMarsan->count() }}</div>
             <div class="text-lg">Mont de Marsan</div>
         </div>
