@@ -200,5 +200,8 @@
 
         <button type="submit" class="w-full bg-green-600 text-white px-6 py-3 rounded-lg shadow hover:bg-green-700  ">Mettre à jour</button>
     </form>
+    <div class="text-right mt-4 p-4">
+        <a href="{{ route('commande.index') }}" class="text-gray-500 hover:underline">Retour</a>
+    </div>
 </div>
 @endsection
