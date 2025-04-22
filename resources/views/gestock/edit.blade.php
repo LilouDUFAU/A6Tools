@@ -74,54 +74,22 @@
         <!-- Partie Client -->
         <div class="border-l-4 border-green-600 pl-4">
             <h2 class="text-2xl font-bold text-gray-800 mb-4">Client</h2>
+            @if($commande->client)
+            <div id="client-details" class="space-y-4">
             <div class="mb-4">
-            <label for="client_id" class="block text-sm font-semibold text-gray-700">Client</label>
-            <select id="client_id" name="client_id" class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm   px-2 py-1" onchange="fetchClientDetails(this.value)">
-            @foreach ($clients as $client)
-            <option value="{{ $client->id }}" @if($commande->client_id === $client->id) selected @endif>{{ $client->nom }}</option>
-            @endforeach
-            </select>
-            </div>
-
-            <div id="client-details" class="space-y-4 hidden">
-            <div class="mb-4">
-            <label for="client_nom" class="block text-sm font-semibold text-gray-700">Nom du Client</label>
-            <input type="text" id="client_nom" name="new_client[nom]" value="{{ $commande->client->nom ?? '' }}" class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm   px-2 py-1">
+                <label for="client_nom" class="block text-sm font-semibold text-gray-700">Nom du Client</label>
+                <input type="text" id="client_nom" name="client[nom]" value="{{ $commande->client->nom ?? '' }}" class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm px-2 py-1">
             </div>
 
             <div class="mb-4">
-            <label for="client_code" class="block text-sm font-semibold text-gray-700">Code Client</label>
-            <input type="text" id="client_code" name="new_client[code_client]" value="{{ $commande->client->code_client ?? '' }}" class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm   px-2 py-1">
+                <label for="client_code" class="block text-sm font-semibold text-gray-700">Code Client</label>
+                <input type="text" id="client_code" name="client[code_client]" value="{{ $commande->client->code_client ?? '' }}" class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm px-2 py-1">
             </div>
             </div>
-
-            <div class="flex justify-end">
-            <button type="button" onclick="toggleClientDetails()" class="bg-green-600 text-white px-4 py-2 rounded-lg shadow hover:bg-green-700  ">Modifier le Client</button>
-            </div>
+            @else
+            <p class="text-sm text-gray-700">Aucun client n'est associé à cette commande.</p>
+            @endif
         </div>
-
-        <script>
-            function fetchClientDetails(clientId) {
-            // Fetch client details via AJAX
-            fetch(`/clients/${clientId}`)
-                .then(response => response.json())
-                .then(data => {
-                document.getElementById('client_nom').value = data.nom || '';
-                document.getElementById('client_code').value = data.code_client || '';
-                })
-                .catch(error => console.error('Error fetching client details:', error));
-            }
-
-            function toggleClientDetails() {
-            // Toggle visibility of client details
-            const clientDetails = document.getElementById('client-details');
-            if (clientDetails.classList.contains('hidden')) {
-                clientDetails.classList.remove('hidden');
-            } else {
-                clientDetails.classList.add('hidden');
-            }
-            }
-        </script>
 
         <!-- Partie Produit -->
     <div class="border-l-4 border-green-600 pl-4">
