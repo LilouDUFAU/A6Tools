@@ -35,7 +35,7 @@ class PcRenouvController extends Controller
         $validated = $request->validate([
             'reference' => 'required|string|max:255',
             'quantite' => 'required|integer',
-            'caracteristique' => 'nullable|string|max:255',
+            'caracteristiques' => 'nullable|string|max:5000',
             'type' => 'required|string|max:255',
             'statut' => 'required|string|max:255',
             'stock_id' => 'required|exists:stocks,id',
@@ -72,7 +72,7 @@ class PcRenouvController extends Controller
         $validated = $request->validate([
             'reference' => 'required|string|max:255',
             'quantite' => 'required|integer',
-            'caracteristique' => 'nullable|string|max:255',
+            'caracteristiques' => 'nullable|string|max:255',
             'type' => 'required|string|max:255',
             'statut' => 'required|string|max:255',
             'stock_id' => 'required|exists:stocks,id',
