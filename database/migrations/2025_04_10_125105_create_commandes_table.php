@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('commandes', function (Blueprint $table) {
             $table->id();
             $table->enum('etat', ['A faire','Commandé', 'Reçu', 'Prévenu', 'Délais']); // Etat de la commande
-            $table->enum('urgence', ['pas urgent', 'urgent', 'très urgent']); // Urgence
+            $table->enum('urgence', ['pas urgent', 'urgent']); // Urgence
             $table->text('remarque')->nullable(); // Remarques sur la commande
             $table->integer('delai_installation')->nullable(); // Date de livraison fournisseur
             $table->date('date_installation_prevue')->nullable(); // Date d'installation prévue
