@@ -3,53 +3,52 @@
 @section('content')
 
 <div class="container mx-auto py-8 px-4 sm:px-6 lg:px-8 min-h-screen">
-        <h1 class="text-3xl font-bold text-gray-800">Tableau de Bord des PCRenouvs</h1>
+    <h1 class="text-3xl font-bold text-gray-800">Tableau de Bord des PCRenouvs</h1>
 
-    <h2 class="text-xl sm:text-2xl font-semibold px-2 sm:px-4 py-2 text-gray-700">Nombre de commandes par Site</h2>
+    <h2 class="text-xl sm:text-2xl font-semibold px-2 sm:px-4 py-2 text-gray-700">Nombre de PCRenouv par Site</h2>
     {{-- Filtres par lieu --}}
     <div class='grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 mb-8 px-2 sm:px-4'>
-    @foreach(['Mont de Marsan', 'Aire sur Adour'] as $lieu)
-    <div class="filter-btn {{ $lieu === 'Mont de Marsan' ? 'bg-green-600 hover:bg-green-700 ring-blue-500' : 'bg-red-600 hover:bg-red-700 ring-blue-500' }} text-white text-center py-4 sm:py-6 rounded-lg shadow-md cursor-pointer" data-filter="{{ strtolower($lieu) }}" data-type="lieu">
-        <div class="text-2xl sm:text-3xl font-bold">
-            {{ $pcrenouvs->filter(fn($r) => optional($r->stocks->first())->lieux === $lieu)->count() }}
+        @foreach(['Mont de Marsan', 'Aire sur Adour'] as $lieu)
+        <div class="filter-btn {{ $lieu === 'Mont de Marsan' ? 'bg-green-600 hover:bg-green-700 ring-blue-500' : 'bg-red-600 hover:bg-red-700 ring-blue-500' }} text-white text-center py-4 sm:py-6 rounded-lg shadow-md cursor-pointer" data-filter="{{ strtolower($lieu) }}" data-type="lieu">
+            <div class="text-2xl sm:text-3xl font-bold">
+                {{ $pcrenouvs->filter(fn($r) => optional($r->stocks->first())->lieux === $lieu && $r->quantite > 0)->count() }}
+            </div>
+            <div class="text-sm sm:text-lg">{{ $lieu }}</div>
         </div>
-        <div class="text-sm sm:text-lg">{{ $lieu }}</div>
-    </div>
-    @endforeach
+        @endforeach
     </div>
 
-    <h2 class="text-xl sm:text-2xl font-semibold px-2 sm:px-4 py-2 text-gray-700">Nombre de commandes par Type</h2>
+    <h2 class="text-xl sm:text-2xl font-semibold px-2 sm:px-4 py-2 text-gray-700">Nombre de PCRenouv par Type</h2>
     {{-- Filtres par type --}}
     <div class='grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 mb-8 px-2 sm:px-4'>
-    @foreach(App\Models\PCRenouv::TYPES as $type)
-    <div class="filter-btn {{ $loop->index % 2 === 0 ? 'bg-green-600 hover:bg-green-700 ring-blue-500' : 'bg-red-600 hover:bg-red-700 ring-blue-500' }} text-white text-center py-4 sm:py-6 rounded-lg shadow-md cursor-pointer" data-filter="{{ strtolower($type) }}" data-type="type">
-        <div class="text-2xl sm:text-3xl font-bold">
-            {{ $pcrenouvs->filter(fn($r) => strtolower($r->type) === strtolower($type))->count() }}
+        @foreach(App\Models\PCRenouv::TYPES as $type)
+        <div class="filter-btn {{ $loop->index % 2 === 0 ? 'bg-green-600 hover:bg-green-700 ring-blue-500' : 'bg-red-600 hover:bg-red-700 ring-blue-500' }} text-white text-center py-4 sm:py-6 rounded-lg shadow-md cursor-pointer" data-filter="{{ strtolower($type) }}" data-type="type">
+            <div class="text-2xl sm:text-3xl font-bold">
+                {{ $pcrenouvs->filter(fn($r) => strtolower($r->type) === strtolower($type) && $r->quantite > 0)->count() }}
+            </div>
+            <div class="text-sm sm:text-lg">{{ $type }}</div>
         </div>
-        <div class="text-sm sm:text-lg">{{ $type }}</div>
-    </div>
-    @endforeach
+        @endforeach
     </div>
 
-    <h2 class="text-xl sm:text-2xl font-semibold px-2 sm:px-4 py-2 text-gray-700">Nombre de commandes par Statut</h2>
+    <h2 class="text-xl sm:text-2xl font-semibold px-2 sm:px-4 py-2 text-gray-700">Nombre de PCRenouv par Statut</h2>
     {{-- Filtres par statut --}}
     <div class='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6 mb-8 px-2 sm:px-4'>
-    @foreach(App\Models\PCRenouv::STATUTS as $statut)
-    <div class="filter-btn 
-        {{ strtolower($statut) === 'en stock' ? 'bg-green-600 hover:bg-green-700 ring-blue-500' : 
-           (strtolower($statut) === 'prêté' ? 'bg-amber-600 hover:bg-amber-700 ring-blue-500' : 
-           (strtolower($statut) === 'loué' ? 'bg-red-600 hover:bg-red-700 ring-blue-500' : 
-           'bg-red-600 hover:bg-red-700 ring-blue-500')) }} 
-        text-white text-center py-4 sm:py-6 rounded-lg shadow-md cursor-pointer" 
-        data-filter="{{ strtolower($statut) }}" data-type="statut">
-        <div class="text-2xl sm:text-3xl font-bold">
-            {{ $pcrenouvs->filter(fn($r) => strtolower($r->statut) === strtolower($statut))->count() }}
+        @foreach(App\Models\PCRenouv::STATUTS as $statut)
+        <div class="filter-btn 
+            {{ strtolower($statut) === 'en stock' ? 'bg-green-600 hover:bg-green-700 ring-blue-500' : 
+            (strtolower($statut) === 'prêté' ? 'bg-amber-600 hover:bg-amber-700 ring-blue-500' : 
+            (strtolower($statut) === 'loué' ? 'bg-red-600 hover:bg-red-700 ring-blue-500' : 
+            'bg-red-600 hover:bg-red-700 ring-blue-500')) }} 
+            text-white text-center py-4 sm:py-6 rounded-lg shadow-md cursor-pointer" 
+            data-filter="{{ strtolower($statut) }}" data-type="statut">
+            <div class="text-2xl sm:text-3xl font-bold">
+                {{ $pcrenouvs->filter(fn($r) => strtolower($r->statut) === strtolower($statut) && $r->quantite > 0)->count() }}
+            </div>
+            <div class="text-sm sm:text-lg">{{ $statut }}</div>
         </div>
-        <div class="text-sm sm:text-lg">{{ $statut }}</div>
+        @endforeach
     </div>
-    @endforeach
-    </div>
-
 
     <div class="flex justify-between items-center mb-4 px-4">
         <button id="resetFilters" class="bg-gray-600 text-white px-6 py-3 rounded-lg shadow-md hover:bg-gray-700">Réinitialiser les filtres</button>
@@ -90,12 +89,18 @@
         $preterUrl = route('gestrenouv.preter', ['id' => $r->id]);
 
         $option = "
-            <button class='text-blue-600 font-semibold hover:underline' onclick=\"window.location.href='{$louerUrl}'\">Louer</button>
-            <span class='mx-2'></span>
-            <button class='text-purple-600 font-semibold hover:underline' onclick=\"window.location.href='{$preterUrl}'\">Prêter</button>";
+        <div class='inline-flex space-x-2'>
+        <button class='text-blue-600 font-semibold hover:underline' onclick=\"window.location.href='{$louerUrl}'\">Louer</button>
+        <button class='text-purple-600 font-semibold hover:underline' onclick=\"window.location.href='{$preterUrl}'\">Prêter</button>
+        <form action='".route('gestrenouv.retour', ['id' => $r->id])."' method='POST' id='retour-form'>
+            ".csrf_field()."
+            ".method_field('PUT')."
+            <button type='submit' class='text-orange-600 font-semibold hover:underline'>Retour</button>
+        </form>
+        </div>";
 
         $actions = "
-            <form action='".route('gestrenouv.destroy',$r->id)."' method='POST' class='inline'>
+            <form action='".route('gestrenouv.destroy',$r->id)."' method='POST' class='inline-flex space-x-2'>
             <input type='hidden' name='_token' value='{$csrf}'>
             <input type='hidden' name='_method' value='DELETE'>
             <button type='button' class='text-green-600 hover:text-green-700 font-semibold mr-2' onclick=\"window.location.href='".route('gestrenouv.show',$r->id)."'\">Détails</button>
@@ -120,11 +125,12 @@
     const body = document.getElementById('pcrenouv-body');
 
     const filtreOK = r =>
+        r.quantite > 0 &&  // Ajout de la condition pour vérifier que la quantité est supérieure à 0
         (!activeFilters.lieu.size || [...activeFilters.lieu].some(f => r.lieux.includes(f))) &&
         (!activeFilters.type.size || activeFilters.type.has(r.type)) &&
         (!activeFilters.statut.size || activeFilters.statut.has(r.statut));
 
-    const rowHTML = r => `
+    const rowHTML = r => `        
         <tr class="border-t hover:bg-gray-50">
             <td class="py-3 px-4 border border-gray-200">${r.reference}</td>
             <td class="py-3 px-4 border border-gray-200">${r.type}</td>
