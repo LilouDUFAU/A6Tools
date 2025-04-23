@@ -55,8 +55,6 @@
         <button id="resetFilters" class="bg-gray-600 text-white px-6 py-3 rounded-lg shadow-md hover:bg-gray-700">Réinitialiser les filtres</button>
 
         <div class="flex space-x-4 ml-auto">
-            <button id="rentButton" class="bg-blue-600 text-white px-6 py-3 rounded-lg shadow-md hover:bg-blue-700">Louer</button>
-            <button id="lendButton" class="bg-purple-600 text-white px-6 py-3 rounded-lg shadow-md hover:bg-purple-700">Prêter</button>
             <a href="{{ route('gestrenouv.create') }}" class="bg-green-600 text-white px-6 py-3 rounded-lg shadow-md hover:bg-green-700">Ajouter un PCRenouv</a>
         </div>
     </div>
@@ -72,6 +70,7 @@
                         <th class="py-3 px-4 border border-gray-200">Site</th>
                         <th class="py-3 px-4 border border-gray-200">Statut</th>
                         <th class="py-3 px-4 border border-gray-200">Quantité</th>
+                        <th class="py-3 px-4 border border-gray-200">Options</th>
                         <th class="py-3 px-4 border border-gray-200">Actions</th>
                     </tr>
                 </thead>
@@ -87,6 +86,14 @@
     $csrf = csrf_token();
     $renouvellements = $pcrenouvs->map(function($r) use($csrf) {
         $site = optional($r->stocks->first())->lieux ?? 'Non défini';
+        $louerUrl = route('gestrenouv.louer', ['id' => $r->id]);
+        $preterUrl = route('gestrenouv.preter', ['id' => $r->id]);
+
+        $option = "
+            <button class='text-blue-600 font-semibold hover:underline' onclick=\"window.location.href='{$louerUrl}'\">Louer</button>
+            <span class='mx-2'></span>
+            <button class='text-purple-600 font-semibold hover:underline' onclick=\"window.location.href='{$preterUrl}'\">Prêter</button>";
+
         $actions = "
             <form action='".route('gestrenouv.destroy',$r->id)."' method='POST' class='inline'>
             <input type='hidden' name='_token' value='{$csrf}'>
@@ -101,6 +108,7 @@
             'lieux' => strtolower($site),
             'statut' => strtolower($r->statut),
             'quantite' => $r->quantite,
+            'option' => $option,
             'actions' => $actions
         ];
     });
@@ -123,6 +131,7 @@
             <td class="py-3 px-4 border border-gray-200">${r.lieux}</td>
             <td class="py-3 px-4 border border-gray-200">${r.statut}</td>
             <td class="py-3 px-4 border border-gray-200">${r.quantite}</td>
+            <td class="py-3 px-4 border border-gray-200">${r.option}</td>
             <td class="py-3 px-4 border border-gray-200">${r.actions}</td>
         </tr>
     `;
