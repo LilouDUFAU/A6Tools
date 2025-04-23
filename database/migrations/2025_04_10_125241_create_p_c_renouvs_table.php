@@ -17,7 +17,7 @@ return new class extends Migration
             $table->integer('quantite'); // Quantité
             $table->string('caracteristiques', 5000)->nullable(); // Caractéristiques du PCRenouv
             $table->enum('type', ['portable', 'fixe']); // Type du PCRenouv
-            $table->enum('statut', ['en stock', 'prêté']); // Statut du PCRenouv
+            $table->enum('statut', ['en stock', 'prêté', 'loué']); // Statut du PCRenouv
             $table->unsignedBigInteger('employe_id'); // Clé étrangère vers la table users (employé)
             $table->timestamps(); // created_at, updated_at
 
