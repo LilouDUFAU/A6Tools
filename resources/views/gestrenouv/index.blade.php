@@ -47,7 +47,12 @@
 
     <div class="flex justify-between items-center mb-4 px-4">
         <button id="resetFilters" class="bg-gray-600 text-white px-6 py-3 rounded-lg shadow-md hover:bg-gray-700">Réinitialiser les filtres</button>
-        <a href="{{ route('gestrenouv.create') }}" class="bg-green-600 text-white px-6 py-3 rounded-lg shadow-md hover:bg-green-700">Ajouter un PCRenouv</a>
+
+        <div class="flex space-x-4 ml-auto">
+            <button id="rentButton" class="bg-blue-600 text-white px-6 py-3 rounded-lg shadow-md hover:bg-blue-700">Louer</button>
+            <button id="lendButton" class="bg-purple-600 text-white px-6 py-3 rounded-lg shadow-md hover:bg-purple-700">Prêter</button>
+            <a href="{{ route('gestrenouv.create') }}" class="bg-green-600 text-white px-6 py-3 rounded-lg shadow-md hover:bg-green-700">Ajouter un PCRenouv</a>
+        </div>
     </div>
 
     <div class="bg-white shadow rounded-lg p-4 sm:p-6">
