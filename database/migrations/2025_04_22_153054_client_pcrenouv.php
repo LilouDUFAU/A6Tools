@@ -11,7 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        //
+        Schema::create('client_pcrenouv', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('client_id')->constrained()->onDelete('cascade');
+            $table->foreignId('pcrenouv_id')->constrained()->onDelete('cascade');
+            $table->date('date_pret');
+            $table->date('date_retour')->nullable();
+            $table->timestamps();
+        });
     }
 
     /**
@@ -19,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        //
+        Schema::dropIfExists('client_panne');
     }
 };
