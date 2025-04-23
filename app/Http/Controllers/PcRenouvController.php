@@ -53,7 +53,7 @@ class PcRenouvController extends Controller
 
     public function show(string $id)
     {
-        $pcrenouv = PCRenouv::with(['employe', 'stocks'])->findOrFail($id);
+        $pcrenouv = PCRenouv::with(['employe', 'stocks', 'clients'])->findOrFail($id);
         return view('gestrenouv.show', compact('pcrenouv'));
     }
 
