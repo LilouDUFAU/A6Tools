@@ -54,6 +54,6 @@ class PCRenouv extends Model
     // un pcrenouv peut etre prete a plusieurs clients
     public function clients()
     {
-        return $this->belongsToMany(Client::class, 'client_pcrenouv', 'client_id', 'pcrenouv_id')->withPivot('date_pret', 'date_retour');
+        return $this->belongsToMany(Client::class, 'client_pcrenouv', 'pcrenouv_id', 'client_id')->withPivot('date_pret', 'date_retour');
     }
 }
