@@ -9,7 +9,7 @@
         @method('PUT')
 
         <div class="border-l-4 border-green-600 pl-4">
-            <h2 class="text-2xl font-bold text-gray-800 mb-4">Commande</h2>
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">PCRenouv</h2>
 
             <div class="mb-4">
                 <label for="reference" class="block text-gray-700 font-bold mb-2">Référence</label>
