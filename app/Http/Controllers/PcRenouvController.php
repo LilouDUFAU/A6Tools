@@ -194,16 +194,6 @@ class PcRenouvController extends Controller
                 ->withErrors(['error' => 'Une erreur est survenue lors de la mise à jour : ' . $e->getMessage()]);
         }
     }
-            
-
-    public function destroy(string $id)
-    {
-        $pcrenouv = PCRenouv::findOrFail($id);
-        $pcrenouv->stocks()->detach();
-        $pcrenouv->delete();
-
-        return redirect()->route('gestrenouv.index')->with('success', 'PCRenouv supprimé avec succès.');
-    }
 
     public function louer(string $id)
     {
@@ -363,4 +353,69 @@ class PcRenouvController extends Controller
             return redirect()->back()->with('error', $e->getMessage());
         }
     }
+
+    public function destroy(string $id)
+    {
+        try {
+            DB::transaction(function () use ($id) {
+                $pcrenouv = PCRenouv::with('stocks')->findOrFail($id);
+                $reference = $pcrenouv->reference;
+
+                if (Str::startsWith($reference, 'location-') || Str::startsWith($reference, 'prêt-')) {
+                    // 🔁 C'est une location ou un prêt
+                    $base = Str::startsWith($reference, 'location-')
+                        ? Str::after($reference, 'location-')
+                        : Str::after($reference, 'prêt-');
+                    $originalReference = preg_replace('/-\d+$/', '', $base);
+
+                    $originalPc = PCRenouv::where('reference', $originalReference)->firstOrFail();
+
+                    $stock = $pcrenouv->stocks()->first();
+                    if (!$stock) {
+                        throw new \Exception("Stock introuvable pour la location/prêt.");
+                    }
+
+                    $pivot = $originalPc->stocks()->where('stock_id', $stock->id)->first();
+                    if (!$pivot) {
+                        throw new \Exception("Le stock associé au PC d'origine n'a pas été trouvé dans la relation pivot.");
+                    }
+
+                    // 🧮 Mise à jour des quantités
+                    $newQty = $pivot->pivot->quantite + $pcrenouv->quantite;
+
+                    $originalPc->stocks()->updateExistingPivot($stock->id, [
+                        'quantite' => $newQty,
+                        'updated_at' => now(),
+                    ]);
+
+                    $originalPc->update(['quantite' => $originalPc->quantite + $pcrenouv->quantite]);
+
+                } else {
+                    // 🧹 C'est un PC d'origine → on supprime toutes les locations/prêts qui en dérivent
+                    $locationsEtPrets = PCRenouv::where(function ($query) use ($reference) {
+                        $query->where('reference', 'like', 'location-' . $reference . '-%')
+                            ->orWhere('reference', 'like', 'prêt-' . $reference . '-%');
+                    })->get();
+
+                    foreach ($locationsEtPrets as $pc) {
+                        $pc->stocks()->detach();
+                        $pc->clients()->detach();
+                        $pc->delete();
+                    }
+                }
+
+                // 🔚 Suppression finale du PC
+                $pcrenouv->stocks()->detach();
+                $pcrenouv->clients()->detach();
+                $pcrenouv->delete();
+            });
+
+            return redirect()->route('gestrenouv.index')->with('success', 'PCRenouv supprimé avec succès.');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Erreur lors de la suppression : ' . $e->getMessage());
+        }
+    }
+
+
+       
 }
