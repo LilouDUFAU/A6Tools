@@ -216,81 +216,6 @@ class PcRenouvController extends Controller
         return view('gestrenouv.louer', compact('pcrenouv', 'stocks', 'type', 'statut', 'clients'));
     }
 
-    public function addLoc(Request $request, $id)
-    {
-        $validated = $request->validate([
-            'reference' => 'required|string|max:255',
-            'quantite' => 'required|integer|min:1',
-            'caracteristiques' => 'nullable|string',
-            'type' => 'required|string',
-            'statut' => 'required|string',
-            'stock_id' => 'required|exists:stocks,id',
-            'client_id' => 'nullable|exists:clients,id',
-            'new_client.nom' => 'nullable|string|max:255',
-            'new_client.code_client' => 'nullable|string|max:255',
-            'date_retour' => 'nullable|date',
-        ]);
-
-        try {
-            DB::transaction(function () use ($validated, $id) {
-                $originalPc = Pcrenouv::findOrFail($id);
-
-                if (!empty($validated['new_client']['nom'])) {
-                    $client = Client::create([
-                        'nom' => $validated['new_client']['nom'],
-                        'code_client' => $validated['new_client']['code_client'],
-                    ]);
-                } else {
-                    $client = Client::findOrFail($validated['client_id']);
-                }
-
-                $validated['employe_id'] = auth()->id();
-
-                $newPc = Pcrenouv::create([
-                    'reference' => $validated['reference'],
-                    'quantite' => $validated['quantite'],
-                    'caracteristiques' => $validated['caracteristiques'] ?? null,
-                    'type' => $validated['type'],
-                    'statut' => $validated['statut'],
-                    'employe_id' => $validated['employe_id'],
-                ]);
-
-                $client->pcrenouv()->attach($newPc->id, [
-                    'date_pret' => now(),
-                    'date_retour' => $validated['date_retour'] ?? null,
-                ]);
-
-                $stock = Stock::findOrFail($validated['stock_id']);
-                $newPc->stocks()->attach($stock->id, [
-                    'quantite' => $validated['quantite'],
-                ]);
-
-                $pivot = $originalPc->stocks()->where('stock_id', $stock->id)->first();
-
-                if ($pivot) {
-                    $currentQty = $pivot->pivot->quantite;
-
-                    if ($currentQty >= $validated['quantite']) {
-                        $originalPc->stocks()->updateExistingPivot($stock->id, [
-                            'quantite' => $currentQty - $validated['quantite'],
-                        ]);
-
-                        $originalPc->update([
-                            'quantite' => $originalPc->quantite - $validated['quantite'],
-                        ]);
-                    } else {
-                        throw new \Exception("Quantité insuffisante dans le stock pour le PC sélectionné.");
-                    }
-                } else {
-                    throw new \Exception("Le PC d'origine n'est pas associé à ce stock.");
-                }
-            });
-
-            return redirect()->route('gestrenouv.index')->with('success', 'Location enregistrée avec succès.');
-        } catch (\Exception $e) {
-            return redirect()->back()->withInput()->with('error', $e->getMessage());
-        }
-    }
 
     public function preter(string $id)
     {
@@ -303,7 +228,7 @@ class PcRenouvController extends Controller
         return view('gestrenouv.preter', compact('pcrenouv', 'stocks', 'type', 'statut', 'clients'));
     }    
 
-    public function addPret(Request $request, $id)
+    public function addLocPret(Request $request, $id)
     {
         $validated = $request->validate([
             'reference' => 'required|string|max:255',
@@ -343,7 +268,7 @@ class PcRenouvController extends Controller
                 ]);
 
                 $client->pcrenouv()->attach($newPc->id, [
-                    'date_pret' => now(),
+                    'date_pret' => $validated['date_pret'] ?? now(),
                     'date_retour' => $validated['date_retour'] ?? null,
                 ]);
 
