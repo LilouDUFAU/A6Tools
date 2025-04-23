@@ -3,6 +3,11 @@
 @section('content')
 <div class="container mx-auto py-8 px-4 sm:px-6 lg:px-8 min-h-screen">
 <h1 class="text-3xl font-extrabold text-gray-800 mb-8">Louer le PCRenouv</h1>
+<script>
+    document.querySelector('form').addEventListener('submit', function () {
+        console.log('Formulaire soumis');
+    });
+</script>
     <form action="{{ route('gestrenouv.addLocPret', $pcrenouv->id) }}" method="POST" class="space-y-6">
         @csrf
         @method('PUT')
@@ -15,7 +20,7 @@
                 <input type="text" name="reference" id="reference"
                     value="{{ old('reference', 'location-' . $pcrenouv->reference . '-' . now()->format('YmdHis')) }}"
                     class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1 cursor-not-allowed"
-                    required maxlength="255" disabled>
+                    required maxlength="255" readonly>
             </div>
 
             <div class="mb-4">
@@ -38,7 +43,7 @@
                 <label for="type" class="block text-gray-700 font-bold mb-2">Type</label>
                 <select id="type" name="type"
                     class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1 cursor-not-allowed"
-                    required disabled>
+                    required readonly>
                     <option value="">-- Sélectionner un type --</option>
                     @foreach ($type as $typeOption)
                         <option value="{{ $typeOption }}" {{ old('type', $pcrenouv->type) == $typeOption ? 'selected' : '' }}>
@@ -52,7 +57,7 @@
                 <label for="statut" class="block text-gray-700 font-bold mb-2">Statut</label>
                 <select id="statut" name="statut"
                     class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1 cursor-not-allowed"
-                    required disabled>
+                    required readonly>
                     <option value="" selected>-- Sélectionner un statut --</option>
                     @foreach ($statut as $statutOption)
                         <option value="{{ $statutOption }}" {{ old('statut', 'loué') == $statutOption ? 'selected' : '' }}>
@@ -69,7 +74,7 @@
             <label for="stock_id" class="block text-sm font-semibold text-gray-700">Choisir un site</label>
             <select id="stock_id" name="stock_id"
                 class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1 cursor-not-allowed"
-                required disabled>
+                required readonly>
                 <option value="">-- Sélectionner un site --</option>
                 @foreach (\App\Models\Stock::all() as $stock)
                 <option value="{{ $stock->id }}" {{ old('stock_id', $pcrenouv->stocks->first()?->id) == $stock->id ? 'selected' : '' }}>
