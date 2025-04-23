@@ -100,4 +100,24 @@ class PcRenouvController extends Controller
 
         return redirect()->route('gestrenouv.index')->with('success', 'PCRenouv supprimé avec succès.');
     }
+
+    public function louer(string $id)
+    {
+        $pcrenouv = PCRenouv::findOrFail($id);
+        $stocks = Stock::LIEUX;
+        $type = PCRenouv::TYPES;
+        $statut = PCRenouv::STATUTS;
+
+        return view('gestrenouv.louer', compact('pcrenouv', 'stocks', 'type', 'statut'));
+    }
+
+    public function preter(string $id)
+    {
+        $pcrenouv = PCRenouv::findOrFail($id);
+        $stocks = Stock::LIEUX;
+        $type = PCRenouv::TYPES;
+        $statut = PCRenouv::STATUTS;
+
+        return view('gestrenouv.preter', compact('pcrenouv', 'stocks', 'type', 'statut'));
+    }    
 }
