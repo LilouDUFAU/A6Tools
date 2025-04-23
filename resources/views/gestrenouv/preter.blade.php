@@ -15,7 +15,7 @@
                 <input type="text" name="reference" id="reference"
                     value="{{ old('reference', 'prêt-' . $pcrenouv->reference . '-' . now()->format('YmdHis')) }}"
                     class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1 cursor-not-allowed"
-                    required maxlength="255" disabled>
+                    required maxlength="255" readonly>
             </div>
 
             <div class="mb-4">
@@ -38,7 +38,7 @@
                 <label for="type" class="block text-gray-700 font-bold mb-2">Type</label>
                 <select id="type" name="type"
                     class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1 cursor-not-allowed"
-                    required disabled>
+                    required readonly>
                     <option value="">-- Sélectionner un type --</option>
                     @foreach ($type as $typeOption)
                         <option value="{{ $typeOption }}" {{ old('type', $pcrenouv->type) == $typeOption ? 'selected' : '' }}>
@@ -52,7 +52,7 @@
                 <label for="statut" class="block text-gray-700 font-bold mb-2">Statut</label>
                 <select id="statut" name="statut"
                     class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1 cursor-not-allowed"
-                    required disabled>
+                    required readonly>
                     <option value="">-- Sélectionner un statut --</option>
                     @foreach ($statut as $statutOption)
                         <option value="{{ $statutOption }}" {{ old('statut', 'prêté') == $statutOption ? 'selected' : '' }}>
@@ -69,7 +69,7 @@
             <label for="stock_id" class="block text-sm font-semibold text-gray-700">Choisir un site</label>
             <select id="stock_id" name="stock_id"
                 class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1 cursor-not-allowed"
-                disabled>
+                readonly>
                 <option value="">-- Sélectionner un site --</option>
                 @foreach (\App\Models\Stock::all() as $stock)
                 <option value="{{ $stock->id }}" {{ old('stock_id', $pcrenouv->stocks->first()?->id) == $stock->id ? 'selected' : '' }}>
