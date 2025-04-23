@@ -33,9 +33,15 @@
 
     <h2 class="text-xl sm:text-2xl font-semibold px-2 sm:px-4 py-2 text-gray-700">Nombre de commandes par Statut</h2>
     {{-- Filtres par statut --}}
-    <div class='grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 mb-8 px-2 sm:px-4'>
+    <div class='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6 mb-8 px-2 sm:px-4'>
     @foreach(App\Models\PCRenouv::STATUTS as $statut)
-    <div class="filter-btn {{ $loop->index % 2 === 0 ? 'bg-green-600 hover:bg-green-700 ring-blue-500' : 'bg-red-600 hover:bg-red-700 ring-blue-500' }} text-white text-center py-4 sm:py-6 rounded-lg shadow-md cursor-pointer" data-filter="{{ strtolower($statut) }}" data-type="statut">
+    <div class="filter-btn 
+        {{ strtolower($statut) === 'en stock' ? 'bg-green-600 hover:bg-green-700 ring-blue-500' : 
+           (strtolower($statut) === 'prêté' ? 'bg-amber-600 hover:bg-amber-700 ring-blue-500' : 
+           (strtolower($statut) === 'loué' ? 'bg-red-600 hover:bg-red-700 ring-blue-500' : 
+           'bg-red-600 hover:bg-red-700 ring-blue-500')) }} 
+        text-white text-center py-4 sm:py-6 rounded-lg shadow-md cursor-pointer" 
+        data-filter="{{ strtolower($statut) }}" data-type="statut">
         <div class="text-2xl sm:text-3xl font-bold">
             {{ $pcrenouvs->filter(fn($r) => strtolower($r->statut) === strtolower($statut))->count() }}
         </div>
