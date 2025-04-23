@@ -32,6 +32,7 @@ class PCRenouv extends Model
     const STATUTS = [
         'en stock',
         'prêté',
+        'loué',
     ];
 
     //////////////////////////////
@@ -48,5 +49,11 @@ class PCRenouv extends Model
     public function stocks()
     {
         return $this->belongsToMany(Stock::class, 'pcrenouv_stock', 'pcrenouv_id', 'stock_id')->withPivot('quantite');
+    }
+
+    // un pcrenouv peut etre prete a plusieurs clients
+    public function clients()
+    {
+        return $this->belongsToMany(Client::class, 'client_pcrenouv', 'pcrenouv_id', 'client_id')->withPivot('date_pret', 'date_retour');
     }
 }
