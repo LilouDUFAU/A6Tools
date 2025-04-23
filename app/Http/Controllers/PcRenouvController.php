@@ -358,63 +358,66 @@ class PcRenouvController extends Controller
     {
         try {
             DB::transaction(function () use ($id) {
-                $pcrenouv = PCRenouv::with('stocks')->findOrFail($id);
+                $pcrenouv = PCRenouv::with('stocks', 'clients')->findOrFail($id);
                 $reference = $pcrenouv->reference;
-
+    
                 if (Str::startsWith($reference, 'location-') || Str::startsWith($reference, 'prêt-')) {
                     // 🔁 C'est une location ou un prêt
                     $base = Str::startsWith($reference, 'location-')
                         ? Str::after($reference, 'location-')
                         : Str::after($reference, 'prêt-');
                     $originalReference = preg_replace('/-\d+$/', '', $base);
-
+    
                     $originalPc = PCRenouv::where('reference', $originalReference)->firstOrFail();
-
+    
                     $stock = $pcrenouv->stocks()->first();
                     if (!$stock) {
                         throw new \Exception("Stock introuvable pour la location/prêt.");
                     }
-
+    
                     $pivot = $originalPc->stocks()->where('stock_id', $stock->id)->first();
                     if (!$pivot) {
                         throw new \Exception("Le stock associé au PC d'origine n'a pas été trouvé dans la relation pivot.");
                     }
-
+    
                     // 🧮 Mise à jour des quantités
                     $newQty = $pivot->pivot->quantite + $pcrenouv->quantite;
-
+    
                     $originalPc->stocks()->updateExistingPivot($stock->id, [
                         'quantite' => $newQty,
                         'updated_at' => now(),
                     ]);
-
+    
                     $originalPc->update(['quantite' => $originalPc->quantite + $pcrenouv->quantite]);
-
+    
+                    // 🧽 Nettoyage de la relation client_pcrenouv
+                    $pcrenouv->clients()->detach();
                 } else {
                     // 🧹 C'est un PC d'origine → on supprime toutes les locations/prêts qui en dérivent
                     $locationsEtPrets = PCRenouv::where(function ($query) use ($reference) {
                         $query->where('reference', 'like', 'location-' . $reference . '-%')
                             ->orWhere('reference', 'like', 'prêt-' . $reference . '-%');
                     })->get();
-
+    
                     foreach ($locationsEtPrets as $pc) {
                         $pc->stocks()->detach();
-                        $pc->clients()->detach();
+                        $pc->clients()->detach(); // 🧽 Détachement client-location/pret
                         $pc->delete();
                     }
                 }
-
+    
                 // 🔚 Suppression finale du PC
                 $pcrenouv->stocks()->detach();
-                $pcrenouv->clients()->detach();
+                $pcrenouv->clients()->detach(); // toujours détacher les relations clients avant suppression
                 $pcrenouv->delete();
             });
-
+    
             return redirect()->route('gestrenouv.index')->with('success', 'PCRenouv supprimé avec succès.');
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'Erreur lors de la suppression : ' . $e->getMessage());
         }
     }
+    
 
 
        
