@@ -10,6 +10,8 @@ use App\Models\StockRenouv;
 use App\Models\Client;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Log;
+
 
 class PcRenouvController extends Controller
 {
@@ -63,31 +65,136 @@ class PcRenouvController extends Controller
         $stocks = Stock::LIEUX;
         $type = PCRenouv::TYPES;
         $statut = PCRenouv::STATUTS;
+        $clients = Client::all();
 
-        return view('gestrenouv.edit', compact('pcrenouv', 'stocks', 'type', 'statut'));
+        return view('gestrenouv.edit', compact('pcrenouv', 'stocks', 'type', 'statut', 'clients'));
     }
 
     public function update(Request $request, string $id)
     {
-        $pcrenouv = PCRenouv::findOrFail($id);
-
-        $validated = $request->validate([
-            'reference' => 'required|string|max:255',
-            'quantite' => 'required|integer',
-            'caracteristiques' => 'nullable|string|max:255',
-            'type' => 'required|string|max:255',
-            'statut' => 'required|string|max:255',
-            'stock_id' => 'required|exists:stocks,id',
-        ]);
-
-        $pcrenouv->update($validated);
-
-        $pcrenouv->stocks()->sync([
-            $request->input('stock_id') => ['quantite' => $request->input('quantite')]
-        ]);
-
-        return redirect()->route('gestrenouv.index')->with('success', 'PCRenouv mis à jour avec succès.');
+        try {
+            DB::transaction(function () use ($request, $id) {
+                Log::debug("Début de la mise à jour du PCRenouv : " . $id);
+        
+                // Récupérer le PCRenouv à mettre à jour
+                $pcrenouv = PCRenouv::findOrFail($id);
+                Log::debug("PCRenouv récupéré : " . $pcrenouv->reference);
+        
+                // Récupérer la référence et déterminer la référence de base
+                $fullReference = $pcrenouv->reference;
+                Log::debug("Référence complète : " . $fullReference);
+        
+                // Déterminer si c'est une location ou un prêt
+                if (Str::startsWith($fullReference, 'location-') || Str::startsWith($fullReference, 'prêt-')) {
+                    $base = Str::startsWith($fullReference, 'location-')
+                        ? Str::after($fullReference, 'location-')
+                        : Str::after($fullReference, 'prêt-');
+        
+                    $originalReference = preg_replace('/-\d+$/', '', $base);
+                    Log::debug("Référence d'origine : " . $originalReference);
+        
+                    $originalPc = PCRenouv::where('reference', $originalReference)->first();
+                    if (!$originalPc) {
+                        Log::error("Le PC d'origine n'a pas été trouvé avec la référence : " . $originalReference);
+                        throw new \Exception("Le PC d'origine n'a pas été trouvé.");
+                    }
+                    Log::debug("PCRenouv d'origine trouvé : " . $originalPc->reference);
+                } else {
+                    $originalPc = $pcrenouv; // Le PC modifié est déjà le PC d'origine
+                    Log::debug("Le PCRenouv modifié est déjà le PC d'origine.");
+                }
+        
+                // Récupérer les quantités actuelles
+                $currentPivot = $pcrenouv->stocks()->where('stock_id', $request->stock_id)->first();
+                $currentQuantityInPivot = $currentPivot ? $currentPivot->pivot->quantite : 0;
+                Log::debug("Quantité actuelle dans pivot : " . $currentQuantityInPivot);
+        
+                // Mise à jour du PCRenouv
+                $pcrenouv->update([
+                    'reference' => $request->reference,
+                    'quantite' => $request->quantite,
+                    'caracteristiques' => $request->caracteristiques,
+                    'type' => $request->type,
+                    'statut' => $request->statut,
+                ]);
+                Log::debug("PCRenouv mis à jour.");
+        
+                // Mise à jour de la table pivot pcrenouv_stock
+                if ($currentPivot) {
+                    $pcrenouv->stocks()->updateExistingPivot($request->stock_id, [
+                        'quantite' => $request->quantite,
+                        'updated_at' => now()
+                    ]);
+                } else {
+                    $pcrenouv->stocks()->attach($request->stock_id, [
+                        'quantite' => $request->quantite,
+                        'created_at' => now(),
+                        'updated_at' => now()
+                    ]);
+                }
+                Log::debug("Table pivot pcrenouv_stock mise à jour.");
+        
+                // Calculer et appliquer la différence sur le PC d'origine si nécessaire
+                if ($originalPc->id !== $pcrenouv->id) {
+                    $difference = $request->quantite - $currentQuantityInPivot;
+                    Log::debug("Différence de quantité à appliquer : " . $difference);
+        
+                    if ($difference !== 0) {
+                        $originalPcPivot = $originalPc->stocks()->where('stock_id', $request->stock_id)->first();
+                        if (!$originalPcPivot) {
+                            throw new \Exception("Le stock associé au PC d'origine n'a pas été trouvé.");
+                        }
+        
+                        $newOriginalQuantity = $originalPcPivot->pivot->quantite - $difference;
+                        if ($newOriginalQuantity < 0) {
+                            throw new \Exception("La quantité disponible dans le PC d'origine est insuffisante.");
+                        }
+        
+                        $originalPc->stocks()->updateExistingPivot($request->stock_id, [
+                            'quantite' => $newOriginalQuantity,
+                            'updated_at' => now()
+                        ]);
+                        
+                        $originalPc->update(['quantite' => $newOriginalQuantity]);
+                        Log::debug("Quantité du PC d'origine mise à jour : " . $newOriginalQuantity);
+                    }
+                }
+        
+                // Mise à jour des clients (si présents)
+                if ($request->has('clients')) {
+                    foreach ($request->clients as $clientId => $clientData) {
+                        if (!empty($clientData['nom']) && !empty($clientData['code_client'])) {
+                            $client = Client::find($clientId);
+                            if ($client) {
+                                $client->update([
+                                    'nom' => $clientData['nom'],
+                                    'code_client' => $clientData['code_client'],
+                                ]);
+                                Log::debug("Client mis à jour : " . $client->nom);
+        
+                                $pcrenouv->clients()->updateExistingPivot($clientId, [
+                                    'date_pret' => $clientData['date_pret'] ?? null,
+                                    'date_retour' => $clientData['date_retour'] ?? null,
+                                    'updated_at' => now(),
+                                ]);
+                                Log::debug("Dates mises à jour pour client : " . $client->nom);
+                            }
+                        }
+                    }
+                }
+            });
+        
+            Log::debug("Mise à jour terminée avec succès.");
+            return redirect()->route('gestrenouv.index')
+                ->with('success', 'PCRenouv mis à jour avec succès.');
+        } catch (\Exception $e) {
+            Log::error("Erreur lors de la mise à jour : " . $e->getMessage());
+            return redirect()->back()
+                ->withInput()
+                ->withErrors(['error' => 'Une erreur est survenue lors de la mise à jour : ' . $e->getMessage()]);
+        }
     }
+            
 
     public function destroy(string $id)
     {
