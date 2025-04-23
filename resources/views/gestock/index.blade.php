@@ -31,8 +31,17 @@
 
     <h2 class="text-2xl font-semibold px-4 py-2 text-gray-700">Nombre de commandes par état</h2>
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6 mb-8 px-4">
-        @foreach(['A faire'=>'green','Commandé'=>'yellow','Reçu'=>'amber','Prévenu'=>'orange','Délais'=>'red'] as $etat => $color)
-        <div class="filter-btn bg-{{$color}}-600 text-white text-center py-6 rounded-lg shadow-md hover:bg-{{$color}}-700 cursor-pointer" data-filter="{{ strtolower($etat) }}" data-type="etat">
+        @php
+            $etatCouleurs = [
+                'A faire' => 'bg-green-600 hover:bg-green-700',
+                'Commandé' => 'bg-yellow-600 hover:bg-yellow-700',
+                'Reçu' => 'bg-amber-600 hover:bg-amber-700',
+                'Prévenu' => 'bg-orange-600 hover:bg-orange-700',
+                'Délais' => 'bg-red-600 hover:bg-red-700'
+            ];
+        @endphp
+        @foreach($etatCouleurs as $etat => $classes)
+        <div class="filter-btn {{ $classes }} text-white text-center py-6 rounded-lg shadow-md cursor-pointer" data-filter="{{ strtolower($etat) }}" data-type="etat">
             <div class="text-3xl font-bold">{{ $commandes->where('etat', $etat)->count() }}</div>
             <div class="text-lg">{{ $etat }}</div>
         </div>
