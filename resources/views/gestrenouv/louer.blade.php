@@ -2,7 +2,7 @@
 
 @section('content')
 <div class="container mx-auto py-8 px-4 sm:px-6 lg:px-8 min-h-screen">
-    <h1>Louer un PC</h1>
+<h1 class="text-3xl font-extrabold text-gray-800 mb-8">Louer le PCRenouv</h1>
     <form action="{{ route('gestrenouv.addLocPret', $pcrenouv->id) }}" method="POST" class="space-y-6">
         @csrf
         @method('PUT')
@@ -14,8 +14,8 @@
                 <label for="reference" class="block text-gray-700 font-bold mb-2">Référence</label>
                 <input type="text" name="reference" id="reference"
                     value="{{ old('reference', 'location-' . $pcrenouv->reference . '-' . now()->format('YmdHis')) }}"
-                    class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1"
-                    required maxlength="255">
+                    class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1 cursor-not-allowed"
+                    required maxlength="255" disabled>
             </div>
 
             <div class="mb-4">
@@ -37,8 +37,8 @@
             <div class="mb-4">
                 <label for="type" class="block text-gray-700 font-bold mb-2">Type</label>
                 <select id="type" name="type"
-                    class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1"
-                    required>
+                    class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1 cursor-not-allowed"
+                    required disabled>
                     <option value="">-- Sélectionner un type --</option>
                     @foreach ($type as $typeOption)
                         <option value="{{ $typeOption }}" {{ old('type', $pcrenouv->type) == $typeOption ? 'selected' : '' }}>
@@ -51,8 +51,8 @@
             <div class="mb-4">
                 <label for="statut" class="block text-gray-700 font-bold mb-2">Statut</label>
                 <select id="statut" name="statut"
-                    class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1"
-                    required>
+                    class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1 cursor-not-allowed"
+                    required disabled>
                     <option value="" selected>-- Sélectionner un statut --</option>
                     @foreach ($statut as $statutOption)
                         <option value="{{ $statutOption }}" {{ old('statut', 'loué') == $statutOption ? 'selected' : '' }}>
@@ -66,17 +66,17 @@
         <div class="border-l-4 border-green-600 pl-4">
             <h2 class="text-2xl font-bold text-gray-800 mb-4">Magasin</h2>
             <div class="mb-4">
-                <label for="stock_id" class="block text-sm font-semibold text-gray-700">Choisir un site</label>
-                <select id="stock_id" name="stock_id"
-                    class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1"
-                    required>
-                    <option value="">-- Sélectionner un site --</option>
-                    @foreach (\App\Models\Stock::all() as $stock)
-                        <option value="{{ $stock->id }}" {{ old('stock_id', $pcrenouv->stocks->first()?->id) == $stock->id ? 'selected' : '' }}>
-                            {{ ucfirst($stock->lieux) }}
-                        </option>
-                    @endforeach
-                </select>
+            <label for="stock_id" class="block text-sm font-semibold text-gray-700">Choisir un site</label>
+            <select id="stock_id" name="stock_id"
+                class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1 cursor-not-allowed"
+                required disabled>
+                <option value="">-- Sélectionner un site --</option>
+                @foreach (\App\Models\Stock::all() as $stock)
+                <option value="{{ $stock->id }}" {{ old('stock_id', $pcrenouv->stocks->first()?->id) == $stock->id ? 'selected' : '' }}>
+                    {{ ucfirst($stock->lieux) }}
+                </option>
+                @endforeach
+            </select>
             </div>
         </div>
 
