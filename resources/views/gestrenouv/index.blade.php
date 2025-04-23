@@ -2,8 +2,8 @@
 
 @section('content')
 
-<div class="container mx-auto py-8 px-4 sm:px-6 lg:px-8">
-<h1 class="text-3xl font-bold mb-8 px-4 pt-10 text-gray-800">Tableau de Bord des PCRenouvs</h1>
+<div class="container mx-auto py-8 px-4 sm:px-6 lg:px-8 min-h-screen">
+        <h1 class="text-3xl font-bold text-gray-800">Tableau de Bord des PCRenouvs</h1>
 
     <h2 class="text-xl sm:text-2xl font-semibold px-2 sm:px-4 py-2 text-gray-700">Nombre de commandes par Site</h2>
     {{-- Filtres par lieu --}}
