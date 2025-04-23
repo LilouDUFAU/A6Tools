@@ -37,6 +37,6 @@ class Client extends Model
     // un client peut avoir plusieurs pcrenouv
     public function pcrenouv()
     {
-        return $this->belongsToMany(Client::class, 'client_pcrenouv', 'pcrenouv_id', 'client_id')->withPivot('date_pret', 'date_retour');
+        return $this->belongsToMany(Client::class, 'client_pcrenouv', 'client_id', 'pcrenouv_id')->withPivot('date_pret', 'date_retour');
     }
 }
