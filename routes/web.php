@@ -31,6 +31,9 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/pcrenouv/{id}/edit', [PCRenouvController::class, 'edit'])->name('gestrenouv.edit');
     Route::put('/pcrenouv/{id}', [PCRenouvController::class, 'update'])->name('gestrenouv.update');
     Route::delete('/pcrenouv/{id}', [PCRenouvController::class, 'destroy'])->name('gestrenouv.destroy');
+    Route::get('/pcrenouv{id}/louer', [PCRenouvController::class, 'louer'])->name('gestrenouv.louer');
+    Route::get('/pcrenouv{id}/preter', [PCRenouvController::class, 'preter'])->name('gestrenouv.preter');
+    
 });
 
 Route::middleware(['auth', 'admin'])->group(function () {
