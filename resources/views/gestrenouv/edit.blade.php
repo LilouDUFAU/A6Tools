@@ -81,6 +81,38 @@
             </div>
         </div>
 
+        
+        <div class="border-l-4 border-green-600 pl-4 mb-8">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Client</h2>
+            @if($pcrenouv->clients->isNotEmpty())
+            @foreach($pcrenouv->clients as $client)
+                <div class="mb-6 bg-gray-50 p-4 rounded-lg">
+                <div class="mb-4">
+                    <label for="client_nom_{{ $client->id }}" class="block text-sm font-semibold text-gray-700">Nom du Client</label>
+                    <input type="text" id="client_nom_{{ $client->id }}" name="clients[{{ $client->id }}][nom]" value="{{ $client->nom ?? '' }}" class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm px-2 py-1">
+                </div>
+
+                <div class="mb-4">
+                    <label for="client_code_{{ $client->id }}" class="block text-sm font-semibold text-gray-700">Code Client</label>
+                    <input type="text" id="client_code_{{ $client->id }}" name="clients[{{ $client->id }}][code_client]" value="{{ $client->code_client ?? '' }}" class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm px-2 py-1">
+                </div>
+
+                <div class="mb-4">
+                    <label for="date_pret_{{ $client->id }}" class="block text-sm font-semibold text-gray-700">Date de prêt</label>
+                    <input type="date" id="date_pret_{{ $client->id }}" name="clients[{{ $client->id }}][date_pret]" value="{{ $client->pivot->date_pret ?? '' }}" class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm px-2 py-1">
+                </div>
+
+                <div class="mb-4">
+                    <label for="date_retour_{{ $client->id }}" class="block text-sm font-semibold text-gray-700">Date de retour prévue</label>
+                    <input type="date" id="date_retour_{{ $client->id }}" name="clients[{{ $client->id }}][date_retour]" value="{{ $client->pivot->date_retour ?? '' }}" class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm px-2 py-1">
+                </div>
+                </div>
+            @endforeach
+            @else
+            <p>Aucun client associé car ceci n'est pas une <strong>location</strong> ou un <strong>prêt</strong>.</p>
+            @endif
+        </div>
+
         <div class="flex items-center justify-between">
             <button type="submit"
                 class="w-full bg-green-600 text-white px-6 py-3 rounded-lg shadow hover:bg-green-700 focus:ring-2 focus:ring-green-500 flex items-center justify-center">
