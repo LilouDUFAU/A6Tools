@@ -3,7 +3,7 @@
 @section('content')
 <div class="container mx-auto py-8 px-4 sm:px-6 lg:px-8 min-h-screen">
     <h1>Louer un PC</h1>
-    <form action="{{ route('gestrenouv.addLoc', $pcrenouv->id) }}" method="POST" class="space-y-6">
+    <form action="{{ route('gestrenouv.addLocPret', $pcrenouv->id) }}" method="POST" class="space-y-6">
         @csrf
         @method('PUT')
 
@@ -123,6 +123,22 @@
             <div id="selected_client" class="mb-6 p-4 bg-green-50 rounded-lg border border-green-200 hidden">
                 <h3 class="font-medium text-green-800">Client sélectionné</h3>
                 <p id="selected_client_info" class="text-green-700"></p>
+            </div>
+
+            <div class="mb-4">
+                <label for="date_pret" class="block text-gray-700 font-bold mb-2">Date de prêt</label>
+                <input type="date" name="date_pret" id="date_pret"
+                    value="{{ old('date_pret') }}"
+                    class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1"
+                    >
+            </div>
+
+            <div class="mb-4">
+                <label for="date_retour" class="block text-gray-700 font-bold mb-2">Date de retour</label>
+                <input type="date" name="date_retour" id="date_retour"
+                    value="{{ old('date_retour') }}"
+                    class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1"
+                    >
             </div>
         </div>
 
