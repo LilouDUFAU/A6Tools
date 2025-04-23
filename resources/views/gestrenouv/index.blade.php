@@ -110,10 +110,10 @@
             </form>";
         return [
             'reference' => $r->reference,
-            'code_client' => $r->clients->isNotEmpty() ? $r->clients->pluck('code_client')->join(', ') : '<strong>Pas de client</strong>',
+            'code_client' => $r->clients->isNotEmpty() ? $r->clients->pluck('code_client')->join(', ') : '<span class="block text-center font-bold">-</span>',
             'lieux' => strtolower($site),
             'type' => strtolower($r->type),
-            'statut' => strtolower($r->statut),
+            'statut' => strtolower($r->statut) === 'en stock' ? '<strong>' . strtolower($r->statut) . '</strong>' : strtolower($r->statut),
             'quantite' => $r->quantite,
             'option' => $option,
             'actions' => $actions
