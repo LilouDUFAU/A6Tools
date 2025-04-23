@@ -3,9 +3,9 @@
 @section('content')
 
 <div class="container mx-auto py-8 px-4 sm:px-6 lg:px-8 min-h-screen">
-    <h1 class="text-3xl font-bold text-gray-800">Tableau de Bord des PCRenouvs</h1>
+    <h1 class="text-3xl font-bold mb-8 px-4 pt-10 text-gray-800">Tableau de Bord des PCRenouvs</h1>
 
-    <h2 class="text-xl sm:text-2xl font-semibold px-2 sm:px-4 py-2 text-gray-700">Nombre de PCRenouv par Site</h2>
+    <h2 class="text-xl sm:text-2xl font-semibold px-2 sm:px-4 py-2 text-gray-700 ">Nombre de PCRenouv par Site</h2>
     {{-- Filtres par lieu --}}
     <div class='grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 mb-8 px-2 sm:px-4'>
         @foreach(['Mont de Marsan', 'Aire sur Adour'] as $lieu)
@@ -65,8 +65,9 @@
                 <thead>
                     <tr class="bg-gray-100 text-left text-sm font-semibold text-gray-700">
                         <th class="py-3 px-4 border border-gray-200">Référence</th>
-                        <th class="py-3 px-4 border border-gray-200">Type</th>
+                        <th class="py-3 px-4 border border-gray-200">Client</th>
                         <th class="py-3 px-4 border border-gray-200">Site</th>
+                        <th class="py-3 px-4 border border-gray-200">Type</th>
                         <th class="py-3 px-4 border border-gray-200">Statut</th>
                         <th class="py-3 px-4 border border-gray-200">Quantité</th>
                         <th class="py-3 px-4 border border-gray-200">Options</th>
@@ -109,8 +110,9 @@
             </form>";
         return [
             'reference' => $r->reference,
-            'type' => strtolower($r->type),
+            'code_client' => $r->clients->isNotEmpty() ? $r->clients->pluck('code_client')->join(', ') : '<strong>Pas de client</strong>',
             'lieux' => strtolower($site),
+            'type' => strtolower($r->type),
             'statut' => strtolower($r->statut),
             'quantite' => $r->quantite,
             'option' => $option,
@@ -133,8 +135,9 @@
     const rowHTML = r => `        
         <tr class="border-t hover:bg-gray-50">
             <td class="py-3 px-4 border border-gray-200">${r.reference}</td>
-            <td class="py-3 px-4 border border-gray-200">${r.type}</td>
+            <td class="py-3 px-4 border border-gray-200">${r.code_client}</td>
             <td class="py-3 px-4 border border-gray-200">${r.lieux}</td>
+            <td class="py-3 px-4 border border-gray-200">${r.type}</td>
             <td class="py-3 px-4 border border-gray-200">${r.statut}</td>
             <td class="py-3 px-4 border border-gray-200">${r.quantite}</td>
             <td class="py-3 px-4 border border-gray-200">${r.option}</td>
