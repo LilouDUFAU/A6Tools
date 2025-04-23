@@ -89,15 +89,33 @@
         $louerUrl = route('gestrenouv.louer', ['id' => $r->id]);
         $preterUrl = route('gestrenouv.preter', ['id' => $r->id]);
 
+        $isDisabled = in_array(strtolower($r->statut), ['loué', 'prêté']);
+
         $option = "
         <div class='inline-flex space-x-2'>
-        <button class='text-blue-600 font-semibold hover:underline' onclick=\"window.location.href='{$louerUrl}'\">Louer</button>
-        <button class='text-purple-600 font-semibold hover:underline' onclick=\"window.location.href='{$preterUrl}'\">Prêter</button>
-        <form action='".route('gestrenouv.retour', ['id' => $r->id])."' method='POST' id='retour-form'>
-            ".csrf_field()."
-            ".method_field('PUT')."
-            <button type='submit' class='text-orange-600 font-semibold hover:underline'>Retour</button>
-        </form>
+            <button onclick=\"window.location.href='{$louerUrl}'\" 
+                class='" . ($isDisabled ? "text-gray-400 cursor-not-allowed" : "text-blue-600 font-semibold hover:underline") . "' 
+                " . ($isDisabled ? "disabled" : "") . ">
+                Louer
+            </button>
+
+            <button onclick=\"window.location.href='{$preterUrl}'\" 
+                class='" . ($isDisabled ? "text-gray-400 cursor-not-allowed" : "text-purple-600 font-semibold hover:underline") . "' 
+                " . ($isDisabled ? "disabled" : "") . ">
+                Prêter
+            </button>
+
+            <form action='".route('gestrenouv.retour', ['id' => $r->id])."' method='POST' id='retour-form'>
+                ".csrf_field()."
+                ".method_field('PUT')."
+                <button type='submit'
+                    ".(strtolower($r->statut) === 'en stock' ? 'disabled' : '')."
+                    class='".(strtolower($r->statut) === 'en stock'
+                        ? 'text-gray-400 cursor-not-allowed'
+                        : 'text-orange-600 font-semibold hover:underline')."'>
+                    Retour
+                </button>
+            </form>
         </div>";
 
         $actions = "
