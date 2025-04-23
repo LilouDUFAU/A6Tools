@@ -120,7 +120,7 @@
             "</form>";
         return [
             'id'=>$c->id,
-            'client'=>$c->client?->nom?:'<p class="text-red-500">Pas de client</p>',
+            'client'=>$c->client?->code_client?:'<p class="text-red-500">Pas de client</p>',
             'fournisseur'=>$fourn,
             'lieux'=>$lieux?:'Non défini',
             'produits'=>$produits,
