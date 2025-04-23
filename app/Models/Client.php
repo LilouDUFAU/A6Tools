@@ -33,4 +33,10 @@ class Client extends Model
     {
         return $this->hasMany(Panne::class, 'client_id', 'id');
     }
+
+    // un client peut avoir plusieurs pcrenouv
+    public function pcrenouv()
+    {
+        return $this->belongsToMany(Client::class, 'client_pcrenouv', 'pcrenouv_id', 'client_id')->withPivot('date_pret', 'date_retour');
+    }
 }
