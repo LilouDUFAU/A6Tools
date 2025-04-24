@@ -15,6 +15,8 @@ class PrepAtelier extends Model
     /////////////////////////
     protected $fillable = [
         'notes',
+        'commande_id',
+        'employe_id',
         'created_at',
     ];
     
@@ -31,7 +33,7 @@ class PrepAtelier extends Model
     //une preparation d'atelier peut lister plusieurs etapes
     public function etapes()
     {
-        return $this->hasMany(Etape::class, 'prep_atelier_id', 'id');
+        return $this->hasMany(Etape::class, 'preparation_id', 'id');
     }
 
     //une preparation d'atelier peut etre preparee par un seul employe
