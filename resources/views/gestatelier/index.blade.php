@@ -29,7 +29,13 @@
                     @foreach($prepAteliers as $atelier)
                         <tr class="border-t hover:bg-gray-50">
                             <td class="py-3 px-4 border border-gray-200">Cmde n°{{ $atelier->commande->id }} - {{ $atelier->commande->client->nom }} ({{ $atelier->commande->client->code_client }})</td>
-                            <td class="py-3 px-4 border border-gray-200">{{ $atelier->notes }}</td>
+                            <td class="py-3 px-4 border border-gray-200 text-center">
+                                @if($atelier->notes)
+                                    {{ $atelier->notes }}
+                                @else
+                                    <strong>-</strong>
+                                @endif
+                            </td>
 
                             <td class="py-3 px-4 border border-gray-200">
                                 {{ $atelier->etapes->where('is_done', true)->count() }}
