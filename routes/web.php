@@ -4,7 +4,9 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AccountController;
 use App\Http\Controllers\CommandeController;
 use App\Http\Controllers\HomeController;
-use App\Http\Controllers\PCRenouvController; // Assurez-vous d'importer le contrôleur
+use App\Http\Controllers\PCRenouvController;
+use App\Http\Controllers\PrepAtelierController;
+use App\Http\Controllers\PanneController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -36,6 +38,21 @@ Route::middleware(['auth'])->group(function () {
     Route::put('/gestrenouv/{id}/addLocPret', [PCRenouvController::class, 'addLocPret'])->name('gestrenouv.addLocPret');
     Route::put('/pcrenouv/{id}/retour', [PCRenouvController::class, 'retour'])->name('gestrenouv.retour');
 
+    Route::get('/prepatelier', [PrepAtelierController::class, 'index'])->name('prepatelier.index');
+    Route::get('/prepatelier/create', [PrepAtelierController::class, 'create'])->name('prepatelier.create');
+    Route::post('/prepatelier', [PrepAtelierController::class, 'store'])->name('prepatelier.store');
+    Route::get('/prepatelier/{id}', [PrepAtelierController::class, 'show'])->name('prepatelier.show');
+    Route::get('/prepatelier/{id}/edit', [PrepAtelierController::class, 'edit'])->name('prepatelier.edit');
+    Route::put('/prepatelier/{id}', [PrepAtelierController::class, 'update'])->name('prepatelier.update');
+    Route::delete('/prepatelier/{id}', [PrepAtelierController::class, 'destroy'])->name('prepatelier.destroy');
+
+    Route::get('/panne', [PanneController::class, 'index'])->name('panne.index');
+    Route::get('/panne/create', [PanneController::class, 'create'])->name('panne.create');
+    Route::post('/panne', [PanneController::class, 'store'])->name('v.store');
+    Route::get('/panne/{id}', [PanneController::class, 'show'])->name('panne.show');
+    Route::get('/panne/{id}/edit', [PanneController::class, 'edit'])->name('panne.edit');
+    Route::put('/panne/{id}', [PanneController::class, 'update'])->name('panne.update');
+    Route::delete('/panne/{id}', [PanneController::class, 'destroy'])->name('panne.destroy');
     
 });
 
