@@ -78,27 +78,36 @@ class EtapeController extends Controller
         $request->validate([
             'is_done' => 'required|boolean',  // On vérifie que la valeur de is_done est un booléen
         ]);
-
+    
         // Log pour vérifier que la requête est bien reçue
         Log::info("Mise à jour de l'état de l'étape ID : $id avec is_done = " . $request->input('is_done'));
-
+    
         // Récupérer l'étape à partir de l'ID
         $etape = Etape::findOrFail($id);
-
+    
         // Log pour vérifier si l'étape existe
         Log::info("Étape trouvée : " . $etape->intitule);
-
+    
+        // Si is_done est déjà à true, on ne permet pas la mise à jour à false
+        if ($etape->is_done && $request->input('is_done') === false) {
+            // Log pour expliquer pourquoi la mise à jour ne s'est pas effectuée
+            Log::info("L'état de l'étape ID $id ne peut pas être mis à false car il est déjà à true.");
+    
+            // Réponse avec un message d'erreur
+            return redirect()->back()->with('error', 'L\'étape est déjà terminée et ne peut pas être marquée comme non terminée.');
+        }
+    
         // Mise à jour de l'état de l'étape
         $etape->is_done = $request->input('is_done');
         $etape->save();
-
+    
         // Log après la mise à jour
         Log::info("L'état de l'étape ID $id a été mis à jour à : " . $etape->is_done);
-
+    
         // Réponse JSON avec le nouvel état de l'étape
         return redirect()->back()->with('success', 'L\'état de l\'étape a été mis à jour avec succès.');
     }
-
+    
     
     /**
      * Supprime une étape spécifique.

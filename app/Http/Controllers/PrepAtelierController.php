@@ -123,7 +123,7 @@ class PrepAtelierController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, string $id) 
     {
         // Validation des données envoyées
         $validated = $request->validate([
@@ -159,8 +159,16 @@ class PrepAtelierController extends Controller
                 $existingEtapeId = isset($existingEtapes[$index]) ? $existingEtapes[$index] : null;
                 
                 if ($existingEtapeId) {
-                    // Si l'étape existe, la mettre à jour
+                    // Si l'étape existe, vérifier si l'état est déjà à true
                     $etapeRecord = Etape::findOrFail($existingEtapeId);
+    
+                    // Si l'état actuel est déjà à true, on ne permet pas de le mettre à false
+                    if ($etapeRecord->is_done && $is_done === false) {
+                        // Si is_done est true, on garde cette valeur sans la modifier
+                        $is_done = true;
+                    }
+    
+                    // Mettre à jour l'étape avec le nouvel intitulé et l'état (is_done)
                     $etapeRecord->update([
                         'intitule' => $etape,
                         'is_done' => $is_done,
@@ -183,6 +191,7 @@ class PrepAtelierController extends Controller
         // Retourner la préparation mise à jour avec un message de succès
         return redirect()->route('prepatelier.index')->with('success', 'Préparation mise à jour avec succès!');
     }
+    
     
     /**
      * Remove the specified resource from storage.
