@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('prep_ateliers', function (Blueprint $table) {
             $table->id();
-            $table->text('notes'); // Notes concernant la préparation
+            $table->text('notes')->nullable(); // Notes concernant la préparation
             $table->unsignedBigInteger('commande_id'); // Clé étrangère vers la table commandes
             $table->unsignedBigInteger('employe_id'); // Clé étrangère vers la table users (employé qui prépare l'atelier)
             $table->timestamps(); // created_at, updated_at
