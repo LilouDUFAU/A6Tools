@@ -15,6 +15,8 @@ class Etape extends Model
     /////////////////////////
     protected $fillable = [
         'intitule',
+        'is_done',
+        'preparation_id',
     ];
 
     

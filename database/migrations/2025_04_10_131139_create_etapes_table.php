@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('intitule'); // Intitulé de l'étape
             $table->unsignedBigInteger('preparation_id'); // Clé étrangère vers la table prep_atelier
+            $table->boolean('is_done')->default(false);
             $table->timestamps(); // created_at, updated_at
 
             // Clé étrangère vers la table prep_atelier
