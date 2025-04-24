@@ -34,16 +34,21 @@
                 <ul class="list-disc pl-5 space-y-2">
                     @foreach ($prepAtelier->etapes as $etape)
                         <li class="flex justify-between items-center">
+                        <form action="{{ route('etapes.update', $etape->id) }}" method="POST">
+                            @csrf
+                            @method('PUT')
                             <label class="flex items-center space-x-3">
                                 <input 
                                     type="checkbox" 
                                     class="form-checkbox h-5 w-5 text-green-600" 
-                                    data-etape-id="{{ $etape->id }}" 
+                                    name="is_done"
+                                    value="1"
                                     {{ $etape->is_done ? 'checked' : '' }}
-                                    onchange="updateEtapeStatus(this)"
+                                    onchange="this.form.submit()"
                                 >
                                 <span>{{ $etape->intitule }}</span>
                             </label>
+                        </form>
                         </li>
                     @endforeach
                 </ul>
