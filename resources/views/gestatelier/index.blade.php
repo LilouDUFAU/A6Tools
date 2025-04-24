@@ -20,6 +20,8 @@
                     <tr class="bg-gray-100 text-left text-sm font-semibold text-gray-700">
                         <th class="py-3 px-4 border border-gray-200">Commande liée</th>
                         <th class="py-3 px-4 border border-gray-200">Notes Technicien</th>
+                        <th class="py-3 px-4 border border-gray-200">Etapes terminées</th>
+                        <th class="py-3 px-4 border border-gray-200">Etapes restantes</th>
                         <th class="py-3 px-4 border border-gray-200">Actions</th>
                     </tr>
                 </thead>
@@ -28,6 +30,13 @@
                         <tr class="border-t hover:bg-gray-50">
                             <td class="py-3 px-4 border border-gray-200">Cmde n°{{ $atelier->commande->id }} - {{ $atelier->commande->client->nom }} ({{ $atelier->commande->client->code_client }})</td>
                             <td class="py-3 px-4 border border-gray-200">{{ $atelier->notes }}</td>
+
+                            <td class="py-3 px-4 border border-gray-200">
+                                {{ $atelier->etapes->where('is_done', true)->count() }}
+                            </td>
+                            <td class="py-3 px-4 border border-gray-200">
+                                {{ $atelier->etapes->where('is_done', false)->count() }}
+                            </td>
                             <td class="py-3 px-4 border border-gray-200">
                                 <div class="inline-flex space-x-2">
                                     <a href="{{ route('prepatelier.show', $atelier->id) }}" class="text-green-600 font-semibold hover:underline">Détails</a>
