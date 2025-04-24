@@ -1,3 +1,1 @@
-<div>
-    <!-- Simplicity is the essence of happiness. - Cedric Bledsoe -->
-</div>
+yo la team comment ca va 
