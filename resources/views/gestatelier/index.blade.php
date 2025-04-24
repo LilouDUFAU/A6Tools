@@ -18,7 +18,7 @@
             <table class="min-w-full border-collapse border border-gray-200">
                 <thead>
                     <tr class="bg-gray-100 text-left text-sm font-semibold text-gray-700">
-                        <th class="py-3 px-4 border border-gray-200">Commande liée</th>
+                        <th class="py-3 px-4 border border-gray-200">Commande client liée</th>
                         <th class="py-3 px-4 border border-gray-200">Notes Technicien</th>
                         <th class="py-3 px-4 border border-gray-200">Etapes terminées</th>
                         <th class="py-3 px-4 border border-gray-200">Etapes restantes</th>
