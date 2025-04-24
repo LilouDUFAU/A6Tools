@@ -8,7 +8,7 @@
             <h2 class="text-2xl font-bold text-gray-800 mb-4">Préparation</h2>
             <div class="mb-4">
                 <label for="notes" class="block text-gray-700 font-bold mb-2">Notes</label>
-                <textarea name="notes" id="notes" class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm   px-2 py-1" required maxlength="255" rows="4"></textarea>
+                <textarea name="notes" id="notes" class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm   px-2 py-1" maxlength="255" rows="4"></textarea>
             </div>
             <!-- Partie Employé -->
     <h2 class="text-2xl font-bold text-gray-800 mb-4">Employé</h2>
@@ -40,15 +40,17 @@
         </div>
 
         <div class="border-l-4 border-green-600 pl-4">
-            <h2 class="text-2xl font-bold text-gray-800 mb-4">Commande</h2>
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Commande client</h2>
             <div class="mb-4">
-                <label for="commande_id" class="block text-sm font-semibold text-gray-700">Choisir une commande</label>
+                <label for="commande_id" class="block text-sm font-semibold text-gray-700">Choisir une commande client</label>
                 <select id="commande_id" name="commande_id" class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm px-2 py-1">
                     <option value="">-- Sélectionner une commande --</option>
                     @foreach ($commandes as $commande)
-                        <option value="{{ $commande->id }}" {{ old('commande_id') == $commande->id ? 'selected' : '' }}>
-                            Commande n°{{ $commande->id }} : {{ $commande->client->nom }} ({{ $commande->client->code_client }})
-                        </option>
+                        @if ($commande->client)
+                            <option value="{{ $commande->id }}" {{ old('commande_id') == $commande->id ? 'selected' : '' }}>
+                                Commande n°{{ $commande->id }} : {{ $commande->client->nom }} ({{ $commande->client->code_client }})
+                            </option>
+                        @endif
                     @endforeach
                 </select>
             </div>
