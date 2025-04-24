@@ -46,7 +46,8 @@
                 <select id="commande_id" name="commande_id" class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm px-2 py-1">
                     <option value="">-- Sélectionner une commande --</option>
                     @foreach ($commandes as $commande)
-                        @if ($commande->client)
+                        <!-- Affiche uniquement les commandes ayant un client et n'étant pas liées à une préparation -->
+                        @if ($commande->client && $commande->delai_installation)
                             <option value="{{ $commande->id }}" {{ old('commande_id') == $commande->id ? 'selected' : '' }}>
                                 Commande n°{{ $commande->id }} : {{ $commande->client->nom }} ({{ $commande->client->code_client }})
                             </option>
@@ -59,8 +60,7 @@
         <div class="border-l-4 border-green-600 pl-4">
         <h2 class="text-2xl font-bold text-gray-800 mb-4">To do list</h2>
         <div id="etapes-container">
-            <div class="etape-item mb-4 flex items-center">
-            <input type="checkbox" name="etapes_done[]" value="0" class="mr-2">
+            <div class="etape-item mb-4">
             <input type="text" name="etapes[]" class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm   px-2 py-1" placeholder="Description de l'étape" required>
             </div>
         </div>
@@ -74,9 +74,8 @@
             document.getElementById('add-etape-btn').addEventListener('click', function () {
             const container = document.getElementById('etapes-container');
             const newEtape = document.createElement('div');
-            newEtape.classList.add('etape-item', 'mb-4', 'flex', 'items-center');
+            newEtape.classList.add('etape-item', 'mb-4');
             newEtape.innerHTML = `
-            <input type="checkbox" name="etapes_done[]" value="0" class="mr-2">
             <input type="text" name="etapes[]" class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm   px-2 py-1" placeholder="Description de l'étape" required>
             `;
             container.appendChild(newEtape);
