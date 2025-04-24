@@ -6,6 +6,7 @@ use App\Http\Controllers\CommandeController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\PCRenouvController;
 use App\Http\Controllers\PrepAtelierController;
+use App\Http\Controllers\EtapeController;
 use App\Http\Controllers\PanneController;
 
 Route::get('/', function () {
@@ -53,7 +54,9 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/panne/{id}/edit', [PanneController::class, 'edit'])->name('panne.edit');
     Route::put('/panne/{id}', [PanneController::class, 'update'])->name('panne.update');
     Route::delete('/panne/{id}', [PanneController::class, 'destroy'])->name('panne.destroy');
-    
+
+    Route::put('/etapes/{id}/update', [EtapeController::class, 'update'])->name('etapes.update');
+
 });
 
 Route::middleware(['auth', 'admin'])->group(function () {
