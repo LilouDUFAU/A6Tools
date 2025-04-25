@@ -51,7 +51,7 @@
                             $preparationExistante = \App\Models\PrepAtelier::where('commande_id', $commande->id)->exists();
                         @endphp
 
-                        @if ($commande->client && $commande->delai_installation && !$preparationExistante)
+                        @if ($commande->client && !$preparationExistante)
                             <option value="{{ $commande->id }}" {{ old('commande_id') == $commande->id ? 'selected' : '' }}>
                                 Commande n°{{ $commande->id }} : {{ $commande->client->nom }} ({{ $commande->client->code_client }})
                             </option>
