@@ -95,6 +95,31 @@
             @endforeach
         </div>
 
+        <!-- Préparation Atelier -->
+        <div class="border-l-4 border-green-600 pl-4 mb-8">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Préparation Atelier</h2>
+            @php
+                $preparation = \App\Models\PrepAtelier::where('commande_id', $commande->id)->first();
+            @endphp
+
+            @if($preparation)
+                <div class="card mb-4">
+                    <div class="card-body">
+                    <p><strong>ID :</strong> {{ $preparation->id }}</p>
+                    @php
+                        $technicien = \App\Models\User::find($preparation->employe_id);
+                    @endphp
+                    <p><strong>Technicien :</strong> {{ $technicien ? $technicien->prenom : '/' }} {{ $technicien ? $technicien->nom : '/' }}</p>
+                        <p><strong>Voir la préparation :</strong>
+                            <a href="{{ route('prepatelier.show', $preparation->id) }}" class="text-blue-600 hover:underline">Voir la Préparation</a>
+                        </p>
+                    </div>
+                </div>
+            @else
+                <p>Aucune préparation liée à cette commande.</p>
+            @endif
+        </div>
+
         <!-- Boutons -->
         <div class="flex justify-between mt-8">
             <a href="{{ route('commande.edit', $commande->id) }}" class="text-green-600 font-medium hover:underline">Modifier</a>
