@@ -1,29 +1,60 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="text-black flex items-center justify-center min-h-screen flex-col">
+<div class="text-black flex items-center justify-center min-h-screen flex-col bg-gray-100">
     <div class="w-full max-w-4xl text-center mb-6 bg-white shadow-lg p-6 rounded-lg">
         {{-- Welcome Message --}}
-        <h1 class="text-4xl font-bold text-gray-800 mb-4">Bienvenue sur A6Tools</h1>
-        <p class="text-lg text-gray-600">Votre outil de gestion web collaboratif !</p>
+        <h1 class="text-4xl md:text-5xl font-bold text-gray-800 mb-4">👋🏻 Bienvenue sur <span class="text-green-600">A6Tools</span></h1>
+        <p class="text-lg md:text-xl text-gray-600">Votre outil de gestion web collaboratif !</p>
     </div>
 
-    
     <div class="w-full max-w-4xl text-center">
         @if (Route::has('login'))
-            <div class="flex items-center justify-center gap-6">
+            <div class="flex flex-col items-center justify-center gap-6">
                 @auth
-                    <a href="{{ url('/dashboard') }}" class="bg-green-600 text-white hover:bg-green-700 font-semibold py-2 px-4 rounded-lg shadow-md transition">Accéder au tableau de bord</a>
+                <div class="flex flex-wrap items-center justify-center gap-4">
+                    <a href="{{ url('/dashboard') }}" class="bg-green-600 text-white hover:bg-green-700 font-semibold py-2 px-4 rounded-lg shadow-md transition">
+                        Accéder au tableau de bord
+                    </a>
                     <form method="POST" action="{{ route('logout') }}">
                         @csrf
                         <button type="submit" class="bg-red-600 text-white hover:bg-red-700 font-semibold py-2 px-4 rounded-lg shadow-md transition">
                             Déconnexion
                         </button>
                     </form>
-                    <!-- ajouter applications -->
+                </div>
+
+                <!-- Applications Section -->
+                <div class="mt-12">
+                    <h2 class="text-3xl md:text-4xl font-bold text-gray-800 mb-6 lg:mb-20">Applications</h2>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+                        <a href="{{ route('commande.index') }}" class="flex flex-col items-center text-gray-800 hover:text-green-600 transition">
+                            <i class="nav-icon fas fa-box-open text-6xl mb-4"></i>
+                            <span class="text-lg md:text-xl">Gestock</span>
+                        </a>
+                        <a href="{{ route('gestrenouv.index') }}" class="flex flex-col items-center text-gray-800 hover:text-green-600 transition">
+                            <i class="nav-icon fa-solid fa-desktop text-6xl mb-4"></i>
+                            <span class="text-lg md:text-xl">GestRenouv</span>
+                        </a>
+                        <a href="{{ route('prepatelier.index') }}" class="flex flex-col items-center text-gray-800 hover:text-green-600 transition">
+                            <i class="nav-icon fa-solid fa-wrench text-6xl mb-4"></i>
+                            <span class="text-lg md:text-xl">GestAtelier</span>
+                        </a>
+                        <a href="{{ route('panne.index') }}" class="flex flex-col items-center text-gray-800 hover:text-green-600 transition">
+                            <i class="nav-icon fa-solid fa-bolt text-6xl mb-4"></i>
+                            <span class="text-lg md:text-xl">GestSAV</span>
+                        </a>
+                    </div>
+                </div>
                 @else
-                    <a href="{{ route('login') }}" class="bg-green-600 text-white hover:bg-green-700 font-semibold py-2 px-4 rounded-lg shadow-md transition">Connexion</a>
-                    <a href="{{ route('register') }}" class="bg-green-600 text-white hover:bg-green-700 font-semibold py-2 px-4 rounded-lg shadow-md transition">Inscription ( à enlever → direction créée )</a>
+                <div class="flex flex-wrap items-center justify-center gap-4">
+                    <a href="{{ route('login') }}" class="bg-green-600 text-white hover:bg-green-700 font-semibold py-2 px-4 rounded-lg shadow-md transition">
+                        Connexion
+                    </a>
+                    <a href="{{ route('register') }}" class="bg-green-600 text-white hover:bg-green-700 font-semibold py-2 px-4 rounded-lg shadow-md transition">
+                        Inscription
+                    </a>
+                </div>
                 @endauth
             </div>
         @endif
