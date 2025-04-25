@@ -46,8 +46,12 @@
                 <select id="commande_id" name="commande_id" class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm px-2 py-1">
                     <option value="">-- Sélectionner une commande --</option>
                     @foreach ($commandes as $commande)
-                        <!-- Affiche uniquement les commandes ayant un client et n'étant pas liées à une préparation -->
-                        @if ($commande->client && $commande->delai_installation)
+                        @php
+                            // Vérifie si une préparation est déjà liée à cette commande
+                            $preparationExistante = \App\Models\PrepAtelier::where('commande_id', $commande->id)->exists();
+                        @endphp
+
+                        @if ($commande->client && $commande->delai_installation && !$preparationExistante)
                             <option value="{{ $commande->id }}" {{ old('commande_id') == $commande->id ? 'selected' : '' }}>
                                 Commande n°{{ $commande->id }} : {{ $commande->client->nom }} ({{ $commande->client->code_client }})
                             </option>
