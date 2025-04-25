@@ -197,18 +197,15 @@ class CommandeController extends Controller
                 $commande->client_id = null; // Si le client n'est pas valide, le laisser à null
             }
         }
-        // Ne pas réinitialiser à null si aucune donnée n'est entrée, donc garder le client existant.
     
-        // Fournisseur
+        // Fournisseur : Si aucune modification n'est faite, rien ne se passe
         $fournisseur_id = $commande->fournisseur_id; // Garde le fournisseur existant par défaut
     
         if ($request->filled('fournisseur_id')) {
-            // Si un fournisseur est sélectionné, l'associer à la commande
-            $fournisseur = Fournisseur::findOrFail($request->input('fournisseur_id'));
-            $fournisseur->update([
-                'nom' => $request->input('new_fournisseur.nom', $fournisseur->nom), // Mise à jour du nom si nécessaire
-            ]);
-            $fournisseur_id = $fournisseur->id;
+            // Si un autre fournisseur est sélectionné, on utilise simplement son ID sans modifier son nom
+            $fournisseur_id = $request->input('fournisseur_id');
+            
+            // On ne modifie pas le nom du fournisseur sélectionné
         } elseif ($request->filled('new_fournisseur.nom')) {
             // Si un nouveau fournisseur est ajouté
             $fournisseurNom = $request->input('new_fournisseur.nom');
@@ -217,7 +214,6 @@ class CommandeController extends Controller
             ]);
             $fournisseur_id = $fournisseur->id;
         }
-        // Si aucune donnée n'est fournie pour le fournisseur, on ne fait rien (on garde le fournisseur existant).
     
         // Supprimer les anciennes données liées au produit
         DB::table('produit_stock')->where('commande_id', $commande->id)->delete();
@@ -226,7 +222,7 @@ class CommandeController extends Controller
         // PRODUIT (1 seul)
         $produitData = $request->input('produit');
         if (!empty($produitData)) {
-            $produit = Produit::firstOrCreate(
+            $produit = Produit::updateOrCreate(
                 ['reference' => $produitData['reference']],
                 [
                     'nom' => $produitData['nom'],
@@ -236,31 +232,32 @@ class CommandeController extends Controller
                 ]
             );
     
-            // Lier le fournisseur (si fourni)
+            // Lier le fournisseur (si sélectionné ou modifié)
             if ($fournisseur_id) {
-                $exists = DB::table('fournisseur_produit')
-                    ->where('fournisseur_id', $fournisseur_id)
+                // Supprimer d'abord toute relation existante pour cette commande et ce produit
+                DB::table('fournisseur_produit')
                     ->where('produit_id', $produit->id)
                     ->where('commande_id', $commande->id)
-                    ->exists();
-    
-                if (!$exists) {
-                    DB::table('fournisseur_produit')->insert([
-                        'fournisseur_id' => $fournisseur_id,
-                        'produit_id' => $produit->id,
-                        'commande_id' => $commande->id,
-                        'created_at' => now(),
-                        'updated_at' => now(),
-                    ]);
-                }
+                    ->delete();
+                    
+                // Créer la nouvelle relation avec le fournisseur sélectionné
+                DB::table('fournisseur_produit')->insert([
+                    'fournisseur_id' => $fournisseur_id,
+                    'produit_id' => $produit->id,
+                    'commande_id' => $commande->id,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
             }
     
+            // Attacher le produit à la commande avec ses quantités
             $commande->produits()->attach($produit->id, [
                 'quantite_totale' => $produitData['quantite_totale'] ?? 0,
                 'quantite_client' => $produitData['quantite_client'] ?? 0,
                 'quantite_stock' => ($produitData['quantite_totale'] ?? 0) - ($produitData['quantite_client'] ?? 0),
             ]);
     
+            // Mettre à jour le stock
             DB::table('produit_stock')->insert([
                 'produit_id' => $produit->id,
                 'stock_id' => $request->input('stock_id'),
@@ -276,7 +273,7 @@ class CommandeController extends Controller
     
         return redirect()->route('commande.index')->with('success', 'Commande mise à jour avec succès.');
     }
-    
+        
 
     
     /**
