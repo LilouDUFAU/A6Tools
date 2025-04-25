@@ -173,53 +173,6 @@
             @endforeach
             </select>
             </div>
-
-            <div id="fournisseur-details" class="space-y-4 hidden">
-                <div class="mb-4">
-                    <label for="fournisseur_nom" class="block text-sm font-semibold text-gray-700">Nom du Fournisseur</label>
-                    @foreach($commande->produits as $produit)
-                        @php
-                            $fournisseurProduitCommande = DB::table('fournisseur_produit')
-                                ->join('fournisseurs', 'fournisseur_produit.fournisseur_id', '=', 'fournisseurs.id')
-                                ->where('fournisseur_produit.produit_id', $produit->id)
-                                ->where('fournisseur_produit.commande_id', $commande->id)
-                                ->select('fournisseurs.nom')
-                                ->first();
-                        @endphp
-
-                        @if($fournisseurProduitCommande)
-                            <input type="text" id="fournisseur_nom" name="new_fournisseur[nom]" value="{{ $fournisseurProduitCommande->nom }}" class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm   px-2 py-1">
-                            @break
-                        @endif
-                    @endforeach
-                </div>
-            </div>
-
-            <div class="flex justify-end">
-            <button type="button" onclick="toggleFournisseurDetails()" class="bg-green-600 text-white px-4 py-2 rounded-lg shadow hover:bg-green-700  ">Modifier le Fournisseur</button>
-            </div>
-
-        <script>
-            function fetchFournisseurDetails(fournisseurId) {
-            // Fetch fournisseur details via AJAX
-            fetch(`/fournisseurs/${fournisseurId}`)
-            .then(response => response.json())
-            .then(data => {
-            document.getElementById('fournisseur_nom').value = data.nom || '';
-            })
-            .catch(error => console.error('Error fetching fournisseur details:', error));
-            }
-
-            function toggleFournisseurDetails() {
-            // Toggle visibility of fournisseur details
-            const fournisseurDetails = document.getElementById('fournisseur-details');
-            if (fournisseurDetails.classList.contains('hidden')) {
-            fournisseurDetails.classList.remove('hidden');
-            } else {
-            fournisseurDetails.classList.add('hidden');
-            }
-            }
-        </script>
         </div>
 
         <button type="submit"
