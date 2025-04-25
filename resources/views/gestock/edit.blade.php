@@ -121,6 +121,7 @@
                         <label for="produit_date_livraison_fournisseur" class="block text-sm font-semibold text-gray-700">Date de Livraison Fournisseur</label>
                         <input type="date" id="produit_date_livraison_fournisseur" name="produit[date_livraison_fournisseur]" value="{{ old('produit.date_livraison_fournisseur', $produit->pivot->date_livraison_fournisseur ?? $produit->date_livraison_fournisseur ? \Carbon\Carbon::parse($produit->pivot->date_livraison_fournisseur ?? $produit->date_livraison_fournisseur)->format('Y-m-d') : '') }}" class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm   px-2 py-1">
                     </div>
+                    
 
                     <div class="mb-4">
                         <label for="produit_quantite_totale" class="block text-sm font-semibold text-gray-700">Quantité totale</label>
@@ -143,9 +144,32 @@
             <h2 class="text-2xl font-bold text-gray-800 mb-4">Fournisseur</h2>
             <div class="mb-4">
             <label for="fournisseur_id" class="block text-sm font-semibold text-gray-700">Fournisseur</label>
-            <select id="fournisseur_id" name="fournisseur_id" class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm   px-2 py-1" onchange="fetchFournisseurDetails(this.value)">
+            <select id="fournisseur_id" name="fournisseur_id" class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm px-2 py-1" onchange="fetchFournisseurDetails(this.value)">
+            @php
+                $selectedFournisseurId = null;
+
+                foreach($commande->produits as $produit) {
+                    $fournisseur = DB::table('fournisseur_produit')
+                        ->join('fournisseurs', 'fournisseur_produit.fournisseur_id', '=', 'fournisseurs.id')
+                        ->where('fournisseur_produit.produit_id', $produit->id)
+                        ->where('fournisseur_produit.commande_id', $commande->id)
+                        ->select('fournisseurs.id')
+                        ->first();
+
+                    if ($fournisseur) {
+                        $selectedFournisseurId = $fournisseur->id;
+                        break;
+                    }
+                }
+            @endphp
+
             @foreach ($fournisseurs as $fournisseur)
-            <option value="{{ $fournisseur->id }}" @if($commande->fournisseur_id === $fournisseur->id) selected @endif>{{ $fournisseur->nom }}</option>
+            <option value="{{ $fournisseur->id }}" 
+                @if(($commande->fournisseur_id === $fournisseur->id) || ($selectedFournisseurId && $selectedFournisseurId === $fournisseur->id)) 
+                    selected 
+                @endif>
+                {{ $fournisseur->nom }}
+            </option>
             @endforeach
             </select>
             </div>
