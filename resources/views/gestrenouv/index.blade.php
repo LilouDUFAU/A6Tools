@@ -10,8 +10,8 @@
     <div class='grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 mb-8 px-2 sm:px-4'>
         @foreach(['Mont de Marsan', 'Aire sur Adour'] as $lieu)
         <div class="filter-btn {{ $lieu === 'Mont de Marsan' ? 'bg-green-600 hover:bg-green-700 ring-blue-500' : 'bg-red-600 hover:bg-red-700 ring-blue-500' }} text-white text-center py-4 sm:py-6 rounded-lg shadow-md cursor-pointer" data-filter="{{ strtolower($lieu) }}" data-type="lieu">
-            <div class="text-2xl sm:text-3xl font-bold">
-                {{ $pcrenouvs->filter(fn($r) => optional($r->stocks->first())->lieux === $lieu && $r->quantite > 0)->count() }}
+            <div class="text-2xl sm:text-3xl font-bold count-display">
+                {{ $pcrenouvs->filter(fn($r) => optional($r->stocks->first())->lieux === $lieu && strtolower($r->statut) === 'en stock')->sum('quantite') }}
             </div>
             <div class="text-sm sm:text-lg">{{ $lieu }}</div>
         </div>
@@ -23,8 +23,8 @@
     <div class='grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 mb-8 px-2 sm:px-4'>
         @foreach(App\Models\PCRenouv::TYPES as $type)
         <div class="filter-btn {{ $loop->index % 2 === 0 ? 'bg-green-600 hover:bg-green-700 ring-blue-500' : 'bg-red-600 hover:bg-red-700 ring-blue-500' }} text-white text-center py-4 sm:py-6 rounded-lg shadow-md cursor-pointer" data-filter="{{ strtolower($type) }}" data-type="type">
-            <div class="text-2xl sm:text-3xl font-bold">
-                {{ $pcrenouvs->filter(fn($r) => strtolower($r->type) === strtolower($type) && $r->quantite > 0)->count() }}
+            <div class="text-2xl sm:text-3xl font-bold count-display">
+                {{ $pcrenouvs->filter(fn($r) => strtolower($r->type) === strtolower($type) && in_array(strtolower($type), ['portable', 'fixe']) && $r->quantite > 0)->sum('quantite') }}
             </div>
             <div class="text-sm sm:text-lg">{{ $type }}</div>
         </div>
@@ -42,8 +42,8 @@
             'bg-red-600 hover:bg-red-700 ring-blue-500')) }} 
             text-white text-center py-4 sm:py-6 rounded-lg shadow-md cursor-pointer" 
             data-filter="{{ strtolower($statut) }}" data-type="statut">
-            <div class="text-2xl sm:text-3xl font-bold">
-                {{ $pcrenouvs->filter(fn($r) => strtolower($r->statut) === strtolower($statut) && $r->quantite > 0)->count() }}
+            <div class="text-2xl sm:text-3xl font-bold count-display">
+                {{ $pcrenouvs->filter(fn($r) => strtolower($r->statut) === strtolower($statut) && $r->quantite > 0)->sum('quantite') }}
             </div>
             <div class="text-sm sm:text-lg">{{ $statut }}</div>
         </div>
@@ -144,8 +144,32 @@
     let activeFilters = { lieu: new Set(), type: new Set(), statut: new Set() };
     const body = document.getElementById('pcrenouv-body');
 
+    const calculateCount = (type, value) => {
+        const filteredData = données.filter(r => {
+            const lieuMatch = !activeFilters.lieu.size || [...activeFilters.lieu].some(f => r.lieux.includes(f));
+            const typeMatch = !activeFilters.type.size || activeFilters.type.has(r.type);
+            const statutMatch = !activeFilters.statut.size || activeFilters.statut.has(r.statut);
+            return r.quantite > 0 && lieuMatch && typeMatch && statutMatch;
+        });
+
+        return filteredData.filter(r => {
+            if (type === 'lieu') return r.lieux.includes(value.toLowerCase());
+            if (type === 'type') return r.type === value.toLowerCase();
+            return r.statut === value.toLowerCase();
+        }).reduce((sum, r) => sum + r.quantite, 0);
+    };
+
+    const updateFilterCounts = () => {
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            const type = btn.dataset.type;
+            const value = btn.dataset.filter;
+            const count = calculateCount(type, value);
+            btn.querySelector('.count-display').textContent = count;
+        });
+    };
+
     const filtreOK = r =>
-        r.quantite > 0 &&  // Ajout de la condition pour vérifier que la quantité est supérieure à 0
+        r.quantite > 0 &&
         (!activeFilters.lieu.size || [...activeFilters.lieu].some(f => r.lieux.includes(f))) &&
         (!activeFilters.type.size || activeFilters.type.has(r.type)) &&
         (!activeFilters.statut.size || activeFilters.statut.has(r.statut));
@@ -165,6 +189,7 @@
 
     function renderTable() {
         body.innerHTML = données.filter(filtreOK).map(rowHTML).join('');
+        updateFilterCounts();
     }
 
     document.querySelectorAll('.filter-btn').forEach(btn =>
