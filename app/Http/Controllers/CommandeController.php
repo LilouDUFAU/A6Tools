@@ -7,6 +7,7 @@ use App\Models\Client;
 use App\Models\User;
 use App\Models\Produit;
 use App\Models\Fournisseur;
+use App\Models\PrepAtelier;
 use App\Models\Stock;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -129,7 +130,13 @@ class CommandeController extends Controller
      */
     public function show(string $id)
     {
-        $commande = Commande::with(['client', 'employe', 'produits.fournisseurs', 'produits.stocks'])->findOrFail($id);
+        $commande = Commande::with([
+            'client', 
+            'employe', 
+            'produits.fournisseurs', 
+            'produits.stocks', 
+            'preparation'
+        ])->findOrFail($id);
 
         return view('gestock.show', compact('commande'));
     }
