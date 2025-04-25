@@ -283,12 +283,18 @@ class CommandeController extends Controller
     {
         $commande = Commande::findOrFail($id);
 
+        // Supprimer les préparations associées à la commande
+        PrepAtelier::where('commande_id', $commande->id)->delete();
+
+        // Détacher les produits associés à la commande
         $commande->produits()->detach();
 
+        // Supprimer les entrées dans produit_stock liées à la commande
         DB::table('produit_stock')->where('commande_id', $commande->id)->delete();
 
+        // Supprimer la commande
         $commande->delete();
 
-        return redirect()->route('commande.index')->with('success', 'Commande supprimée avec succès.');
+        return redirect()->route('commande.index')->with('success', 'Commande et ses préparations associées supprimées avec succès.');
     }
 }
