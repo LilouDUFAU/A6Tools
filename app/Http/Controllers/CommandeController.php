@@ -205,21 +205,7 @@ class CommandeController extends Controller
             // Si un autre fournisseur est sélectionné, on utilise simplement son ID sans modifier son nom
             $fournisseur_id = $request->input('fournisseur_id');
             
-            // Si on a aussi fourni un nouveau nom pour le fournisseur sélectionné
-            if ($request->filled('new_fournisseur.nom')) {
-                // On met à jour le nom du fournisseur sélectionné
-                $fournisseur = Fournisseur::findOrFail($fournisseur_id);
-                $fournisseur->update([
-                    'nom' => $request->input('new_fournisseur.nom'),
-                ]);
-            }
-        } elseif ($request->filled('new_fournisseur.nom')) {
-            // Si un nouveau fournisseur est ajouté sans ID existant
-            $fournisseurNom = $request->input('new_fournisseur.nom');
-            $fournisseur = Fournisseur::create([
-                'nom' => $fournisseurNom,
-            ]);
-            $fournisseur_id = $fournisseur->id;
+            // On ne modifie pas le nom du fournisseur sélectionné
         }
     
         // Supprimer les anciennes données liées au produit
