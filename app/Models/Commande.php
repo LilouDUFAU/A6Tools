@@ -59,7 +59,7 @@ class Commande extends Model
     //une commande peut attendre une preparation
     public function preparation()
     {
-        return $this->hasOne(PrepAtelier::class, 'preparation_id', 'id');
+        return $this->hasOne(PrepAtelier::class, 'commande_id', 'id');
     }
 
     //une commande peut etre passee par un employe
