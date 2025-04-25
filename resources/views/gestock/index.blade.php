@@ -20,11 +20,11 @@
     @endphp
     <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-8 px-4">
         <div class="filter-btn bg-green-600 text-white text-center py-6 rounded-lg shadow-md hover:bg-green-700 cursor-pointer" data-filter="mont de marsan" data-type="lieu">
-            <div class="text-3xl font-bold">{{ $commandesMontDeMarsan->count() }}</div>
+            <div class="text-3xl font-bold count-display">{{ $commandesMontDeMarsan->count() }}</div>
             <div class="text-lg">Mont de Marsan</div>
         </div>
         <div class="filter-btn bg-red-600 text-white text-center py-6 rounded-lg shadow-md hover:bg-red-700 cursor-pointer" data-filter="aire sur adour" data-type="lieu">
-            <div class="text-3xl font-bold">{{ $commandesAireSurAdour->count() }}</div>
+            <div class="text-3xl font-bold count-display">{{ $commandesAireSurAdour->count() }}</div>
             <div class="text-lg">Aire sur Adour</div>
         </div>
     </div>
@@ -42,7 +42,7 @@
         @endphp
         @foreach($etatCouleurs as $etat => $classes)
         <div class="filter-btn {{ $classes }} text-white text-center py-6 rounded-lg shadow-md cursor-pointer" data-filter="{{ strtolower($etat) }}" data-type="etat">
-            <div class="text-3xl font-bold">{{ $commandes->where('etat', $etat)->count() }}</div>
+            <div class="text-3xl font-bold count-display">{{ $commandes->where('etat', $etat)->count() }}</div>
             <div class="text-lg">{{ $etat }}</div>
         </div>
         @endforeach
@@ -52,7 +52,7 @@
     <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-8 px-4">
         @foreach(['pas urgent'=>'green','urgent'=>'red'] as $urgence => $color)
         <div class="filter-btn bg-{{$color}}-600 text-white text-center py-6 rounded-lg shadow-md hover:bg-{{$color}}-700 cursor-pointer" data-filter="{{ $urgence }}" data-type="urgence">
-            <div class="text-3xl font-bold">{{ $commandes->where('urgence', $urgence)->count() }}</div>
+            <div class="text-3xl font-bold count-display">{{ $commandes->where('urgence', $urgence)->count() }}</div>
             <div class="text-lg">{{ ucfirst($urgence) }}</div>
         </div>
         @endforeach
@@ -67,7 +67,6 @@
         </div>
         <a href="{{ route('commande.create') }}" class="bg-green-600 text-white px-6 py-3 rounded-lg shadow-md hover:bg-green-700">Ajouter une Commande</a>
     </div>
-        
 
     <div class="bg-white shadow rounded-lg p-4 sm:p-6">
         <h2 id="table-title" class="text-xl sm:text-2xl font-semibold text-gray-800 mb-4">Liste des Commandes</h2>
@@ -76,7 +75,7 @@
                 <thead>
                     <tr id="table-headers" class="bg-gray-100 text-left text-sm font-semibold text-gray-700">
                         <th class="py-3 px-4 border border-gray-200">#</th>
-                        <th class="py-3 px-4 border border-gray-200"">Client</th>
+                        <th class="py-3 px-4 border border-gray-200">Client</th>
                         <th class="py-3 px-4 border border-gray-200">Fournisseur</th>
                         <th class="py-3 px-4 border border-gray-200">Site</th>
                         <th class="py-3 px-4 border border-gray-200">État</th>
@@ -137,7 +136,32 @@
     const titre = document.getElementById('table-title');
     const headers = document.getElementById('table-headers');
 
+    const calculateCount = (type, value) => {
+        const filteredData = données.filter(cmd => {
+            const lieuMatch = !activeFilters.lieu.size || [...activeFilters.lieu].some(f => cmd.lieux.toLowerCase().includes(f));
+            const etatMatch = !activeFilters.etat.size || activeFilters.etat.has(cmd.etat);
+            const urgenceMatch = !activeFilters.urgence.size || activeFilters.urgence.has(cmd.urgence);
+            return lieuMatch && etatMatch && urgenceMatch;
+        });
+
+        return filteredData.filter(cmd => {
+            if (type === 'lieu') return cmd.lieux.toLowerCase().includes(value.toLowerCase());
+            if (type === 'etat') return cmd.etat === value.toLowerCase();
+            return cmd.urgence === value.toLowerCase();
+        }).length;
+    };
+
+    const updateFilterCounts = () => {
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            const type = btn.dataset.type;
+            const value = btn.dataset.filter;
+            const count = calculateCount(type, value);
+            btn.querySelector('.count-display').textContent = count;
+        });
+    };
+
     const defaultHeaders = `
+        <th class="py-3 px-4 border border-gray-200">#</th>
         <th class="py-3 px-4 border border-gray-200">Client</th>
         <th class="py-3 px-4 border border-gray-200">Fournisseur</th>
         <th class="py-3 px-4 border border-gray-200">Site</th>
@@ -152,7 +176,8 @@
         (!activeFilters.urgence.size || activeFilters.urgence.has(cmd.urgence));
 
     const rowHTML = cmd => `
-        <tr class="border-t hover:bg-gray-50" data-lieux="${cmd.lieux}" data-etat="${cmd.etat}" data-urgence="${cmd.urgence}">
+        <tr class="border-t hover:bg-gray-50">
+            <td class="py-3 px-4 border border-gray-200">${cmd.id}</td>
             <td class="py-3 px-4 border border-gray-200">${cmd.client}</td>
             <td class="py-3 px-4 border border-gray-200">${cmd.fournisseur}</td>
             <td class="py-3 px-4 border border-gray-200">${cmd.lieux}</td>
@@ -162,13 +187,14 @@
         </tr>
     `;
 
-    function renderDefault(){
+    function renderDefault() {
         titre.textContent = 'Liste des Commandes';
         headers.innerHTML = defaultHeaders;
         body.innerHTML = données.filter(filtreOK).map(rowHTML).join('');
+        updateFilterCounts();
     }
 
-    function renderByArticle(){
+    function renderByArticle() {
         titre.textContent = 'Grouper par Article';
         headers.innerHTML = `
             <th class="py-3 px-4 border border-gray-200">Produit</th>
@@ -189,9 +215,10 @@
             </tr>
         `);
         body.innerHTML = rows.join('');
+        updateFilterCounts();
     }
 
-    function renderByFournisseur(){
+    function renderByFournisseur() {
         titre.textContent = 'Grouper par Fournisseur';
         headers.innerHTML = `
             <th class="py-3 px-4 border border-gray-200">Fournisseur</th>
@@ -219,6 +246,7 @@
             </tr>
         `);
         body.innerHTML = rows.join('');
+        updateFilterCounts();
     }
 
     document.querySelectorAll('.filter-btn').forEach(b => b.addEventListener('click', () => {
