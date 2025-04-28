@@ -36,7 +36,9 @@
                 <select id="statut" name="statut" class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1" required>
                     <option value="">-- Sélectionner un statut --</option>
                     @foreach ($statut as $statutOption)
-                        <option value="{{ $statutOption }}">{{ ucfirst($statutOption) }}</option>
+                        <option value="{{ $statutOption }}" {{ $statutOption === 'en stock' ? 'selected' : '' }}>
+                            {{ ucfirst($statutOption) }}
+                        </option>
                     @endforeach
                 </select>
             </div>
