@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('categorie_materiel'); // Catégorie du matériel concerné par la panne
             $table->string('categorie_panne'); // Catégorie de la panne
             $table->text('detail_panne'); // Détails sur la panne
+            $table->date('date_commande'); // Date de la commande du matériel
             $table->date('date_panne'); // Date de la panne
             $table->unsignedBigInteger('fournisseur_id'); // Clé étrangère vers la table fournisseurs
             $table->timestamps(); // created_at, updated_at

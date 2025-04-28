@@ -18,6 +18,7 @@ class Panne extends Model
         'categorie_materiel',
         'categorie_panne',
         'detail_panne',
+        'date_commande',
         'date_panne',
     ];
     
