@@ -20,6 +20,7 @@ class Panne extends Model
         'detail_panne',
         'date_commande',
         'date_panne',
+        'fournisseur_id',
     ];
 
     ////////////////////
@@ -31,7 +32,7 @@ class Panne extends Model
         'En attente',
     ];
 
-    
+
     //////////////////////////////
     //relations entre les tables//
     //////////////////////////////
