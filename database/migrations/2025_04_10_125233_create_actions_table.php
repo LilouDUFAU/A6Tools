@@ -16,9 +16,11 @@ return new class extends Migration
             $table->enum('type', ['ajout', 'modification', 'suppression']); // Champ type en enum
             $table->text('description'); // description de l'action
             $table->unsignedBigInteger('panne_id'); // ID de l'employé
+            $table->unsignedBigInteger('user_id'); // ID de l'utilisateur
             $table->timestamps(); // created_at, updated_at
 
             // Clé étrangère vers la table des utilisateurs
+           $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->foreign('panne_id')->references('id')->on('panne')->onDelete('cascade');
         });
     }

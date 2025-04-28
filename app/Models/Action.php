@@ -14,9 +14,9 @@ class Action extends Model
     //attributs de la table//
     /////////////////////////
     protected $fillable = [
-        'type',
-        'description',
-        'created_at',
+        'intitule',
+        'user_id',
+        'panne_id',
     ];
 
     //////////////////////////////
@@ -24,7 +24,13 @@ class Action extends Model
     //////////////////////////////
 
     //une action peut etre realisee par un employe
-    public function pannes()
+    public function employe()
+    {
+        return $this->belongsTo(User::class, 'employe_id', 'id');
+    }
+
+    // une action peut concerner une panne
+    public function panne()
     {
         return $this->belongsTo(User::class, 'action_id', 'id');
     }
