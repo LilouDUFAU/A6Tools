@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="h-screen flex items-center justify-center bg-gray-100">
+<div class="min-h-screen flex items-center justify-center bg-gray-100 py-8">
     <div class="w-full max-w-md">
         <div class="bg-white shadow-md rounded px-8 py-6">
             <div class="text-lg font-bold mb-4">{{ __('Inscription') }}</div>
@@ -81,6 +81,7 @@
                     </button>
                 </div>
             </form>
+            </div>
         </div>
     </div>
 </div>
