@@ -140,7 +140,7 @@
         </button>
     </form>
     <div class="text-right mt-4 p-4">
-        <a href="{{ route('commande.index') }}" class="text-gray-500 hover:underline">Retour</a>
+        <a href="{{ route('panne.index') }}" class="text-gray-500 hover:underline">Retour</a>
     </div>
 </div>
 
