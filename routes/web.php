@@ -56,13 +56,15 @@ Route::middleware(['auth'])->group(function () {
 
     Route::put('/etapes/{id}/update', [EtapeController::class, 'update'])->name('etapes.update');
 
+    // Route::get('/account', [UserController::class, 'show'])->name('user.account');
+
 });
 
 Route::middleware(['auth', 'admin'])->group(function () {
-    Route::get('/admin', [AccountController::class, 'index'])->name('admin.index');
-    Route::get('/admin/create', [AccountController::class, 'create'])->name('admin.create');
-    Route::post('/admin', [AccountController::class, 'store'])->name('admin.store');
-    Route::get('/admin/{id}/edit', [AccountController::class, 'edit'])->name('admin.edit');
-    Route::put('/admin/{id}', [AccountController::class, 'update'])->name('admin.update');
-    Route::delete('/admin/{id}', [AccountController::class, 'destroy'])->name('admin.destroy');
+    Route::get('/employe', [AccountController::class, 'index'])->name('employe.index');
+    Route::get('/employe/create', [AccountController::class, 'create'])->name('employe.create');
+    Route::post('/employe', [AccountController::class, 'store'])->name('employe.store');
+    Route::get('/employe/{id}/edit', [AccountController::class, 'edit'])->name('employe.edit');
+    Route::put('/employe/{id}', [AccountController::class, 'update'])->name('employe.update');
+    Route::delete('/employe/{id}', [AccountController::class, 'destroy'])->name('employe.destroy');
 });
