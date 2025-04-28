@@ -50,7 +50,7 @@
 
             <div class="mb-4">
                 <label for="etat" class="block text-sm font-semibold text-gray-700">État côté client</label>
-                <p class="mt-2 text-gray-800">{{ ucfirst($panne->etat) ?? 'Non défini' }}</p>
+                <p class="mt-2 text-gray-800">{{ ucfirst($panne->etat_client) ?? 'Non défini' }}</p>
             </div>
         </div>
 
@@ -61,6 +61,15 @@
             <div class="mb-4">
                 <label for="fournisseur_id" class="block text-sm font-semibold text-gray-700">Fournisseur</label>
                 <p class="mt-2 text-gray-800">{{ $panne->fournisseur->nom ?? 'Non défini' }}</p>
+            </div>
+        </div>
+
+        <div class="border-l-4 border-green-600 pl-4">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Actions</h2>
+            
+            <div class="mb-4">
+                <label for="fournisseur_id" class="block text-sm font-semibold text-gray-700">Actions</label>
+
             </div>
         </div>
 
