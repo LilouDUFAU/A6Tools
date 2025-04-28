@@ -117,6 +117,9 @@
                 </div>
             @else
                 <p>Aucune préparation liée à cette commande.</p>
+                @if($commande->client)
+                    <a href="{{ route('prepatelier.create', ['commande_id' => $commande->id]) }}" class="text-blue-600 font-medium hover:underline">Créer une Préparation</a>
+                @endif
             @endif
         </div>
 

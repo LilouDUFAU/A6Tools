@@ -52,7 +52,8 @@
                         @endphp
 
                         @if ($commande->client && !$preparationExistante)
-                            <option value="{{ $commande->id }}" {{ old('commande_id') == $commande->id ? 'selected' : '' }}>
+                            <option value="{{ $commande->id }}" 
+                                {{ old('commande_id', request('commande_id')) == $commande->id ? 'selected' : '' }}>
                                 Commande n°{{ $commande->id }} : {{ $commande->client->nom }} ({{ $commande->client->code_client }})
                             </option>
                         @endif
