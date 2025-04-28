@@ -50,6 +50,8 @@
                     class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1"
                     readonly
                     style="cursor: not-allowed;">
+                
+                <!-- Champ caché pour envoyer l'ID du client -->
                 <input type="hidden" id="client_id" name="client_id" value="{{ old('client_id', $panne->clients->first()->id ?? '') }}">
             </div>
 
@@ -82,4 +84,5 @@
         <a href="{{ route('panne.index') }}" class="text-gray-500 hover:underline">Retour</a>
     </div>
 </div>
+
 @endsection
