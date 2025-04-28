@@ -115,7 +115,7 @@
             "<input type='hidden' name='_method' value='DELETE'>".
             "<button type='button' class='text-green-600 hover:text-green-700 font-semibold mr-2' onclick=\"window.location.href='".route('commande.show',$c->id)."'\">Détails</button>".
             "<button type='button' class='text-yellow-600 hover:text-yellow-700 font-semibold mr-2' onclick=\"window.location.href='".route('commande.edit',$c->id)."'\">Modifier</button>".
-            "<button type='submit' onclick=\"return confirm('Confirmer la suppression ?')\" class='text-red-600 hover:text-red-700 font-semibold'>Supprimer</button>".
+            "<button type='submit' onclick=\"return confirm('Êtes-vous sûr de vouloir supprimer cette commande ?')\" class='text-red-600 hover:text-red-700 font-semibold'>Supprimer</button>".
             "</form>";
         return [
             'id'=>$c->id,
