@@ -64,26 +64,35 @@
             </div>
         </div>
 
-        <div class="border-l-4 border-green-600 pl-4">
-            <h2 class="text-2xl font-bold text-gray-800 mb-4">Actions</h2>
-            <div class="mb-4">
-                <label for="fournisseur_id" class="block text-sm font-semibold text-gray-700">Actions</label>
-                @if($panne->actions->isNotEmpty())
-                    <ul class="list-disc pl-5">
-                        @foreach($panne->actions as $action)
-                            <li class="mb-2">
-                                <strong>Intitulé:</strong> {{ $action->intitule }}<br>
-                                <strong>Posté par:</strong> {{ $action->employe->prenom ?? 'Utilisateur inconnu' }} {{ $action->employe->nom ?? '' }}<br>
-                                <strong>Date de création:</strong> {{ $action->created_at->format('d/m/Y H:i') }}<br>
-                                <strong>Date de modification:</strong> {{ $action->updated_at->format('d/m/Y H:i') }}
-                            </li>
-                        @endforeach
-                    </ul>
-                @else
-                    <p class="mt-2 text-gray-800">Aucune action associée</p>
-                @endif
-            </div>
+        <div class="border-l-4 border-green-600 pl-4 mt-6">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Historique des Actions</h2>
 
+            @if($panne->actions->isNotEmpty())
+                <ul class="list-disc pl-5 space-y-4">
+                    @foreach($panne->actions->sortBy('created_at') as $action)
+                        <li>
+                            <p><strong>Intitulé :</strong> {{ $action->intitule }}</p>
+                            <p>
+                                <strong>Posté par :</strong>
+                                {{ $action->employe->prenom ?? 'Utilisateur' }}
+                                {{ $action->employe->nom ?? '' }}
+                            </p>
+                            <p>
+                                <strong>Créé le :</strong>
+                                {{ $action->created_at->format('d/m/Y H:i') }}
+                            </p>
+                            @if($action->updated_at->ne($action->created_at))
+                                <p>
+                                    <strong>Modifié le :</strong>
+                                    {{ $action->updated_at->format('d/m/Y H:i') }}
+                                </p>
+                            @endif
+                        </li>
+                    @endforeach
+                </ul>
+            @else
+                <p class="mt-2 text-gray-800">Aucune action associée</p>
+            @endif
         </div>
 
         <div class="text-right mt-4 p-4">
