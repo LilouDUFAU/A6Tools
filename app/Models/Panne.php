@@ -48,4 +48,10 @@ class Panne extends Model
     {
         return $this->belongsToMany(Client::class, 'client_panne');
     }
+
+    // une panne peut être associée à plusieurs actions
+    public function actions()
+    {
+        return $this->hasMany(Action::class, 'panne_id', 'id');
+    }
 }

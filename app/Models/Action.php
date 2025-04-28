@@ -24,8 +24,8 @@ class Action extends Model
     //////////////////////////////
 
     //une action peut etre realisee par un employe
-    public function employe()
+    public function pannes()
     {
-        return $this->belongsTo(User::class, 'user_id', 'id');
+        return $this->belongsTo(User::class, 'action_id', 'id');
     }
 }
