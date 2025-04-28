@@ -31,7 +31,7 @@ class Client extends Model
     //un client êut etre concerne par plusieurs pannes
     public function pannes()
     {
-        return $this->hasMany(Panne::class, 'client_id', 'id');
+        return $this->belongsToMany(Panne::class, 'client_panne ');
     }
 
     // un client peut avoir plusieurs pcrenouv
