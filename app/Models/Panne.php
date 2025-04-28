@@ -21,6 +21,16 @@ class Panne extends Model
         'date_commande',
         'date_panne',
     ];
+
+    ////////////////////
+    //enum de la table//
+    ////////////////////
+    const ETAT_CLIENT = [
+        'Ordi de prêt',
+        'Échangé',
+        'En attente',
+    ];
+
     
     //////////////////////////////
     //relations entre les tables//

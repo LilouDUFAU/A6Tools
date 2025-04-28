@@ -26,7 +26,6 @@ Route::middleware(['auth'])->group(function () {
     Route::put('/commandes/{id}', [CommandeController::class, 'update'])->name('commande.update');
     Route::delete('/commandes/{id}', [CommandeController::class, 'destroy'])->name('commande.destroy');
 
-    // Routes pour PCRenouvController accessibles uniquement aux utilisateurs connectés
     Route::get('/pcrenouv', [PCRenouvController::class, 'index'])->name('gestrenouv.index');
     Route::get('/pcrenouv/create', [PCRenouvController::class, 'create'])->name('gestrenouv.create');
     Route::post('/pcrenouv', [PCRenouvController::class, 'store'])->name('gestrenouv.store');
@@ -49,7 +48,7 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('/panne', [PanneController::class, 'index'])->name('panne.index');
     Route::get('/panne/create', [PanneController::class, 'create'])->name('panne.create');
-    Route::post('/panne', [PanneController::class, 'store'])->name('v.store');
+    Route::post('/panne', [PanneController::class, 'store'])->name('panne.store');
     Route::get('/panne/{id}', [PanneController::class, 'show'])->name('panne.show');
     Route::get('/panne/{id}/edit', [PanneController::class, 'edit'])->name('panne.edit');
     Route::put('/panne/{id}', [PanneController::class, 'update'])->name('panne.update');
