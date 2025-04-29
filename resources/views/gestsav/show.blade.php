@@ -66,32 +66,40 @@
 
         <div class="border-l-4 border-green-600 pl-4 mt-6">
             <h2 class="text-2xl font-bold text-gray-800 mb-4">Historique des Actions</h2>
-
             @if($panne->actions->isNotEmpty())
-                <ul class="list-disc pl-5 space-y-4">
-                    @foreach($panne->actions->sortBy('created_at') as $action)
-                        <li>
-                            <p><strong>Intitulé :</strong> {{ $action->intitule }}</p>
-                            <p>
-                                <strong>Posté par :</strong>
-                                {{ $action->employe->prenom ?? 'Utilisateur' }}
-                                {{ $action->employe->nom ?? '' }}
-                            </p>
-                            <p>
-                                <strong>Créé le :</strong>
-                                {{ $action->created_at->format('d/m/Y H:i') }}
-                            </p>
-                            @if($action->updated_at->ne($action->created_at))
-                                <p>
-                                    <strong>Modifié le :</strong>
-                                    {{ $action->updated_at->format('d/m/Y H:i') }}
-                                </p>
-                            @endif
-                        </li>
-                    @endforeach
-                </ul>
+            <div class="space-y-6">
+                @foreach($panne->actions->sortBy('created_at') as $action)
+                <div class="p-4 bg-gray-100 rounded-lg shadow-md">
+                    <h3 class="text-lg font-semibold text-gray-700 justify-between flex uppercase">
+                        {{ $action->intitule }}
+                        <span class="rounded-full border px-2 py-1 text-base normal-case
+                            @if($action->statut === 'A faire') bg-red-600 bg-opacity-75 text-white 
+                            @elseif($action->statut === 'En cours') bg-yellow-600 bg-opacity-75 text-white 
+                            @elseif($action->statut === 'Terminé') bg-green-600 bg-opacity-75 text-white 
+                            @endif">
+                            {{ $action->statut }}
+                        </span>
+                    </h3>
+                    <p class="text-sm text-gray-600">
+                    <strong>Posté par :</strong>
+                    {{ $action->employe->prenom ?? 'Utilisateur' }}
+                    {{ $action->employe->nom ?? '' }}
+                    </p>
+                    <p class="text-sm text-gray-600">
+                    <strong>Créé le :</strong>
+                    {{ $action->created_at->format('d/m/Y H:i') }}
+                    </p>
+                    @if($action->updated_at->ne($action->created_at))
+                    <p class="text-sm text-gray-600">
+                        <strong>Modifié le :</strong>
+                        {{ $action->updated_at->format('d/m/Y H:i') }}
+                    </p>
+                    @endif
+                </div>
+                @endforeach
+            </div>
             @else
-                <p class="mt-2 text-gray-800">Aucune action associée</p>
+            <p class="mt-2 text-gray-800">Aucune action associée</p>
             @endif
         </div>
 
