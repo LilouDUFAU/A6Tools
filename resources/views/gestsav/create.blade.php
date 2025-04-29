@@ -107,10 +107,17 @@
                 <div id="actions-container">
                     <div class="flex space-x-2 mb-2">
                         <input type="text" name="actions[]" placeholder="Action" class="block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1">
+                        <select name="status[]" class="border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1">
+                            @foreach ($statut as $statut)
+                                <option value="{{ $statut }}">{{ ucfirst($statut) }}</option>
+                            @endforeach
+                        </select>
                         <button type="button" onclick="addActionField()" class="bg-green-600 text-white px-4 py-2 rounded-lg shadow hover:bg-green-700 focus:ring-2 focus:ring-green-500">+</button>
                     </div>
                 </div>
             </div>
+        </div>
+
 <script>
 function addActionField() {
     const container = document.getElementById('actions-container');
@@ -118,10 +125,16 @@ function addActionField() {
     newActionField.className = 'flex space-x-2 mb-2';
     newActionField.innerHTML = `
         <input type="text" name="actions[]" placeholder="Action" class="block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1">
+        <select name="status[]" class="border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1">
+            <option value="A faire">A faire</option>
+            <option value="En cours">En cours</option>
+            <option value="Terminé">Terminé</option>
+        </select>
         <button type="button" onclick="removeActionField(this)" class="bg-red-600 text-white px-4 py-2 rounded-lg shadow hover:bg-red-700 focus:ring-2 focus:ring-red-500">-</button>
     `;
     container.appendChild(newActionField);
 }
+
 function removeActionField(button) {
     button.parentElement.remove();
 }
