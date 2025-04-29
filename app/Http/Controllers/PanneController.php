@@ -169,74 +169,80 @@ class PanneController extends Controller
     }
 
     // Met à jour une panne existante
-    public function update(Request $request, string $id)
-    {
-        // Validation des données du formulaire
-        $validated = $request->validate([
-            'date_commande' => 'nullable|date',
-            'date_panne' => 'required|date',
-            'categorie_materiel' => 'required|string',
-            'categorie_panne' => 'required|string',
-            'detail_panne' => 'required|string',
-            'client_id' => 'required|exists:clients,id',
-            'actions' => 'nullable|array',
-            'actions.*' => 'nullable|string|max:255',
-            'new_actions' => 'nullable|array',
-            'new_actions.*' => 'nullable|string|max:255',
-            'status' => 'nullable|array',
-            'status.*' => 'nullable|string|in:A faire,En cours,Terminé', // Validation des statuts
-        ]);
-    
-        // Récupérer la panne
-        $panne = Panne::findOrFail($id);
-    
-        // Mettre à jour les champs principaux
-        $panne->update([
-            'date_commande' => $validated['date_commande'] ?? $panne->date_commande,
-            'date_panne' => $validated['date_panne'],
-            'categorie_materiel' => $validated['categorie_materiel'],
-            'categorie_panne' => $validated['categorie_panne'],
-            'detail_panne' => $validated['detail_panne'],
-        ]);
-    
-        // Mettre à jour l'association client
-        $panne->clients()->sync([$validated['client_id']]);
-    
-        // ✅ Mettre à jour les actions existantes avec les nouveaux statuts
-        if (!empty($validated['actions']) && !empty($validated['status'])) {
-            foreach ($validated['actions'] as $actionId => $intitule) {
-                if (!empty($intitule)) {
-                    $action = $panne->actions()->find($actionId);
-                    if ($action && $action->intitule !== $intitule) {
-                        $action->intitule = $intitule;
-                    }
-                    
-                    // Mise à jour du statut pour chaque action existante
-                    $statut = $validated['status'][$actionId] ?? null;
-                    if ($statut) {
-                        $action->statut = $statut;
-                    }
-                    $action->save(); // Sauvegarder la modification
+// Met à jour une panne existante
+public function update(Request $request, string $id)
+{
+    // Validation des données du formulaire
+    $validated = $request->validate([
+        'date_commande' => 'nullable|date',
+        'date_panne' => 'required|date',
+        'categorie_materiel' => 'required|string',
+        'categorie_panne' => 'required|string',
+        'detail_panne' => 'required|string',
+        'client_id' => 'required|exists:clients,id',
+        'actions' => 'nullable|array',
+        'actions.*' => 'nullable|string|max:255',
+        'new_actions' => 'nullable|array',
+        'new_actions.*' => 'nullable|string|max:255',
+        'status' => 'nullable|array',
+        'status.*' => 'nullable|string|in:A faire,En cours,Terminé', // Validation des statuts
+        'new_status' => 'nullable|array',
+        'new_status.*' => 'nullable|string|in:A faire,En cours,Terminé', // Validation des statuts des nouvelles actions
+    ]);
+
+    // Récupérer la panne
+    $panne = Panne::findOrFail($id);
+
+    // Mettre à jour les champs principaux
+    $panne->update([
+        'date_commande' => $validated['date_commande'] ?? $panne->date_commande,
+        'date_panne' => $validated['date_panne'],
+        'categorie_materiel' => $validated['categorie_materiel'],
+        'categorie_panne' => $validated['categorie_panne'],
+        'detail_panne' => $validated['detail_panne'],
+    ]);
+
+    // Mettre à jour l'association client
+    $panne->clients()->sync([$validated['client_id']]);
+
+    // ✅ Mettre à jour les actions existantes avec les nouveaux statuts
+    if (!empty($validated['actions']) && !empty($validated['status'])) {
+        foreach ($validated['actions'] as $actionId => $intitule) {
+            if (!empty($intitule)) {
+                $action = $panne->actions()->find($actionId);
+                if ($action && $action->intitule !== $intitule) {
+                    $action->intitule = $intitule;
                 }
+
+                // Mise à jour du statut pour chaque action existante
+                $statut = $validated['status'][$actionId] ?? null;
+                if ($statut) {
+                    $action->statut = $statut;
+                }
+                $action->save(); // Sauvegarder la modification
             }
         }
-    
-        // ✅ Ajouter les nouvelles actions et leur statut
-        if (!empty($validated['new_actions']) && !empty($validated['new_status'])) {
-            foreach ($validated['new_actions'] as $index => $intitule) {
-                if (!empty($intitule)) {
-                    $statut = $validated['new_status'][$index] ?? 'A faire'; // Valeur par défaut si le statut est vide
-                    $panne->actions()->create([
-                        'intitule' => $intitule,
-                        'user_id' => auth()->id(), // L'utilisateur connecté
-                        'statut' => $statut, // Statut de la nouvelle action
-                    ]);
-                }
-            }
-        }
-    
-        return redirect()->route('panne.index')->with('success', 'Panne mise à jour avec succès');
     }
+
+    // ✅ Ajouter les nouvelles actions et leur statut
+    if (!empty($validated['new_actions']) && !empty($validated['new_status'])) {
+        foreach ($validated['new_actions'] as $index => $intitule) {
+            if (!empty($intitule)) {
+                $statut = $validated['new_status'][$index] ?? 'A faire'; // Valeur par défaut si le statut est vide
+
+                // Créer la nouvelle action et l'associer à la panne
+                $panne->actions()->create([
+                    'intitule' => $intitule,
+                    'user_id' => auth()->id(), // L'utilisateur connecté
+                    'statut' => $statut, // Statut de la nouvelle action
+                ]);
+            }
+        }
+    }
+
+    return redirect()->route('panne.index')->with('success', 'Panne mise à jour avec succès');
+}
+
         
     
             
