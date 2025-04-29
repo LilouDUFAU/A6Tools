@@ -8,7 +8,7 @@
     </div>
 
     {{-- Filtres --}}
-    <h2 class="text-2xl font-semibold px-4 py-2 text-gray-700">Nombre de pannes par état côté client</h2>
+    <h2 class="text-2xl font-semibold px-4 py-2 text-gray-700">Répartition des pannes selon l'état client</h2>
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-8 px-4">
         @php
             $etats = ['Ordi de prêt' => 'bg-green-600 hover:bg-green-700',
