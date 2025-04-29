@@ -24,6 +24,7 @@
                         <th class="py-3 px-4 border border-gray-200">Etat client</th>
                         <th class="py-3 px-4 border border-gray-200">Catégorie panne</th>
                         <th class="py-3 px-4 border border-gray-200">Date panne</th>
+                        <th class="py-3 px-4 border border-gray-200">Dernière action</th>
                         <th class="py-3 px-4 border border-gray-200">Actions</th>
                     </tr>
                 </thead>
@@ -35,6 +36,10 @@
                             <td class="py-3 px-4 border border-gray-200">{{ $panne->etat_client }}</td>
                             <td class="py-3 px-4 border border-gray-200">{{ $panne->categorie_panne }}</td>
                             <td class="py-3 px-4 border border-gray-200">{{ $panne->date_panne }}</td>
+                            <td class="py-3 px-4 border border-gray-200">
+                                {{ $panne->actions->last()->intitule ?? 'Aucune action' }} 
+                                ({{ $panne->actions->last()->created_at->format('d/m/Y H:i') ?? 'N/A' }})
+                            </td>
                             <td class="py-3 px-4 border border-gray-200">
                                     <div class="inline-flex space-x-2">
                                         <a href="{{ route('panne.show', $panne->id) }}" class="text-green-600 font-semibold hover:underline">Détails</a>
