@@ -76,24 +76,25 @@
         </div>
 
         <!-- Partie Actions -->
-        <div class="border-l-4 border-green-600 pl-4">
-            <h2 class="text-2xl font-bold text-gray-800 mb-4">Actions</h2>
-            <div class="mb-4">
-                <label for="actions" class="block text-sm font-semibold text-gray-700">Actions</label>
-                <div id="actions-container">
-                    @foreach($panne->actions as $action)
-                        <div class="flex space-x-2 mb-2">
-                            <input type="text" name="actions[]" value="{{ $action->intitule }}" placeholder="Action" class="block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1">
-                            <input type="hidden" name="existing_actions[]" value="{{ $action->id }}"> <!-- Ajout de l'ID de l'action existante -->
-                            <button type="button" onclick="removeActionField(this)" class="bg-red-600 text-white px-4 py-2 rounded-lg shadow hover:bg-red-700 focus:ring-2 focus:ring-red-500">-</button>
-                        </div>
-                    @endforeach
-                    <div class="flex space-x-2 mb-2">
-                        <input type="text" name="actions[]" placeholder="Action" class="block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1">
-                        <button type="button" onclick="addActionField()" class="bg-green-600 text-white px-4 py-2 rounded-lg shadow hover:bg-green-700 focus:ring-2 focus:ring-green-500">+</button>
-                    </div>
-                </div>
+        <div class="mb-4">
+    <label for="actions" class="block text-sm font-semibold text-gray-700">Actions</label>
+    <div id="actions-container">
+        @foreach($panne->actions as $action)
+            <div class="flex space-x-2 mb-2">
+                <input
+                    type="text"
+                    name="actions[{{ $action->id }}]"
+                    value="{{ $action->intitule }}"
+                    placeholder="Action"
+                    class="block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1">
             </div>
+        @endforeach
+        <div class="flex space-x-2 mb-2">
+            <input type="text" name="new_actions[]" placeholder="Nouvelle action" class="block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1">
+            <button type="button" onclick="addActionField()" class="bg-green-600 text-white px-4 py-2 rounded-lg shadow hover:bg-green-700 focus:ring-2 focus:ring-green-500">+</button>
+        </div>
+    </div>
+</div>
 
 <script>
 function addActionField() {
@@ -101,14 +102,11 @@ function addActionField() {
     const newActionField = document.createElement('div');
     newActionField.className = 'flex space-x-2 mb-2';
     newActionField.innerHTML = `
-        <input type="text" name="actions[]" placeholder="Action" class="block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1">
-        <button type="button" onclick="removeActionField(this)" class="bg-red-600 text-white px-4 py-2 rounded-lg shadow hover:bg-red-700 focus:ring-2 focus:ring-red-500">-</button>
+        <input type="text" name="new_actions[]" placeholder="Nouvelle action" class="block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1">
     `;
     container.appendChild(newActionField);
 }
-function removeActionField(button) {
-    button.parentElement.remove();
-}
+</script>
 </script>
         </div>
 
