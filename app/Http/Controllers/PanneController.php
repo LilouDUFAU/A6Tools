@@ -30,7 +30,6 @@ class PanneController extends Controller
     // Enregistre une nouvelle panne
     public function store(Request $request)
     {
-        Log::info('Début de la méthode store', ['request' => $request->all()]);
 
         $validated = $request->validate([
             'date_commande' => 'nullable|date',
@@ -43,20 +42,16 @@ class PanneController extends Controller
             'actions.*' => 'nullable|string|max:255',
         ]);
 
-        Log::info('Validation des données réussie', ['validated' => $validated]);
 
         // Gestion du fournisseur
         if ($request->filled('new_fournisseur.nom')) {
             $fournisseur = Fournisseur::create([
                 'nom' => $request->input('new_fournisseur.nom')
             ]);
-            Log::info('Nouveau fournisseur créé', ['fournisseur' => $fournisseur]);
         } elseif ($request->filled('fournisseur_id')) {
             $fournisseur = Fournisseur::find($request->input('fournisseur_id'));
-            Log::info('Fournisseur existant sélectionné', ['fournisseur' => $fournisseur]);
         } else {
             $fournisseur = null;
-            Log::warning('Aucun fournisseur fourni');
         }
 
         // Gestion du client
@@ -65,13 +60,10 @@ class PanneController extends Controller
                 'nom' => $request->input('new_client.nom'),
                 'code_client' => $request->input('new_client.code_client'),
             ]);
-            Log::info('Nouveau client créé', ['client' => $client]);
         } elseif ($request->filled('client_id')) {
             $client = Client::find($request->input('client_id'));
-            Log::info('Client existant sélectionné', ['client' => $client]);
         } else {
             $client = null;
-            Log::warning('Aucun client fourni');
         }
 
         // Création de la panne
@@ -91,7 +83,6 @@ class PanneController extends Controller
         // Association du client à la panne
         if ($client) {
             $panne->clients()->sync([$client->id]);
-            Log::info('Client lié à la panne', ['client_id' => $client->id]);
         }
 
         // Enregistrement des actions associées à la panne (correction ici : on utilise 'intitule')
@@ -100,6 +91,7 @@ class PanneController extends Controller
                 if (!empty($actionIntitule)) {
                     $panne->actions()->create([
                         'intitule' => $actionIntitule,
+                        'user_id' => auth()->id(), // L'utilisateur connecté
                     ]);
                 }
             }
@@ -131,8 +123,6 @@ class PanneController extends Controller
     // Met à jour une panne existante
     public function update(Request $request, string $id)
     {
-        Log::info('Début de la méthode update', ['request' => $request->all(), 'id' => $id]);
-
         // Validation des données du formulaire
         $validated = $request->validate([
             'date_commande' => 'nullable|date',
@@ -143,51 +133,53 @@ class PanneController extends Controller
             'client_id' => 'required|exists:clients,id',
             'actions' => 'nullable|array',
             'actions.*' => 'nullable|string|max:255',
+            'new_actions' => 'nullable|array',
+            'new_actions.*' => 'nullable|string|max:255',
         ]);
-
-        // Mise à jour de la panne
+    
+        // Récupérer la panne
         $panne = Panne::findOrFail($id);
-        $panne->date_commande = $validated['date_commande'] ?? $panne->date_commande;
-        $panne->date_panne = $validated['date_panne'];
-        $panne->categorie_materiel = $validated['categorie_materiel'];
-        $panne->categorie_panne = $validated['categorie_panne'];
-        $panne->detail_panne = $validated['detail_panne'];
-        $panne->save();
-
-        // Mise à jour des clients associés à la panne
+    
+        // Mettre à jour les champs principaux
+        $panne->update([
+            'date_commande' => $validated['date_commande'] ?? $panne->date_commande,
+            'date_panne' => $validated['date_panne'],
+            'categorie_materiel' => $validated['categorie_materiel'],
+            'categorie_panne' => $validated['categorie_panne'],
+            'detail_panne' => $validated['detail_panne'],
+        ]);
+    
+        // Mettre à jour l'association client
         $panne->clients()->sync([$validated['client_id']]);
-
-        // Mise à jour des actions existantes et ajout des nouvelles actions
+    
+        // ✅ Mettre à jour les actions existantes
         if (!empty($validated['actions'])) {
-            // Filtrer les actions vides ou nulles
-            $validActions = array_filter($validated['actions'], function($action) {
-                return !empty($action); // Filtre les valeurs nulles et vides
-            });
-
-            // Pour chaque action validée
-            foreach ($validActions as $actionIntitule) {
-                // Vérifie si l'action existe déjà
-                $action = $panne->actions()->where('intitule', $actionIntitule)->first();
-
-                if ($action) {
-                    // Si l'action existe, mets à jour uniquement `updated_at`
-                    $action->touch(); // Cela met à jour le champ `updated_at` sans toucher au `created_at`
-                    Log::info('Action mise à jour', ['action' => $action]);
-                } else {
-                    // Si l'action n'existe pas, crée-la avec `created_at` et `updated_at` égaux
-                    $panne->actions()->create([
-                        'intitule' => $actionIntitule,
-                        'user_id' => auth()->id(), // L'utilisateur connecté effectue l'action
-                    ]);
-                    Log::info('Nouvelle action créée', ['action_intitule' => $actionIntitule]);
+            foreach ($validated['actions'] as $actionId => $intitule) {
+                if (!empty($intitule)) {
+                    $action = $panne->actions()->find($actionId);
+                    if ($action && $action->intitule !== $intitule) {
+                        $action->intitule = $intitule;
+                        $action->save(); // Cela met à jour updated_at
+                    }
                 }
             }
         }
-
-        Log::info('Panne mise à jour', ['panne' => $panne]);
+    
+        // ✅ Ajouter les nouvelles actions
+        if (!empty($validated['new_actions'])) {
+            foreach ($validated['new_actions'] as $intitule) {
+                if (!empty($intitule)) {
+                    $panne->actions()->create([
+                        'intitule' => $intitule,
+                        'user_id' => auth()->id(), // L'utilisateur connecté
+                    ]);
+                }
+            }
+        }
+    
         return redirect()->route('panne.index')->with('success', 'Panne mise à jour avec succès');
     }
-
+    
     
             
     // Supprime une panne
