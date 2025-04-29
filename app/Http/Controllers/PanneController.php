@@ -183,6 +183,8 @@ class PanneController extends Controller
             'actions.*' => 'nullable|string|max:255',
             'new_actions' => 'nullable|array',
             'new_actions.*' => 'nullable|string|max:255',
+            'status' => 'nullable|array',
+            'status.*' => 'nullable|string|in:A faire,En cours,Terminé', // Validation des statuts
         ]);
     
         // Récupérer la panne
@@ -200,26 +202,34 @@ class PanneController extends Controller
         // Mettre à jour l'association client
         $panne->clients()->sync([$validated['client_id']]);
     
-        // ✅ Mettre à jour les actions existantes
-        if (!empty($validated['actions'])) {
+        // ✅ Mettre à jour les actions existantes avec les nouveaux statuts
+        if (!empty($validated['actions']) && !empty($validated['status'])) {
             foreach ($validated['actions'] as $actionId => $intitule) {
                 if (!empty($intitule)) {
                     $action = $panne->actions()->find($actionId);
                     if ($action && $action->intitule !== $intitule) {
                         $action->intitule = $intitule;
-                        $action->save(); // Cela met à jour updated_at
                     }
+                    
+                    // Mise à jour du statut pour chaque action existante
+                    $statut = $validated['status'][$actionId] ?? null;
+                    if ($statut) {
+                        $action->statut = $statut;
+                    }
+                    $action->save(); // Sauvegarder la modification
                 }
             }
         }
     
-        // ✅ Ajouter les nouvelles actions
-        if (!empty($validated['new_actions'])) {
-            foreach ($validated['new_actions'] as $intitule) {
+        // ✅ Ajouter les nouvelles actions et leur statut
+        if (!empty($validated['new_actions']) && !empty($validated['new_status'])) {
+            foreach ($validated['new_actions'] as $index => $intitule) {
                 if (!empty($intitule)) {
+                    $statut = $validated['new_status'][$index] ?? 'A faire'; // Valeur par défaut si le statut est vide
                     $panne->actions()->create([
                         'intitule' => $intitule,
                         'user_id' => auth()->id(), // L'utilisateur connecté
+                        'statut' => $statut, // Statut de la nouvelle action
                     ]);
                 }
             }
@@ -227,7 +237,7 @@ class PanneController extends Controller
     
         return redirect()->route('panne.index')->with('success', 'Panne mise à jour avec succès');
     }
-    
+        
     
             
     // Supprime une panne
