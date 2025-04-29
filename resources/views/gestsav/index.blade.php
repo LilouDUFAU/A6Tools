@@ -36,7 +36,7 @@
     </div>
 
     <div class="bg-white shadow rounded-lg p-4 sm:p-6">
-        <h2 class="text-xl sm:text-2xl font-semibold px-2 sm:px-4 py-2 text-gray-700">Liste des Pannes SAV</h2>
+        <h2 class="text-xl sm:text-2xl font-semibold text-gray-800 mb-4">Liste des Pannes SAV</h2>
         <div class="overflow-x-auto">
             <table class="min-w-full border-collapse border border-gray-200">
                 <thead>
