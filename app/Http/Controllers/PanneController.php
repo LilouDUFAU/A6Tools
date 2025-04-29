@@ -24,13 +24,19 @@ class PanneController extends Controller
         $fournisseurs = Fournisseur::all();
         $clients = Client::all();
         $etat_clients = Panne::ETAT_CLIENT;
-        return view('gestsav.create', compact('fournisseurs', 'clients', 'etat_clients'));
+        $statut = Action::STATUT;
+        return view('gestsav.create', compact('fournisseurs', 'clients', 'etat_clients', 'statut'));
     }
 
     // Enregistre une nouvelle panne
     public function store(Request $request)
     {
-
+        // Log des données reçues avant la validation
+        Log::info('Données reçues avant validation', ['request_data' => $request->all()]);
+    
+        // Validation des données
+        Log::info('Début de la validation des données', ['request_data' => $request->all()]);
+    
         $validated = $request->validate([
             'date_commande' => 'nullable|date',
             'date_panne' => 'required|date',
@@ -40,68 +46,109 @@ class PanneController extends Controller
             'etat' => 'required|in:Ordi de prêt,Échangé,En attente',
             'actions' => 'nullable|array',
             'actions.*' => 'nullable|string|max:255',
+            'status' => 'nullable|array',
+            'status.*' => 'nullable|string|in:A faire,En cours,Terminé', // Validation des statuts
         ]);
-
-
+    
+        Log::info('Données validées', ['validated_data' => $validated]);
+    
         // Gestion du fournisseur
         if ($request->filled('new_fournisseur.nom')) {
             $fournisseur = Fournisseur::create([
                 'nom' => $request->input('new_fournisseur.nom')
             ]);
+            Log::info('Fournisseur créé', ['fournisseur' => $fournisseur]);
         } elseif ($request->filled('fournisseur_id')) {
             $fournisseur = Fournisseur::find($request->input('fournisseur_id'));
+            Log::info('Fournisseur existant trouvé', ['fournisseur' => $fournisseur]);
         } else {
             $fournisseur = null;
+            Log::info('Aucun fournisseur spécifié');
         }
-
+    
         // Gestion du client
         if ($request->filled('new_client.nom')) {
             $client = Client::create([
                 'nom' => $request->input('new_client.nom'),
                 'code_client' => $request->input('new_client.code_client'),
             ]);
+            Log::info('Client créé', ['client' => $client]);
         } elseif ($request->filled('client_id')) {
             $client = Client::find($request->input('client_id'));
+            Log::info('Client existant trouvé', ['client' => $client]);
         } else {
             $client = null;
+            Log::info('Aucun client spécifié');
         }
-
+    
         // Création de la panne
-        $panne = new Panne();
-        $panne->date_commande = $validated['date_commande'] ?? null;
-        $panne->date_panne = $validated['date_panne'];
-        $panne->categorie_materiel = $validated['categorie_materiel'];
-        $panne->categorie_panne = $validated['categorie_panne'];
-        $panne->detail_panne = $validated['detail_panne'];
-        $panne->etat_client = $validated['etat'];
-        if ($fournisseur) {
-            $panne->fournisseur_id = $fournisseur->id;
+        try {
+            $panne = new Panne();
+            $panne->date_commande = $validated['date_commande'] ?? null;
+            $panne->date_panne = $validated['date_panne'];
+            $panne->categorie_materiel = $validated['categorie_materiel'];
+            $panne->categorie_panne = $validated['categorie_panne'];
+            $panne->detail_panne = $validated['detail_panne'];
+            $panne->etat_client = $validated['etat'];
+            if ($fournisseur) {
+                $panne->fournisseur_id = $fournisseur->id;
+            }
+            $panne->save();
+            Log::info('Panne créée', ['panne' => $panne]);
+        } catch (\Exception $e) {
+            Log::error('Erreur lors de la création de la panne', ['error' => $e->getMessage()]);
+            return redirect()->back()->with('error', 'Erreur lors de la création de la panne');
         }
-        $panne->save();
-        Log::info('Panne créée', ['panne' => $panne]);
-
+    
         // Association du client à la panne
         if ($client) {
-            $panne->clients()->sync([$client->id]);
+            try {
+                $panne->clients()->sync([$client->id]);
+                Log::info('Client associé à la panne', ['client_id' => $client->id, 'panne_id' => $panne->id]);
+            } catch (\Exception $e) {
+                Log::error('Erreur lors de l\'association du client à la panne', ['error' => $e->getMessage()]);
+            }
         }
-
-        // Enregistrement des actions associées à la panne (correction ici : on utilise 'intitule')
-        if (!empty($validated['actions'])) {
-            foreach ($validated['actions'] as $actionIntitule) {
+    
+        // Enregistrement des actions associées à la panne
+        if (!empty($validated['actions']) && !empty($validated['status'])) {
+            foreach ($validated['actions'] as $index => $actionIntitule) {
                 if (!empty($actionIntitule)) {
-                    $panne->actions()->create([
-                        'intitule' => $actionIntitule,
-                        'user_id' => auth()->id(), // L'utilisateur connecté
+                    // Récupération du statut correspondant à l'action
+                    $statut = $validated['status'][$index] ?? null;
+                    Log::info('Création de l\'action', [
+                        'action_intitule' => $actionIntitule,
+                        'statut' => $statut,
+                        'index' => $index
                     ]);
+    
+                    try {
+                        $panne->actions()->create([
+                            'intitule' => $actionIntitule,
+                            'user_id' => auth()->id(), // L'utilisateur connecté
+                            'statut' => $statut
+                        ]);
+                        Log::info('Action enregistrée', ['action_intitule' => $actionIntitule, 'statut' => $statut]);
+                    } catch (\Exception $e) {
+                        Log::error('Erreur lors de l\'enregistrement de l\'action', ['error' => $e->getMessage()]);
+                    }
+                } else {
+                    Log::info('Action vide ignorée', ['index' => $index]);
                 }
             }
-            Log::info('Actions enregistrées pour la panne', ['actions' => $validated['actions']]);
+        } else {
+            Log::info('Aucune action à enregistrer');
         }
-
-        Log::info('Fin de la méthode store');
+    
+        // Log de fin de méthode
+        Log::info('Fin de la méthode store', ['panne_id' => $panne->id]);
+    
         return redirect()->route('panne.index')->with('success', 'Panne créée avec succès');
     }
-
+    
+    
+    
+    
     // Affiche les détails d'une panne
     public function show(string $id)
     {
@@ -117,7 +164,8 @@ class PanneController extends Controller
         $clients = Client::all();
         $etat_clients = Panne::ETAT_CLIENT;
         $actions = $panne->actions->pluck('intitule')->toArray(); // Récupération des actions existantes
-        return view('gestsav.edit', compact('panne', 'fournisseurs', 'clients', 'etat_clients', 'actions'));
+        $statut = Action::STATUT;
+        return view('gestsav.edit', compact('panne', 'fournisseurs', 'clients', 'etat_clients', 'actions', 'statut'));
     }
 
     // Met à jour une panne existante
