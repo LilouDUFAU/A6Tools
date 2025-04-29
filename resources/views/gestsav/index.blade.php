@@ -38,7 +38,7 @@
                             <td class="py-3 px-4 border border-gray-200">{{ $panne->date_panne }}</td>
                             <td class="py-3 px-4 border border-gray-200">
                                 {{ $panne->actions->last()->intitule ?? 'Aucune action' }} 
-                                ({{ $panne->actions->last()->created_at->format('d/m/Y H:i') ?? 'N/A' }})
+                                ({{ $panne->actions->last()->statut ?? 'N/A' }})
                             </td>
                             <td class="py-3 px-4 border border-gray-200">
                                     <div class="inline-flex space-x-2">
