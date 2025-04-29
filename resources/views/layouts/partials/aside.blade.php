@@ -4,9 +4,6 @@
         <a href="{{ route('welcome') }}" class="flex md:hidden {{ Route::is('welcome') ? 'bg-green-700 px-2 py-1 text-white font-semibold' : 'hover:bg-green-700 hover:px-2 hover:py-1 hover:text-white transition-all duration-300 hover:font-semibold' }} rounded-lg">
             <i class="fa-solid fa-house"></i> <span class="ml-2">Accueil</span>
         </a>
-        <a href="" class="{{ Request::is('dashboard') ? 'bg-green-700 px-2 py-1 text-white font-semibold' : 'hover:bg-green-700 hover:px-2 hover:py-1 hover:text-white transition-all duration-300 hover:font-semibold' }} rounded-lg">
-            <i class="fa-solid fa-table"></i> <span class="ml-2">Dashboard</span>
-        </a>
         <a href="{{ route('commande.index') }}" class="{{ Route::is('commande.index') ? 'bg-green-700 px-2 py-1 text-white font-semibold' : 'hover:bg-green-700 hover:px-2 hover:py-1 hover:text-white transition-all duration-300 hover:font-semibold' }} rounded-lg">
             <i class="fa-solid fa-box-open"></i> <span class="ml-2">Gestock</span>
         </a>
