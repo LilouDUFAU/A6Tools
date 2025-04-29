@@ -13,9 +13,6 @@
             <div class="flex flex-col items-center justify-center gap-6">
                 @auth
                 <div class="flex flex-wrap items-center justify-center gap-4">
-                    <a href="{{ url('/dashboard') }}" class="bg-green-600 text-white hover:bg-green-700 font-semibold py-2 px-4 rounded-lg shadow-md transition">
-                        Accéder au tableau de bord
-                    </a>
                     <form method="POST" action="{{ route('logout') }}">
                         @csrf
                         <button type="submit" class="bg-red-600 text-white hover:bg-red-700 font-semibold py-2 px-4 rounded-lg shadow-md transition">
