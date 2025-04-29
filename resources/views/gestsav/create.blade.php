@@ -103,18 +103,20 @@
         <div class="border-l-4 border-green-600 pl-4">
             <h2 class="text-2xl font-bold text-gray-800 mb-4">Actions</h2>
             <div class="mb-4">
-                <label for="actions" class="block text-sm font-semibold text-gray-700">Actions</label>
-                <div id="actions-container">
-                    <div class="flex space-x-2 mb-2">
-                        <input type="text" name="actions[]" placeholder="Action" class="block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1">
-                        <select name="status[]" class="border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1">
-                            @foreach ($statut as $statut)
-                                <option value="{{ $statut }}">{{ ucfirst($statut) }}</option>
-                            @endforeach
-                        </select>
-                        <button type="button" onclick="addActionField()" class="bg-green-600 text-white px-4 py-2 rounded-lg shadow hover:bg-green-700 focus:ring-2 focus:ring-green-500">+</button>
-                    </div>
+            <label for="actions" class="block text-sm font-semibold text-gray-700">Actions</label>
+            <div id="actions-container">
+                <div class="flex space-x-2 mb-2">
+                <input type="text" name="actions[]" placeholder="Action" class="block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1">
+                <select name="status[]" class="border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1">
+                    @foreach ($statut as $statut)
+                    <option value="{{ $statut }}">{{ ucfirst($statut) }}</option>
+                    @endforeach
+                </select>
                 </div>
+            </div>
+            <div class="text-right mt-4">
+                <button type="button" onclick="addActionField()" class="bg-green-600 text-white px-4 py-2 rounded-lg shadow hover:bg-green-700 focus:ring-2 focus:ring-green-500">Ajouter une action</button>
+            </div>
             </div>
         </div>
 
