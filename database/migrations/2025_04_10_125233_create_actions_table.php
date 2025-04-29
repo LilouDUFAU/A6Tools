@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('actions', function (Blueprint $table) {
             $table->id();
             $table->text('intitule'); // description de l'action
+            $table->enum('statut', ['A faire', 'En cours', 'Terminé']); // statut de l'action
             $table->unsignedBigInteger('panne_id'); // ID de l'employé
             $table->unsignedBigInteger('user_id'); // ID de l'utilisateur
             $table->timestamps(); // created_at, updated_at

@@ -15,8 +15,18 @@ class Action extends Model
     /////////////////////////
     protected $fillable = [
         'intitule',
+        'statut',
         'user_id',
         'panne_id',
+    ];
+
+    //////////////////////////////
+    //// enum de la table ////////
+    //////////////////////////////
+    const STATUT = [
+        'A faire',
+        'En cours',
+        'Terminé',
     ];
 
     //////////////////////////////
