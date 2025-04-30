@@ -26,7 +26,6 @@
                 </thead>
                 <tbody>
                     @foreach($prepAteliers as $atelier)
-                        @if($atelier->etapes->where('is_done', false)->count() > 0)
                             <tr class="border-t hover:bg-gray-50">
                                 <td class="py-3 px-4 border border-gray-200">
                                     Cmde n°{{ $atelier->commande->id }} - 
@@ -62,7 +61,6 @@
                                     </div>
                                 </td>
                             </tr>
-                        @endif
                     @endforeach
                 </tbody>
             </table>
