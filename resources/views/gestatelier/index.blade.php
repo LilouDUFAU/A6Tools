@@ -26,41 +26,44 @@
                 </thead>
                 <tbody>
                     @foreach($prepAteliers as $atelier)
-                            <tr class="border-t hover:bg-gray-50">
-                                <td class="py-3 px-4 border border-gray-200">
-                                    Cmde n°{{ $atelier->commande->id }} - 
-                                    @if($atelier->commande->client)
-                                        {{ $atelier->commande->client->nom }} ({{ $atelier->commande->client->code_client }})
-                                    @else
-                                        <em>Client non associé</em>
-                                    @endif
-                                </td>
-                                <td class="py-3 px-4 border border-gray-200 text-center">
-                                    @if($atelier->notes)
-                                        {{ $atelier->notes }}
-                                    @else
-                                        <strong>-</strong>
-                                    @endif
-                                </td>
-
-                                <td class="py-3 px-4 border border-gray-200">
-                                    {{ $atelier->etapes->where('is_done', true)->count() }}
-                                </td>
-                                <td class="py-3 px-4 border border-gray-200">
-                                    {{ $atelier->etapes->where('is_done', false)->count() }}
-                                </td>
-                                <td class="py-3 px-4 border border-gray-200">
-                                    <div class="inline-flex space-x-2">
-                                        <a href="{{ route('prepatelier.show', $atelier->id) }}" class="text-green-600 font-semibold hover:underline">Détails</a>
-                                        <a href="{{ route('prepatelier.edit', $atelier->id) }}" class="text-yellow-600 font-semibold hover:underline">Modifier</a>
-                                        <form action="{{ route('prepatelier.destroy', $atelier->id) }}" method="POST" class="inline-block">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="text-red-600 font-semibold hover:underline" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cette préparation atelier ?')">Supprimer</button>
-                                        </form>
-                                    </div>
-                                </td>
-                            </tr>
+                    @php
+                        $etapesRestantes = $atelier->etapes->where('is_done', false)->count();
+                        $cellClass = $etapesRestantes === 0 ? 'bg-green-600/20 ' : '';
+                    @endphp
+                        <tr class="border-t hover:bg-gray-50">
+                            <td class="py-3 px-4 border border-gray-200 {{ $cellClass }}">
+                                Cmde n°{{ $atelier->commande->id }} - 
+                                @if($atelier->commande->client)
+                                    {{ $atelier->commande->client->nom }} ({{ $atelier->commande->client->code_client }})
+                                @else
+                                    <em>Client non associé</em>
+                                @endif
+                            </td>
+                            <td class="py-3 px-4 border border-gray-200 text-center {{ $cellClass }}">
+                                @if($atelier->notes)
+                                    {{ $atelier->notes }}
+                                @else
+                                    <strong>-</strong>
+                                @endif
+                            </td>
+                            <td class="py-3 px-4 border border-gray-200 {{ $cellClass }}">
+                                {{ $atelier->etapes->where('is_done', true)->count() }}
+                            </td>
+                            <td class="py-3 px-4 border border-gray-200 {{ $cellClass }}">
+                                {{ $etapesRestantes }}
+                            </td>
+                            <td class="py-3 px-4 border border-gray-200 {{ $cellClass }}">
+                                <div class="inline-flex space-x-2">
+                                    <a href="{{ route('prepatelier.show', $atelier->id) }}" class="text-green-600 font-semibold hover:underline">Détails</a>
+                                    <a href="{{ route('prepatelier.edit', $atelier->id) }}" class="text-yellow-600 font-semibold hover:underline">Modifier</a>
+                                    <form action="{{ route('prepatelier.destroy', $atelier->id) }}" method="POST" class="inline-block">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="text-red-600 font-semibold hover:underline" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cette préparation atelier ?')">Supprimer</button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
                     @endforeach
                 </tbody>
             </table>
