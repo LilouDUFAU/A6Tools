@@ -3,9 +3,7 @@
 @section('content')
 
 <div class="container mx-auto py-8 px-4 sm:px-6 lg:px-8 min-h-screen">
-    <div class="flex items-center gap-3 mb-8 px-4 pt-10">
-        <h1 class="text-3xl font-bold text-gray-800">Gestion des Pannes SAV</h1>
-    </div>
+<h1 class="text-3xl font-bold mb-8 px-4 pt-10 text-gray-800">Tableau de Bord des Pannes SAV</h1>
 
     {{-- Filtres --}}
     <h2 class="text-2xl font-semibold px-4 py-2 text-gray-700">Répartition des pannes selon l'état client</h2>
