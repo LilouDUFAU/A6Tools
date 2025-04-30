@@ -25,14 +25,6 @@
                     @enderror
                 </div>
 
-                <div class="mb-4">
-                    <div class="flex items-center">
-                        <input class="form-checkbox h-4 w-4 text-green-600 transition duration-150 ease-in-out" type="checkbox" name="remember" id="remember" {{ old('remember') ? 'checked' : '' }}>
-                        <label class="ml-2 block text-sm text-gray-900" for="remember">
-                            {{ __('Se souvenir de moi') }}
-                        </label>
-                    </div>
-                </div>
 
                 <div class="flex items-center justify-between">
                     <button type="submit" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
