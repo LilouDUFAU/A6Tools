@@ -21,7 +21,7 @@
         @endforeach
     </div>
 
-    <div class="flex justify-between items-center px-4 mb-8">
+    <div class="flex justify-between items-center mb-4 px-4">
         <button id="resetFilters" class="bg-gray-600 text-white px-6 py-3 rounded-lg shadow-md hover:bg-gray-700">
             Réinitialiser les filtres
         </button>
