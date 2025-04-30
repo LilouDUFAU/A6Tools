@@ -116,7 +116,7 @@ class CommandeController extends Controller
                 'produit_id' => $produit->id,
                 'stock_id' => $request->input('stock_id'),
                 'commande_id' => $commande->id,
-                'quantite' => $produitData['quantite_totale'] ?? 0,
+                'quantite' => $produitData['quantite_stock'] ?? 0,
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);
