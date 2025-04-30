@@ -74,6 +74,7 @@
             <table class="min-w-full bg-white shadow-md rounded-lg">
                 <thead>
                     <tr id="table-headers" class="bg-gray-100 text-left text-sm font-semibold text-gray-700">
+                    <th class="py-3 px-4 border border-gray-200">N° commande</th>
                         <th class="py-3 px-4 border border-gray-200">Client</th>
                         <th class="py-3 px-4 border border-gray-200">Fournisseur</th>
                         <th class="py-3 px-4 border border-gray-200">Site</th>
@@ -160,6 +161,7 @@
     };
 
     const defaultHeaders = `
+        <th class="py-3 px-4 border border-gray-200">N° commande</th>
         <th class="py-3 px-4 border border-gray-200">Client</th>
         <th class="py-3 px-4 border border-gray-200">Fournisseur</th>
         <th class="py-3 px-4 border border-gray-200">Site</th>
@@ -175,6 +177,7 @@
 
     const rowHTML = cmd => `
         <tr class="border-t hover:bg-gray-50">
+            <td class="py-3 px-4 border border-gray-200">Cmde n° ${cmd.id}</td>
             <td class="py-3 px-4 border border-gray-200">${cmd.client}</td>
             <td class="py-3 px-4 border border-gray-200">${cmd.fournisseur}</td>
             <td class="py-3 px-4 border border-gray-200">${cmd.lieux}</td>
