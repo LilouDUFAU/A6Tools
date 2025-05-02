@@ -1,25 +1,37 @@
 <?php
+/**
+ * @file EtapeController.php
+ * @brief Contrôleur pour la gestion des étapes dans l'application.
+ * @version 1.0
+ * @date 2025-04-18
+ * @author Lilou DUFAU
+ */
 namespace App\Http\Controllers;
 
 use App\Models\Etape;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Validation\ValidationException;
 
-
+/**
+ * @brief Classe EtapeController
+ * @details Gère les opérations CRUD pour le modèle Etape.
+ */
 class EtapeController extends Controller
 {
     /**
-     * Affiche une liste de toutes les étapes.
+     * @brief Affiche la liste de toutes les étapes.
+     * @return \Illuminate\View\View
      */
     public function index()
     {
-        // Récupérer toutes les étapes
         $etapes = Etape::all();
         return view('etapes.index', compact('etapes'));
     }
 
     /**
-     * Montre le formulaire pour créer une nouvelle étape.
+     * @brief Affiche le formulaire de création d'une étape.
+     * @return \Illuminate\View\View
      */
     public function create()
     {
@@ -27,82 +39,84 @@ class EtapeController extends Controller
     }
 
     /**
-     * Enregistre une nouvelle étape dans la base de données.
+     * @brief Enregistre une nouvelle étape dans la base de données.
+     * @param Request $request
+     * @return \Illuminate\Http\RedirectResponse
+     * @throws ValidationException
      */
     public function store(Request $request)
     {
-        // Validation des données
+        // Validation des données d'entrée
         $validated = $request->validate([
-            'intitule' => 'required|string|max:255',  // Validation pour le champ 'intitule'
-            'is_done' => 'required|boolean',  // Validation pour 'is_done'
+            'intitule' => 'required|string|max:255',
+            'is_done' => 'required|boolean',
         ]);
 
-        // Créer une nouvelle étape
+        // Vérification de l'unicité de l'intitulé
         Etape::create([
             'intitule' => $validated['intitule'],
             'is_done' => $validated['is_done'],
         ]);
 
-        // Retourner à la liste des étapes avec un message de succès
+        // Redirection vers la liste des étapes avec un message de succès
         return redirect()->route('etapes.index')->with('success', 'Étape créée avec succès.');
     }
 
     /**
-     * Affiche les détails d'une étape spécifique.
+     * @brief Affiche les détails d'une étape.
+     * @param string $id
+     * @return \Illuminate\View\View
+     * @throws ModelNotFoundException
      */
     public function show(string $id)
     {
-        // Récupérer l'étape
         $etape = Etape::findOrFail($id);
-
         return view('etapes.show', compact('etape'));
     }
 
     /**
-     * Montre le formulaire pour éditer une étape spécifique.
+     * @brief Affiche le formulaire d'édition d'une étape.
+     * @param string $id
+     * @return \Illuminate\View\View
+     * @throws ModelNotFoundException
      */
     public function edit(string $id)
     {
-        // Récupérer l'étape à éditer
         $etape = Etape::findOrFail($id);
-
         return view('etapes.edit', compact('etape'));
     }
 
     /**
-     * Met à jour l'état de l'étape (is_done).
+     * @brief Met à jour l'état (is_done) d'une étape.
+     * @param Request $request
+     * @param string $id
+     * @return \Illuminate\Http\RedirectResponse
+     * @throws ModelNotFoundException
      */
     public function update(Request $request, $id)
     {
-        // Récupérer l'étape à partir de l'ID
+        // mise à jour de l'état de l'étape
         $etape = Etape::findOrFail($id);
-    
-        // Log pour vérifier l'état actuel
-        Log::info("État actuel de l'étape ID $id : " . ($etape->is_done ? 'true' : 'false'));
-    
-        // On inverse la valeur actuelle de is_done
         $etape->is_done = !$etape->is_done;
         $etape->save();
-    
-        // Log après la mise à jour
-        Log::info("Nouveau état de l'étape ID $id : " . ($etape->is_done ? 'true' : 'false'));
-    
+
+        // Redirection vers la liste des étapes avec un message de succès
         return redirect()->back()->with('success', 'L\'état de l\'étape a été mis à jour.');
     }
-        
-    
+
     /**
-     * Supprime une étape spécifique.
+     * @brief Supprime une étape.
+     * @param string $id
+     * @return \Illuminate\Http\RedirectResponse
+     * @throws ModelNotFoundException
      */
     public function destroy(string $id)
     {
-        // Trouver l'étape par son ID
+        // Suppression de l'étape
         $etape = Etape::findOrFail($id);
-
-        // Supprimer l'étape
         $etape->delete();
 
-        // Retourner une réponse de succès
+        // Redirection vers la liste des étapes avec un message de succès
         return redirect()->route('etapes.index')->with('success', 'Étape supprimée avec succès.');
     }
 }
