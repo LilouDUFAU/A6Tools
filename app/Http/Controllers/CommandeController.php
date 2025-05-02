@@ -1,4 +1,11 @@
 <?php
+/**
+ * @file CommandeController.php
+ * @brief Contrôleur pour la gestion des commandes dans l'application.
+ * @version 1.0
+ * @date 2025-04-18
+ * @author Lilou DUFAU
+ */
 
 namespace App\Http\Controllers;
 
@@ -11,11 +18,21 @@ use App\Models\PrepAtelier;
 use App\Models\Stock;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Validation\ValidationException;
+use Illuminate\Database\QueryException;
+use Exception;
 
+/**
+ * @class CommandeController
+ * @brief Contrôleur pour les opérations CRUD sur les commandes.
+ */
 class CommandeController extends Controller
 {
     /**
      * Affiche la liste des commandes.
+     * 
+     * @return \Illuminate\View\View
      */
     public function index()
     {
@@ -24,7 +41,9 @@ class CommandeController extends Controller
     }
 
     /**
-     * Affiche le formulaire de création d'une commande.
+     * Affiche le formulaire de création d'une nouvelle commande.
+     * 
+     * @return \Illuminate\View\View
      */
     public function create()
     {
@@ -38,10 +57,17 @@ class CommandeController extends Controller
     }
 
     /**
-     * Enregistre une nouvelle commande.
+     * Enregistre une nouvelle commande en base de données.
+     * 
+     * @param Request $request
+     * @return \Illuminate\Http\RedirectResponse
+     * 
+     * @throws ValidationException
+     * @throws QueryException
      */
     public function store(Request $request)
     {
+        // Validation des champs de base
         $validated = $request->validate([
             'etat' => 'required|string|max:255',
             'remarque' => 'nullable|string',
@@ -54,6 +80,7 @@ class CommandeController extends Controller
 
         $validated['employe_id'] = auth()->id();
 
+        // Création ou association d’un client
         if ($request->filled('client_id')) {
             $validated['client_id'] = $request->input('client_id');
         } elseif ($request->filled('new_client.nom')) {
@@ -66,6 +93,7 @@ class CommandeController extends Controller
 
         $commande = Commande::create($validated);
 
+        // Création ou association d’un fournisseur
         $fournisseur_id = null;
         if ($request->filled('fournisseur_id')) {
             $fournisseur_id = $request->input('fournisseur_id');
@@ -76,6 +104,7 @@ class CommandeController extends Controller
             $fournisseur_id = $fournisseur->id;
         }
 
+        // Traitement du produit
         $produitData = $request->input('produit');
         if (!empty($produitData)) {
             $produit = Produit::firstOrCreate(
@@ -88,6 +117,7 @@ class CommandeController extends Controller
                 ]
             );
 
+            // Création du lien fournisseur-produit-commande si inexistant
             if ($fournisseur_id) {
                 $exists = DB::table('fournisseur_produit')
                     ->where('fournisseur_id', $fournisseur_id)
@@ -106,12 +136,14 @@ class CommandeController extends Controller
                 }
             }
 
+            // Lier le produit à la commande (pivot)
             $commande->produits()->attach($produit->id, [
                 'quantite_totale' => $produitData['quantite_totale'] ?? 0,
                 'quantite_client' => $produitData['quantite_client'] ?? 0,
                 'quantite_stock' => ($produitData['quantite_totale'] ?? 0) - ($produitData['quantite_client'] ?? 0),
             ]);
 
+            // Stockage dans la table produit_stock
             DB::table('produit_stock')->insert([
                 'produit_id' => $produit->id,
                 'stock_id' => $request->input('stock_id'),
@@ -127,6 +159,11 @@ class CommandeController extends Controller
 
     /**
      * Affiche les détails d'une commande.
+     * 
+     * @param string $id
+     * @return \Illuminate\View\View
+     * 
+     * @throws ModelNotFoundException
      */
     public function show(string $id)
     {
@@ -142,15 +179,18 @@ class CommandeController extends Controller
     }
 
     /**
-     * Affiche le formulaire d'édition d'une commande.
+     * Affiche le formulaire d’édition d’une commande.
+     * 
+     * @param string $id
+     * @return \Illuminate\View\View
+     * 
+     * @throws ModelNotFoundException
      */
     public function edit(string $id)
     {
-
         $commande = Commande::with(['produits' => function($query) {
             $query->withPivot('quantite_totale', 'quantite_client', 'quantite_stock');
         }, 'client'])->findOrFail($id);
-
 
         $clients = Client::all();
         $stocks = Stock::all();
@@ -165,10 +205,18 @@ class CommandeController extends Controller
 
     /**
      * Met à jour une commande existante.
+     * 
+     * @param Request $request
+     * @param string $id
+     * @return \Illuminate\Http\RedirectResponse
+     * 
+     * @throws ValidationException
+     * @throws ModelNotFoundException
+     * @throws QueryException
+     * @throws Exception
      */
     public function update(Request $request, $id)
     {
-        // Validation des données de base
         $validated = $request->validate([
             'etat' => 'required|string|max:255',
             'remarque' => 'nullable|string',
@@ -178,48 +226,31 @@ class CommandeController extends Controller
             'urgence' => 'required|string|max:255',
             'stock_id' => 'required|exists:stocks,id',
         ]);
-    
+
         $commande = Commande::findOrFail($id);
         $validated['employe_id'] = auth()->id();
-    
-        // Mise à jour de la commande avec les données validées
+
         $commande->update($validated);
-    
-        // CLIENT
+
+        // Mise à jour client
         if ($request->filled('client_id')) {
-            // Si un client est sélectionné, l'associer à la commande
             $commande->client_id = $request->input('client_id');
         } elseif ($request->filled('new_client.nom')) {
-            // Si un nouveau client est ajouté
-            $clientNom = $request->input('new_client.nom');
-            $clientCodeClient = $request->input('new_client.code_client');
-    
-            if ($clientNom && $clientCodeClient) {
-                $client = Client::create([
-                    'nom' => $clientNom,
-                    'code_client' => $clientCodeClient,
-                ]);
-                $commande->client_id = $client->id;
-            } else {
-                $commande->client_id = null; // Si le client n'est pas valide, le laisser à null
-            }
+            $client = Client::create([
+                'nom' => $request->input('new_client.nom'),
+                'code_client' => $request->input('new_client.code_client'),
+            ]);
+            $commande->client_id = $client->id;
         }
-    
-        // Fournisseur : Si aucune modification n'est faite, rien ne se passe
-        $fournisseur_id = $commande->fournisseur_id; // Garde le fournisseur existant par défaut
-    
-        if ($request->filled('fournisseur_id')) {
-            // Si un autre fournisseur est sélectionné, on utilise simplement son ID sans modifier son nom
-            $fournisseur_id = $request->input('fournisseur_id');
-            
-            // On ne modifie pas le nom du fournisseur sélectionné
-        }
-    
-        // Supprimer les anciennes données liées au produit
+
+        // Fournisseur (inchangé si rien n’est sélectionné)
+        $fournisseur_id = $request->input('fournisseur_id', $commande->fournisseur_id);
+
+        // Réinitialisation des produits associés à la commande
         DB::table('produit_stock')->where('commande_id', $commande->id)->delete();
         $commande->produits()->detach();
-    
-        // PRODUIT (1 seul)
+
+        // Produit unique
         $produitData = $request->input('produit');
         if (!empty($produitData)) {
             $produit = Produit::updateOrCreate(
@@ -231,33 +262,26 @@ class CommandeController extends Controller
                     'date_livraison_fournisseur' => $produitData['date_livraison_fournisseur'] ?? null,
                 ]
             );
-    
-            // Lier le fournisseur (si sélectionné ou modifié)
-            if ($fournisseur_id) {
-                // Supprimer d'abord toute relation existante pour cette commande et ce produit
-                DB::table('fournisseur_produit')
-                    ->where('produit_id', $produit->id)
-                    ->where('commande_id', $commande->id)
-                    ->delete();
-                    
-                // Créer la nouvelle relation avec le fournisseur sélectionné
-                DB::table('fournisseur_produit')->insert([
-                    'fournisseur_id' => $fournisseur_id,
-                    'produit_id' => $produit->id,
-                    'commande_id' => $commande->id,
-                    'created_at' => now(),
-                    'updated_at' => now(),
-                ]);
-            }
-    
-            // Attacher le produit à la commande avec ses quantités
+
+            DB::table('fournisseur_produit')
+                ->where('produit_id', $produit->id)
+                ->where('commande_id', $commande->id)
+                ->delete();
+
+            DB::table('fournisseur_produit')->insert([
+                'fournisseur_id' => $fournisseur_id,
+                'produit_id' => $produit->id,
+                'commande_id' => $commande->id,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+
             $commande->produits()->attach($produit->id, [
                 'quantite_totale' => $produitData['quantite_totale'] ?? 0,
                 'quantite_client' => $produitData['quantite_client'] ?? 0,
                 'quantite_stock' => ($produitData['quantite_totale'] ?? 0) - ($produitData['quantite_client'] ?? 0),
             ]);
-    
-            // Mettre à jour le stock
+
             DB::table('produit_stock')->insert([
                 'produit_id' => $produit->id,
                 'stock_id' => $request->input('stock_id'),
@@ -267,32 +291,32 @@ class CommandeController extends Controller
                 'updated_at' => now(),
             ]);
         }
-    
-        // Sauvegarde des modifications
+
         $commande->save();
-    
+
         return redirect()->route('commande.index')->with('success', 'Commande mise à jour avec succès.');
     }
-        
 
-    
     /**
-     * Supprime une commande.
+     * Supprime une commande et ses dépendances.
+     * 
+     * @param string $id
+     * @return \Illuminate\Http\RedirectResponse
+     * 
+     * @throws ModelNotFoundException
+     * @throws QueryException
+     * @throws Exception
      */
     public function destroy(string $id)
     {
         $commande = Commande::findOrFail($id);
 
-        // Supprimer les préparations associées à la commande
+        // Suppression des entités liées
         PrepAtelier::where('commande_id', $commande->id)->delete();
-
-        // Détacher les produits associés à la commande
         $commande->produits()->detach();
-
-        // Supprimer les entrées dans produit_stock liées à la commande
         DB::table('produit_stock')->where('commande_id', $commande->id)->delete();
 
-        // Supprimer la commande
+        // Suppression de la commande
         $commande->delete();
 
         return redirect()->route('commande.index')->with('success', 'Commande et ses préparations associées supprimées avec succès.');
