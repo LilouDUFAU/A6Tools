@@ -153,7 +153,7 @@
             <button id="closeModal" class="text-gray-600 hover:text-gray-800">&times;</button>
         </div>
         <div class="p-4">
-            <p class="text-gray-700">Êtes-vous sûr de vouloir supprimer <strong>{{ $user->prenom }} {{ $user->nom }}</strong> ? Cette action est irréversible.</p>
+            <p class="text-gray-700">Êtes-vous sûr de vouloir supprimer <strong>{{ $user->prenom ?? 'cet utilisateur' }} {{ $user->nom ?? '' }}</strong> ? Cette action est irréversible.</p>
         </div>
         <div class="px-4 py-2 flex justify-end space-x-4">
             <button id="cancelModal" class="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700">Annuler</button>
