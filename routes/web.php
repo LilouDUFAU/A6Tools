@@ -57,10 +57,11 @@ Route::middleware(['auth'])->group(function () {
 
     Route::put('/etapes/{id}/update', [EtapeController::class, 'update'])->name('etapes.update');
 
-    Route::get('/employe/{id}', [UserController::class, 'show'])->name('employe.show'); // Manquant
+
     Route::get('/employe', [UserController::class, 'index'])->name('employe.index');
-    Route::get('/employe/create', [UserController::class, 'create'])->name('employe.create');
+    Route::get('/employe/create', [UserController::class, 'create'])->name('employe.create');    
     Route::post('/employe', [UserController::class, 'store'])->name('employe.store');
+    Route::get('/employe/{id}', [UserController::class, 'show'])->name('employe.show');
     Route::get('/employe/{id}/edit', [UserController::class, 'edit'])->name('employe.edit');
     Route::put('/employe/{id}', [UserController::class, 'update'])->name('employe.update');
     Route::delete('/employe/{id}', [UserController::class, 'destroy'])->name('employe.destroy');
