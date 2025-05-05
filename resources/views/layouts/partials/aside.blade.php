@@ -17,6 +17,12 @@
             <i class="fa-solid fa-bolt"></i> <span class="ml-2">GestSAV</span>
         </a>
 
+        @if(auth()->user()->role->nom === 'admin')
+        <a href="{{ route('employe.index') }}" class="{{ Route::is('employe.index') ? 'bg-green-700 px-2 py-1 text-white font-semibold' : 'hover:bg-green-700 hover:px-2 hover:py-1 hover:text-white transition-all duration-300 hover:font-semibold' }} rounded-lg">
+            <i class="fa-solid fa-users-cog"></i> <span class="ml-2">Gestion utilisateur</span>
+        </a>
+        @endif
+
         @if (Route::has('login'))
             @auth
             <a href="{{ route('employe.show', ['id' => Auth::user()->id]) }}" class="flex md:hidden {{ Request::is('profile') ? 'bg-green-700 px-2 py-1 text-white font-semibold' : 'hover:bg-green-700 hover:px-2 hover:py-1 hover:text-white transition-all duration-300 hover:font-semibold' }} rounded-lg">
