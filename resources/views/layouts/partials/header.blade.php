@@ -12,7 +12,7 @@
     @if (Route::has('login'))
         <div>
             @auth
-                <a href="" class="hidden md:flex bg-green-600 text-white rounded-lg hover:bg-green-700 transition-all duration-300 items-center gap-2 px-2 py-1">
+                <a href="{{ route('employe.show', ['id' => Auth::user()->id]) }}" class="hidden md:flex bg-green-600 text-white rounded-lg hover:bg-green-700 transition-all duration-300 items-center gap-2 px-2 py-1">
                     <div class="flex items-center gap-4 px-2 py-1 transition-all duration-300">
                         <i class="fa-solid fa-circle-user text-2xl text-white"></i>
                         <span class="text-lg font-semibold"> {{ Auth::user()->prenom }} </span>
