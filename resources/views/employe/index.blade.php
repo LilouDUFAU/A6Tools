@@ -56,6 +56,16 @@
                     @endforeach
                 </select>
             </div>
+
+            {{-- Bouton Réinitialiser --}}
+    <div>
+        <button 
+            @click="selectedRole = ''; selectedService = ''; filterEmployees()" 
+            class="px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded-md transition"
+        >
+            Réinitialiser
+        </button>
+    </div>
         </div>
 
         <div class="mb-6 flex justify-end">
