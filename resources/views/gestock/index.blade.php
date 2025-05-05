@@ -2,6 +2,7 @@
 
 @section('content')
 
+<div class="min-h-screen">
 <div class="container mx-auto py-8 px-4 sm:px-6 lg:px-8">
     <h1 class="text-3xl font-bold mb-8 px-4 pt-10 text-gray-800">Tableau de Bord des Commandes</h1>
 
@@ -147,6 +148,7 @@
             </form>
         </div>
     </div>
+</div>
 </div>
 
 <script>
