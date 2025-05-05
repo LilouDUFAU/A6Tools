@@ -4,7 +4,7 @@
 <div class="min-h-screen flex items-center justify-center bg-gray-100 py-8">
     <div class="w-full max-w-md">
         <div class="bg-white shadow-md rounded px-8 py-6">
-            <div class="text-lg font-bold mb-4">{{ __('Inscription') }}</div>
+            <div class="text-lg font-bold mb-4">{{ __('Création d\'employé') }}</div>
 
             <form method="POST" action="{{ route('employe.store') }}" enctype="multipart/form-data">
                 @csrf
@@ -74,6 +74,20 @@
                         <p class="text-red-500 text-xs italic mt-2">{{ $message }}</p>
                     @enderror
                 </div>
+
+                <div class="mb-4">
+                    <label for="role_id" class="block text-gray-700 text-sm font-bold mb-2">{{ __('Rôle') }}</label>
+                    <select id="role_id" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('role_id') border-red-500 @enderror" name="role_id" required>
+                        <option value="">{{ __('Sélectionnez un rôle') }}</option>
+                        @foreach(\App\Models\Role::all() as $role)
+                            <option value="{{ $role->id }}" {{ old('role_id') == $role->id ? 'selected' : '' }}>{{ $role->nom }}</option>
+                        @endforeach
+                    </select>
+                    @error('role_id')
+                        <p class="text-red-500 text-xs italic mt-2">{{ $message }}</p>
+                    @enderror
+                </div>
+
 
                 <div class="flex items-center justify-between">
                     <button type="submit" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
