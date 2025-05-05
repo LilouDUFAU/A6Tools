@@ -63,7 +63,9 @@
             </div>
 
             <div class="mt-4 flex justify-between align-center item-center">
+            @if(auth()->user()->role->nom === 'admin')
             <a href="{{ route('employe.edit', ['id' => $user->id]) }}" class="inline-block text-blue-500 hover:underline transition">Modifier</a>
+            @endif
             <a href="{{ route('home') }}" class="inline-block text-gray-500 hover:underline transition">Retour à l'accueil</a>
             </div>
         </div>
