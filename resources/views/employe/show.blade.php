@@ -42,6 +42,11 @@
                 </div>
 
                 <div>
+                    <p class="text-sm text-gray-500">Date de création :</p>
+                    <p class="text-lg text-gray-900 font-semibold">{{ $user->created_at->format('d/m/Y H:i') }}</p>
+                </div>
+
+                <div>
                     <p class="text-sm text-gray-500">Photo :</p>
                     @if($user->photo)
                         <img src="{{ asset('storage/' . $user->photo) }}" alt="Photo de {{ $user->nom }}" class="mt-2 w-32 h-32 object-cover rounded-full shadow">
@@ -51,8 +56,15 @@
                 </div>
             </div>
 
-            <div class="mt-8">
-                <a href="{{ route('employe.index') }}" class="inline-block px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold rounded-xl transition">← Retour</a>
+            <div class="mt-6 flex justify-end">
+            @if(auth()->user()->role->nom === 'admin')
+            <a href="{{ route('employe.index') }}" class="inline-block text-gray-500 hover:underline transition">Retour à la liste des employés</a>
+            @endif
+            </div>
+
+            <div class="mt-4 flex justify-between align-center item-center">
+            <a href="{{ route('employe.edit', ['id' => $user->id]) }}" class="inline-block text-blue-500 hover:underline transition">Modifier</a>
+            <a href="{{ route('home') }}" class="inline-block text-gray-500 hover:underline transition">Retour à l'accueil</a>
             </div>
         </div>
     </div>
