@@ -30,18 +30,21 @@ class UserController extends Controller
     public function store(Request $request)
     {
         $validatedData = $request->validate([
-            'name' => 'required|string|max:255',
+            'nom' => 'required|string|max:255',
+            'prenom' => 'required|string|max:255',
+            'telephone' => 'required|string|max:20',
             'email' => 'required|email|unique:users,email',
             'password' => 'required|string|min:8',
+            'photo' => 'nullable|string',
+            'service_id' => 'required|exists:services,id',
+            'role_id' => 'required|exists:roles,id',
         ]);
 
-        $user = User::create([
-            'name' => $validatedData['name'],
-            'email' => $validatedData['email'],
-            'password' => bcrypt($validatedData['password']),
-        ]);
+        $validatedData['password'] = bcrypt($validatedData['password']);
 
-        return redirect()->route('employe.index')->with('success', 'User created successfully.');
+        User::create($validatedData);
+
+        return redirect()->route('employe.index')->with('success', 'Utilisateur créé avec succès.');
     }
 
     /**
@@ -70,18 +73,25 @@ class UserController extends Controller
         $user = User::findOrFail($id);
 
         $validatedData = $request->validate([
-            'name' => 'sometimes|required|string|max:255',
+            'nom' => 'sometimes|required|string|max:255',
+            'prenom' => 'sometimes|required|string|max:255',
+            'telephone' => 'sometimes|required|string|max:20',
             'email' => 'sometimes|required|email|unique:users,email,' . $user->id,
             'password' => 'nullable|string|min:8',
+            'photo' => 'nullable|string',
+            'service_id' => 'sometimes|required|exists:services,id',
+            'role_id' => 'sometimes|required|exists:roles,id',
         ]);
 
-        $user->update([
-            'name' => $validatedData['name'] ?? $user->name,
-            'email' => $validatedData['email'] ?? $user->email,
-            'password' => isset($validatedData['password']) ? bcrypt($validatedData['password']) : $user->password,
-        ]);
+        if (!empty($validatedData['password'])) {
+            $validatedData['password'] = bcrypt($validatedData['password']);
+        } else {
+            unset($validatedData['password']);
+        }
 
-        return redirect()->route('employe.index')->with('success', 'User updated successfully.');
+        $user->update($validatedData);
+
+        return redirect()->route('employe.index')->with('success', 'Utilisateur mis à jour avec succès.');
     }
 
     /**
@@ -92,6 +102,6 @@ class UserController extends Controller
         $user = User::findOrFail($id);
         $user->delete();
 
-        return redirect()->route('employe.index')->with('success', 'User deleted successfully.');
+        return redirect()->route('employe.index')->with('success', 'Utilisateur supprimé avec succès.');
     }
 }
