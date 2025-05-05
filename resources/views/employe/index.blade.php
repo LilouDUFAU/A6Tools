@@ -60,7 +60,7 @@
 
         <div class="mb-6 flex justify-end">
             <a href="{{ route('employe.create') }}" class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-xl transition">
-            Créer un nouvel employé
+                Créer un nouvel employé
             </a>
         </div>
 
