@@ -1,5 +1,7 @@
 @extends('layouts.app')
 @section('content')
+
+<div class="min-h-screen">
 <div class="max-w-6xl mx-auto my-4 py-8 px-6 bg-white shadow-md rounded-lg">
     <h1 class="text-3xl font-extrabold text-gray-800 mb-8">Nouvelle Panne</h1>
     <form action="{{ route('panne.store') }}" method="POST" class="space-y-6">
@@ -120,6 +122,7 @@
             </div>
         </div>
 
+
 <script>
 function addActionField() {
     const container = document.getElementById('actions-container');
@@ -153,6 +156,7 @@ function removeActionField(button) {
         
     </form>
     
+</div>
 </div>
 <script>
 let clients = @json($clients);
