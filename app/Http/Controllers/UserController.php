@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Models\Service;
+use App\Models\Role;
 use Illuminate\Http\Request;
 
 class UserController extends Controller
@@ -10,12 +12,24 @@ class UserController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $users = User::all();
-        return view('employe.index', compact('users'));
-    }
+        $query = User::query();
 
+        if ($request->filled('role')) {
+            $query->where('role_id', $request->role);
+        }
+
+        if ($request->filled('service')) {
+            $query->where('service_id', $request->service);
+        }
+
+        $users = $query->get();
+        $roles = Role::all();
+        $services = Service::all();
+
+        return view('employe.index', compact('users', 'roles', 'services'));
+    }
     /**
      * Show the form for creating a new resource.
      */
