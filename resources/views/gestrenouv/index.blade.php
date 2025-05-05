@@ -142,14 +142,14 @@
 <!-- Modale de confirmation de suppression -->
 <div id="delete-modal" class="fixed inset-0 z-50 hidden bg-gray-800/40 flex items-center justify-center">
     <div class="bg-white rounded-lg shadow-lg w-11/12 sm:w-1/2 lg:w-1/3">
-        <div class="border-b px-4 py-2 flex justify-between items-center">
+        <div class="px-4 py-2 flex justify-between items-center">
             <h3 class="text-lg font-semibold text-gray-800">Confirmation de Suppression</h3>
             <button id="closeModal" class="text-gray-600 hover:text-gray-800" onclick="closeDeleteModal()">&times;</button>
         </div>
         <div class="p-4">
             <p class="text-gray-700">Êtes-vous sûr de vouloir supprimer ce PC Renouvo ? Cette action est irréversible.</p>
         </div>
-        <div class="border-t px-4 py-2 flex justify-end space-x-4">
+        <div class="px-4 py-2 flex justify-end space-x-4">
             <button id="cancelModal" class="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700" onclick="closeDeleteModal()">Annuler</button>
             <form id="deleteForm" method="POST" action="{{ route('gestrenouv.destroy', 0) }}">
                 @csrf
