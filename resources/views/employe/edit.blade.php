@@ -100,8 +100,8 @@
                     @enderror
                 </div>
 
-                <div class="flex items-center justify-between">
-                    <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+                <div class="flex items-center w-full">
+                    <button type="submit" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
                         {{ __('Mettre à jour') }}
                     </button>
                 </div>
