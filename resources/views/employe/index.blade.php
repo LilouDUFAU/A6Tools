@@ -91,10 +91,10 @@
 
                     <div class="mt-4 flex justify-center space-x-2">
                         <a href="{{ route('employe.edit', $user->id) }}" class="text-blue-600 hover:underline">Modifier</a>
-                        <form action="{{ route('employe.destroy', $user->id) }}" method="POST" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cet employé ?');">
+                        <form action="{{ route('employe.destroy', $user->id) }}" method="POST">
                             @csrf
                             @method('DELETE')
-                            <button type="submit" class="text-red-600 hover:underline">Supprimer</button>
+                            <button type="button" onclick="openModal({{ $user->id }})" class="text-red-600 hover:underline">Supprimer</button>
                         </form>
                     </div>
                 </div>
@@ -132,10 +132,10 @@
                             <td class="px-6 py-4">{{ $user->role->nom ?? 'Rôle inconnu' }}</td>
                             <td class="px-6 py-4 flex space-x-2">
                                 <a href="{{ route('employe.edit', $user->id) }}" class="text-blue-600 hover:underline" onclick="event.stopPropagation();">Modifier</a>
-                                <form action="{{ route('employe.destroy', $user->id) }}" method="POST" onsubmit="event.stopPropagation(); return confirm('Êtes-vous sûr de vouloir supprimer cet employé ?');">
+                                <form action="{{ route('employe.destroy', $user->id) }}" method="POST">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" class="text-red-600 hover:underline">Supprimer</button>
+                                    <button type="button" onclick="openModal({{ $user->id }})" class="text-red-600 hover:underline">Supprimer</button>
                                 </form>
                             </td>
                         </tr>
@@ -145,4 +145,48 @@
         </div>
     </div>
 </div>
+
+<div id="modal" class="fixed inset-0 z-50 hidden bg-gray-800/40 flex items-center justify-center">
+    <div class="bg-white rounded-lg shadow-lg w-11/12 sm:w-1/2 lg:w-1/3">
+        <div class="px-4 py-2 flex justify-between items-center">
+            <h3 class="text-lg font-semibold text-gray-800">Confirmation de Suppression</h3>
+            <button id="closeModal" class="text-gray-600 hover:text-gray-800">&times;</button>
+        </div>
+        <div class="p-4">
+            <p class="text-gray-700">Êtes-vous sûr de vouloir supprimer <strong>{{ $user->prenom }} {{ $user->nom }}</strong> ? Cette action est irréversible.</p>
+        </div>
+        <div class="px-4 py-2 flex justify-end space-x-4">
+            <button id="cancelModal" class="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700">Annuler</button>
+            <form id="deleteForm" method="POST" action="{{ route('employe.destroy', 0) }}">
+                @csrf
+                @method('DELETE')
+                <button type="submit" class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700">Supprimer</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    const modal = document.getElementById('modal');
+    const closeModal = document.getElementById('closeModal');
+    const cancelModal = document.getElementById('cancelModal');
+    const deleteForm = document.getElementById('deleteForm');
+    const deleteRouteTemplate = "{{ route('employe.destroy', ':id') }}";
+
+    function openModal(id) {
+        deleteForm.action = deleteRouteTemplate.replace(':id', id);
+        modal.classList.remove('hidden');
+    }
+
+    function closeModalHandler() {
+        modal.classList.add('hidden');
+    }
+
+    closeModal.addEventListener('click', closeModalHandler);
+    cancelModal.addEventListener('click', closeModalHandler);
+    window.addEventListener('click', (e) => {
+        if (e.target === modal) closeModalHandler();
+    });
+</script>
+
 @endsection
