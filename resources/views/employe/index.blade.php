@@ -58,6 +58,12 @@
             </div>
         </div>
 
+        <div class="mb-6 flex justify-end">
+            <a href="{{ route('employe.create') }}" class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-xl transition">
+            Créer un nouvel employé
+            </a>
+        </div>
+
         {{-- Vue Mosaïque --}}
         <div 
             x-show="view === 'grid'" 
@@ -118,17 +124,15 @@
                 </thead>
                 <tbody class="divide-y divide-gray-200 text-sm text-gray-800">
                     @foreach($users as $user)
-                        <tr class="hover:bg-gray-50">
+                        <tr class="hover:bg-gray-50 cursor-pointer" onclick="window.location='{{ route('employe.show', $user->id) }}';">
                             <td class="px-6 py-4">
-                                <a href="{{ route('employe.show', $user->id) }}" class="text-blue-600 hover:underline">
-                                    {{ $user->nom }} {{ $user->prenom }}
-                                </a>
+                                {{ $user->nom }} {{ $user->prenom }}
                             </td>
                             <td class="px-6 py-4">{{ $user->service->nom ?? 'Service inconnu' }}</td>
                             <td class="px-6 py-4">{{ $user->role->nom ?? 'Rôle inconnu' }}</td>
                             <td class="px-6 py-4 flex space-x-2">
-                                <a href="{{ route('employe.edit', $user->id) }}" class="text-blue-600 hover:underline">Modifier</a>
-                                <form action="{{ route('employe.destroy', $user->id) }}" method="POST" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cet employé ?');">
+                                <a href="{{ route('employe.edit', $user->id) }}" class="text-blue-600 hover:underline" onclick="event.stopPropagation();">Modifier</a>
+                                <form action="{{ route('employe.destroy', $user->id) }}" method="POST" onsubmit="event.stopPropagation(); return confirm('Êtes-vous sûr de vouloir supprimer cet employé ?');">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" class="text-red-600 hover:underline">Supprimer</button>
