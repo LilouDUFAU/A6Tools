@@ -58,16 +58,16 @@
                                 ({{ $panne->actions->last()->statut ?? 'N/A' }})
                             </td>
                             <td class="py-3 px-4 border border-gray-200">
-                                    <div class="inline-flex space-x-2">
-                                        <a href="{{ route('panne.show', $panne->id) }}" class="text-green-600 font-semibold hover:underline">Détails</a>
-                                        <a href="{{ route('panne.edit', $panne->id) }}" class="text-yellow-600 font-semibold hover:underline">Modifier</a>
-                                        <form action="{{ route('panne.destroy', $panne->id) }}" method="POST" class="inline-block">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="text-red-600 font-semibold hover:underline" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cette préparation atelier ?')">Supprimer</button>
-                                        </form>
-                                    </div>
-                                </td>
+                                <div class="inline-flex space-x-2">
+                                    <a href="{{ route('panne.show', $panne->id) }}" class="text-green-600 font-semibold hover:underline">Détails</a>
+                                    <a href="{{ route('panne.edit', $panne->id) }}" class="text-yellow-600 font-semibold hover:underline">Modifier</a>
+                                    <form action="{{ route('panne.destroy', $panne->id) }}" method="POST" class="inline-block">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="button" onclick="openModal({{ $panne->id }})" class="text-red-600 hover:text-red-700 font-semibold">Supprimer</button> 
+                                    </form>
+                                </div>
+                            </td>
                         </tr>
                     @endforeach
                 </tbody>
@@ -76,6 +76,47 @@
     </div>
 </div>
 
+<div id="modal" class="fixed inset-0 z-50 hidden bg-gray-800/40 flex items-center justify-center">
+    <div class="bg-white rounded-lg shadow-lg w-11/12 sm:w-1/2 lg:w-1/3">
+        <div class="border-b px-4 py-2 flex justify-between items-center">
+            <h3 class="text-lg font-semibold text-gray-800">Confirmation de Suppression</h3>
+            <button id="closeModal" class="text-gray-600 hover:text-gray-800">&times;</button>
+        </div>
+        <div class="p-4">
+            <p class="text-gray-700">Êtes-vous sûr de vouloir supprimer cette panne SAV ? Cette action est irréversible.</p>
+        </div>
+        <div class="border-t px-4 py-2 flex justify-end space-x-4">
+            <button id="cancelModal" class="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700">Annuler</button>
+            <form id="deleteForm" method="POST" action="{{ route('panne.destroy', 0) }}">
+                @csrf
+                @method('DELETE')
+                <button type="submit" class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700">Supprimer</button>
+            </form>
+        </div>
+    </div>
+</div>
+<script>
+    const modal = document.getElementById('modal');
+    const closeModal = document.getElementById('closeModal');
+    const cancelModal = document.getElementById('cancelModal');
+    const deleteForm = document.getElementById('deleteForm');
+    const deleteRouteTemplate = "{{ route('panne.destroy', ':id') }}";
+
+    function openModal(id) {
+        deleteForm.action = deleteRouteTemplate.replace(':id', id);
+        modal.classList.remove('hidden');
+    }
+
+    function closeModalHandler() {
+        modal.classList.add('hidden');
+    }
+
+    closeModal.addEventListener('click', closeModalHandler);
+    cancelModal.addEventListener('click', closeModalHandler);
+    window.addEventListener('click', (e) => {
+        if (e.target === modal) closeModalHandler();
+    });
+</script>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         let activeFilters = new Set();
