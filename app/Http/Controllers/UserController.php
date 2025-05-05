@@ -35,7 +35,9 @@ class UserController extends Controller
      */
     public function create()
     {
-        return view('employe.create');
+        $roles = Role::all();
+        $services = Service::all();
+        return view('employe.create', compact('roles', 'services'));
     }
 
     /**
