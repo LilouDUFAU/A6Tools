@@ -119,13 +119,13 @@
         </div>";
 
         $actions = "
-            <form action='".route('gestrenouv.destroy',$r->id)."' method='POST' class='inline-flex space-x-2'>
-            <input type='hidden' name='_token' value='{$csrf}'>
-            <input type='hidden' name='_method' value='DELETE'>
-            <button type='button' class='text-green-600 hover:text-green-700 font-semibold mr-2' onclick=\"window.location.href='".route('gestrenouv.show',$r->id)."'\">Détails</button>
-            <button type='button' class='text-yellow-600 hover:text-yellow-700 font-semibold mr-2' onclick=\"window.location.href='".route('gestrenouv.edit',$r->id)."'\">Modifier</button>
-            <button type='submit' onclick=\"return confirm('Êtes-vous sûr de vouloir supprimer ce PC RenouvO ?')\" class='text-red-600 hover:text-red-600 font-semibold'>Supprimer</button>
-            </form>";
+    <form action='".route('gestrenouv.destroy',$r->id)."' method='POST' class='inline-flex space-x-2'>
+        <input type='hidden' name='_token' value='{$csrf}'>
+        <input type='hidden' name='_method' value='DELETE'>
+        <button type='button' class='text-green-600 hover:text-green-700 font-semibold mr-2' onclick=\"window.location.href='".route('gestrenouv.show',$r->id)."'\">Détails</button>
+        <button type='button' class='text-yellow-600 hover:text-yellow-700 font-semibold mr-2' onclick=\"window.location.href='".route('gestrenouv.edit',$r->id)."'\">Modifier</button>
+        <button type='button' class='text-red-600 hover:text-red-600 font-semibold' onclick='openDeleteModal({$r->id})'>Supprimer</button>
+    </form>";
         return [
             'reference' => $r->reference,
             'code_client' => $r->clients->isNotEmpty() ? $r->clients->pluck('code_client')->join(', ') : '<span class="block text-center font-bold">-</span>',
@@ -138,6 +138,57 @@
         ];
     });
 @endphp
+
+<!-- Modale de confirmation de suppression -->
+<div id="delete-modal" class="fixed inset-0 z-50 hidden bg-gray-800/40 flex items-center justify-center">
+    <div class="bg-white rounded-lg shadow-lg w-11/12 sm:w-1/2 lg:w-1/3">
+        <div class="border-b px-4 py-2 flex justify-between items-center">
+            <h3 class="text-lg font-semibold text-gray-800">Confirmation de Suppression</h3>
+            <button id="closeModal" class="text-gray-600 hover:text-gray-800" onclick="closeDeleteModal()">&times;</button>
+        </div>
+        <div class="p-4">
+            <p class="text-gray-700">Êtes-vous sûr de vouloir supprimer ce PC Renouvo ? Cette action est irréversible.</p>
+        </div>
+        <div class="border-t px-4 py-2 flex justify-end space-x-4">
+            <button id="cancelModal" class="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700" onclick="closeDeleteModal()">Annuler</button>
+            <form id="deleteForm" method="POST" action="{{ route('gestrenouv.destroy', 0) }}">
+                @csrf
+                @method('DELETE')
+                <button type="submit" class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700">Supprimer</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    const modal = document.getElementById('delete-modal');
+    const closeModal = document.getElementById('closeModal');
+    const cancelModal = document.getElementById('cancelModal');
+    const deleteForm = document.getElementById('deleteForm');
+    const deleteRouteTemplate = "{{ route('gestrenouv.destroy', ':id') }}";
+
+    // Fonction pour ouvrir la modale de confirmation de suppression
+    function openDeleteModal(id) {
+        // Met à jour l'URL du formulaire de suppression avec l'ID de l'élément à supprimer
+        deleteForm.action = deleteRouteTemplate.replace(':id', id);
+        
+        // Affiche la modale
+        modal.classList.remove('hidden');
+    }
+
+    // Fonction pour fermer la modale
+    function closeDeleteModal() {
+        modal.classList.add('hidden');
+    }
+
+    // Ajout des écouteurs d'événements
+    closeModal.addEventListener('click', closeDeleteModal);
+    cancelModal.addEventListener('click', closeDeleteModal);
+    window.addEventListener('click', (e) => {
+        if (e.target === modal) closeDeleteModal();
+    });
+</script>
 
 <script>
     const données = @json($renouvellements);
