@@ -58,10 +58,6 @@ Route::middleware(['auth'])->group(function () {
     Route::put('/etapes/{id}/update', [EtapeController::class, 'update'])->name('etapes.update');
 
     Route::get('/employe/{id}', [UserController::class, 'show'])->name('employe.show'); // Manquant
-
-});
-
-Route::middleware(['auth', 'admin'])->group(function () {
     Route::get('/employe', [UserController::class, 'index'])->name('employe.index');
     Route::get('/employe/create', [UserController::class, 'create'])->name('employe.create');
     Route::post('/employe', [UserController::class, 'store'])->name('employe.store');
