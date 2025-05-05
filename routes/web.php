@@ -8,6 +8,7 @@ use App\Http\Controllers\PCRenouvController;
 use App\Http\Controllers\PrepAtelierController;
 use App\Http\Controllers\EtapeController;
 use App\Http\Controllers\PanneController;
+use App\Http\Controllers\UserController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -56,15 +57,15 @@ Route::middleware(['auth'])->group(function () {
 
     Route::put('/etapes/{id}/update', [EtapeController::class, 'update'])->name('etapes.update');
 
-    // Route::get('/account', [UserController::class, 'show'])->name('user.account');
+    Route::get('/employe/{id}', [UserController::class, 'show'])->name('employe.show'); // Manquant
 
 });
 
 Route::middleware(['auth', 'admin'])->group(function () {
-    Route::get('/employe', [AccountController::class, 'index'])->name('employe.index');
-    Route::get('/employe/create', [AccountController::class, 'create'])->name('employe.create');
-    Route::post('/employe', [AccountController::class, 'store'])->name('employe.store');
-    Route::get('/employe/{id}/edit', [AccountController::class, 'edit'])->name('employe.edit');
-    Route::put('/employe/{id}', [AccountController::class, 'update'])->name('employe.update');
-    Route::delete('/employe/{id}', [AccountController::class, 'destroy'])->name('employe.destroy');
+    Route::get('/employe', [UserController::class, 'index'])->name('employe.index');
+    Route::get('/employe/create', [UserController::class, 'create'])->name('employe.create');
+    Route::post('/employe', [UserController::class, 'store'])->name('employe.store');
+    Route::get('/employe/{id}/edit', [UserController::class, 'edit'])->name('employe.edit');
+    Route::put('/employe/{id}', [UserController::class, 'update'])->name('employe.update');
+    Route::delete('/employe/{id}', [UserController::class, 'destroy'])->name('employe.destroy');
 });
