@@ -121,7 +121,11 @@ class UserController extends Controller
 
         $user->update($validatedData);
 
-        $validatedData['photo'] = isset($validatedData['photo']) ? $validatedData['photo']->store('photos', 'public') : null;
+        if (isset($validatedData['photo'])) {
+            $validatedData['photo'] = $validatedData['photo']->store('photos', 'public');
+        } else {
+            unset($validatedData['photo']);
+        }
         $user->update($validatedData);
 
         return redirect()->route('employe.index')->with('success', 'Utilisateur mis à jour avec succès.');
