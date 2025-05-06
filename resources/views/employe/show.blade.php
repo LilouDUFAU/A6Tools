@@ -49,11 +49,33 @@
                 <div>
                     <p class="text-sm text-gray-500">Photo :</p>
                     @if($user->photo)
-                        <img src="{{ asset('storage/' . $user->photo) }}" alt="Photo de {{ $user->nom }}" class="mt-2 w-32 h-32 object-cover rounded-full shadow">
+                        <img src="{{ asset('storage/' . $user->photo) }}" alt="Photo de {{ $user->nom }}" class="mt-2 w-32 h-32 object-cover rounded-full shadow cursor-pointer hover:opacity-75 transition" onclick="openPopup('{{ asset('storage/' . $user->photo) }}')">
                     @else
                         <p class="text-gray-600 italic">Pas de photo</p>
                     @endif
                 </div>
+
+                <!-- Popup Modal -->
+                <div id="photoPopup" class="fixed inset-0 bg-gray-800/40 flex items-center justify-center hidden">
+                    <div class="bg-white p-4 rounded shadow-lg relative">
+                        <button onclick="closePopup()" class="absolute top-2 right-2 text-gray-500 hover:text-gray-700">&times;</button>
+                        <img id="popupImage" src="" alt="Photo agrandie" class="max-w-full max-h-screen">
+                    </div>
+                </div>
+
+                <script>
+                    function openPopup(imageUrl) {
+                        const popup = document.getElementById('photoPopup');
+                        const popupImage = document.getElementById('popupImage');
+                        popupImage.src = imageUrl;
+                        popup.classList.remove('hidden');
+                    }
+
+                    function closePopup() {
+                        const popup = document.getElementById('photoPopup');
+                        popup.classList.add('hidden');
+                    }
+                </script>
             </div>
 
             <div class="mt-6 flex justify-end">
