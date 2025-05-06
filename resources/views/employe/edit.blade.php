@@ -100,10 +100,13 @@
                     @enderror
                 </div>
 
-                <div class="flex items-center w-full">
+                <div class="flex items-center justify-between">
                     <button type="submit" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
                         {{ __('Mettre à jour') }}
                     </button>
+                    <a href="{{ route('employe.index') }}" class="text-gray-500 hover:text-gray-700 hover:underline py-2 px-4 focus:outline-none focus:shadow-outline">
+                        {{ __('Retour') }}
+                    </a>
                 </div>
             </form>
         </div>
