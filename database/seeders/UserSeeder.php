@@ -25,7 +25,6 @@ class UserSeeder extends Seeder
                 'email' => 'direction@a6landes.fr',
                 'telephone' => '05 58 45 40 40',
                 'password' => Hash::make(env('ADMIN_PASSWORD', 'password_par_defaut')),
-                'photo' => 'https://www.a6landes.fr/wp-content/uploads/2023/01/logo-a6-landes.png',
                 'service_id' => 3,
                 'role_id' => 2,
                 'updated_at' => $now,
