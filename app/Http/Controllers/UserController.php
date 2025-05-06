@@ -6,6 +6,7 @@ use App\Models\User;
 use App\Models\Service;
 use App\Models\Role;
 use Illuminate\Http\Request;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class UserController extends Controller
 {
@@ -55,12 +56,24 @@ class UserController extends Controller
             'service_id' => 'required|exists:services,id',
             'role_id' => 'required|exists:roles,id',
         ]);
-
+    
+        // Sauvegardez le mot de passe en clair pour le PDF
+        $plainPassword = $validatedData['password'];
+        
+        // Cryptez le mot de passe pour la base de données
         $validatedData['password'] = bcrypt($validatedData['password']);
-
-        User::create($validatedData);
-
-        return redirect()->route('employe.index')->with('success', 'Utilisateur créé avec succès.');
+    
+        // Créez l'utilisateur
+        $user = User::create($validatedData);
+    
+        // Générez le PDF
+        $pdf = PDF::loadView('pdf.user_credentials', [
+            'user' => $user,
+            'password' => $plainPassword
+        ]);
+    
+        // Option 1 : Téléchargement immédiat du PDF
+        return $pdf->download('identifiants_' . $user->nom . '_' . $user->prenom . '.pdf');
     }
 
     /**
