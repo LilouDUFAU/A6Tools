@@ -4,33 +4,33 @@
 <div class="container mx-auto py-8 px-4 sm:px-6 lg:px-8 min-h-screen">
     <h1 class="text-3xl font-bold mb-8 px-4 pt-10 text-gray-800">Tableau de Bord des PCRenouvs</h1>
 
-    <h2 class="text-xl sm:text-2xl font-semibold px-2 sm:px-4 py-2 text-gray-700 ">Nombre de PCRenouv par Site</h2>
+    <h2 class="text-2xl font-semibold px-2 sm:px-4 py-2 text-gray-700 ">Nombre de PCRenouv par Site</h2>
     {{-- Filtres par lieu --}}
     <div class='grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 mb-8 px-2 sm:px-4'>
         @foreach(['Mont de Marsan', 'Aire sur Adour'] as $lieu)
         <div class="filter-btn {{ $lieu === 'Mont de Marsan' ? 'bg-green-600 hover:bg-green-700 ring-blue-500' : 'bg-red-600 hover:bg-red-700 ring-blue-500' }} text-white text-center py-4 sm:py-6 rounded-lg shadow-md cursor-pointer" data-filter="{{ strtolower($lieu) }}" data-type="lieu">
-            <div class="text-2xl sm:text-3xl font-bold count-display">
+            <div class="text-3xl sm:text-3xl font-bold count-display">
                 {{ $pcrenouvs->filter(fn($r) => optional($r->stocks->first())->lieux === $lieu && strtolower($r->statut) === 'en stock')->sum('quantite') }}
             </div>
-            <div class="text-sm sm:text-lg">{{ $lieu }}</div>
+            <div class="text-lg">{{ $lieu }}</div>
         </div>
         @endforeach
     </div>
 
-    <h2 class="text-xl sm:text-2xl font-semibold px-2 sm:px-4 py-2 text-gray-700">Nombre de PCRenouv par Type</h2>
+    <h2 class="text-2xl font-semibold px-2 sm:px-4 py-2 text-gray-700">Nombre de PCRenouv par Type</h2>
     {{-- Filtres par type --}}
     <div class='grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 mb-8 px-2 sm:px-4'>
         @foreach(App\Models\PCRenouv::TYPES as $type)
         <div class="filter-btn {{ $loop->index % 2 === 0 ? 'bg-green-600 hover:bg-green-700 ring-blue-500' : 'bg-red-600 hover:bg-red-700 ring-blue-500' }} text-white text-center py-4 sm:py-6 rounded-lg shadow-md cursor-pointer" data-filter="{{ strtolower($type) }}" data-type="type">
-            <div class="text-2xl sm:text-3xl font-bold count-display">
+            <div class="text-3xl sm:text-3xl font-bold count-display">
                 {{ $pcrenouvs->filter(fn($r) => strtolower($r->type) === strtolower($type) && in_array(strtolower($type), ['portable', 'fixe']) && $r->quantite > 0)->sum('quantite') }}
             </div>
-            <div class="text-sm sm:text-lg">{{ $type }}</div>
+            <div class="text-lg">{{ $type }}</div>
         </div>
         @endforeach
     </div>
 
-    <h2 class="text-xl sm:text-2xl font-semibold px-2 sm:px-4 py-2 text-gray-700">Nombre de PCRenouv par Statut</h2>
+    <h2 class="text-2xl font-semibold px-2 sm:px-4 py-2 text-gray-700">Nombre de PCRenouv par Statut</h2>
     {{-- Filtres par statut --}}
     <div class='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6 mb-8 px-2 sm:px-4'>
         @foreach(App\Models\PCRenouv::STATUTS as $statut)
@@ -41,28 +41,28 @@
             'bg-red-600 hover:bg-red-700 ring-blue-500')) }} 
             text-white text-center py-4 sm:py-6 rounded-lg shadow-md cursor-pointer" 
             data-filter="{{ strtolower($statut) }}" data-type="statut">
-            <div class="text-2xl sm:text-3xl font-bold count-display">
+            <div class="text-3xl sm:text-3xl font-bold count-display">
                 {{ $pcrenouvs->filter(fn($r) => strtolower($r->statut) === strtolower($statut) && $r->quantite > 0)->sum('quantite') }}
             </div>
-            <div class="text-sm sm:text-lg">{{ $statut }}</div>
+            <div class="text-lg">{{ $statut }}</div>
         </div>
         @endforeach
     </div>
 
-    <div class="flex justify-between items-center mb-4 px-4">
-        <button id="resetFilters" class="bg-gray-600 text-white px-6 py-3 rounded-lg shadow-md hover:bg-gray-700">Réinitialiser les filtres</button>
+    <div class="flex flex-col sm:flex-row justify-between items-center mb-4 px-4 space-y-4 sm:space-y-0">
+        <button id="resetFilters" class="bg-gray-600 text-white px-6 py-3 rounded-lg shadow-md hover:bg-gray-700 w-full sm:w-auto">Réinitialiser les filtres</button>
 
-        <div class="flex space-x-4 ml-auto">
-            <a href="{{ route('gestrenouv.create') }}" class="bg-green-600 text-white px-6 py-3 rounded-lg shadow-md hover:bg-green-700">Ajouter un PCRenouv</a>
+        <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 w-full sm:w-auto">
+            <a href="{{ route('gestrenouv.create') }}" class="bg-green-600 text-white px-6 py-3 rounded-lg shadow-md hover:bg-green-700 w-full sm:w-auto text-center">Ajouter un PCRenouv</a>
         </div>
     </div>
 
     <div class="bg-white shadow rounded-lg p-4 sm:p-6">
         <h2 id="table-title" class="text-xl sm:text-2xl font-semibold text-gray-800 mb-4">Liste des PCRenouv</h2>
         <div class="overflow-x-auto">
-            <table class="min-w-full border-collapse border border-gray-200">
+            <table class="min-w-full border-collapse border border-gray-200 ">
                 <thead>
-                    <tr class="bg-gray-100 text-left text-sm font-semibold text-gray-700">
+                    <tr class="bg-gray-100 text-left font-semibold text-gray-700">
                         <th class="py-3 px-4 border border-gray-200">Référence</th>
                         <th class="py-3 px-4 border border-gray-200">Client</th>
                         <th class="py-3 px-4 border border-gray-200">Site</th>
@@ -79,7 +79,6 @@
             </table>
         </div>
     </div>
-</div>
 
 @php
     $csrf = csrf_token();
@@ -91,7 +90,7 @@
         $isDisabled = in_array(strtolower($r->statut), ['loué', 'prêté']);
 
         $option = "
-        <div class='inline-flex space-x-2'>
+        <div class='inline-flex flex-wrap space-x-2'>
             <button onclick=\"window.location.href='{$louerUrl}'\" 
                 class='" . ($isDisabled ? "text-gray-400 cursor-not-allowed" : "text-blue-600 font-semibold hover:underline") . "' 
                 " . ($isDisabled ? "disabled" : "") . ">
@@ -118,7 +117,7 @@
         </div>";
 
         $actions = "
-    <form action='".route('gestrenouv.destroy',$r->id)."' method='POST' class='inline-flex space-x-2'>
+    <form action='".route('gestrenouv.destroy',$r->id)."' method='POST' class='inline-flex flex-wrap space-x-2'>
         <input type='hidden' name='_token' value='{$csrf}'>
         <input type='hidden' name='_method' value='DELETE'>
         <button type='button' class='text-green-600 hover:text-green-700 font-semibold mr-2' onclick=\"window.location.href='".route('gestrenouv.show',$r->id)."'\">Détails</button>
