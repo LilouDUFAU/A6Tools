@@ -59,14 +59,14 @@
         @endforeach
     </div>
 
-    <div class="flex justify-between items-center mb-4 px-4">
-        <div class="flex flex-wrap gap-4">
-            <button id="resetFilters" class="bg-gray-600 text-white px-6 py-3 rounded-lg shadow-md hover:bg-gray-700">Réinitialiser les filtres</button>
-            <button id="groupDefault" class="bg-indigo-600 text-white px-6 py-3 rounded-lg shadow-md hover:bg-indigo-700">Vue par Défaut</button>
-            <button id="groupByArticle" class="bg-blue-600 text-white px-6 py-3 rounded-lg shadow-md hover:bg-blue-700">Grouper par Article</button>
-            <button id="groupByFournisseur" class="bg-purple-600 text-white px-6 py-3 rounded-lg shadow-md hover:bg-purple-700">Grouper par Fournisseur</button>
+    <div class="flex flex-wrap justify-between items-center mb-4 px-4 gap-4">
+        <div class="flex flex-wrap gap-4 w-full sm:w-auto">
+            <button id="resetFilters" class="bg-gray-600 text-white px-6 py-3 rounded-lg shadow-md hover:bg-gray-700 w-full sm:w-auto">Réinitialiser les filtres</button>
+            <button id="groupDefault" class="bg-indigo-600 text-white px-6 py-3 rounded-lg shadow-md hover:bg-indigo-700 w-full sm:w-auto">Vue par Défaut</button>
+            <button id="groupByArticle" class="bg-blue-600 text-white px-6 py-3 rounded-lg shadow-md hover:bg-blue-700 w-full sm:w-auto">Grouper par Article</button>
+            <button id="groupByFournisseur" class="bg-purple-600 text-white px-6 py-3 rounded-lg shadow-md hover:bg-purple-700 w-full sm:w-auto">Grouper par Fournisseur</button>
         </div>
-        <a href="{{ route('commande.create') }}" class="bg-green-600 text-white px-6 py-3 rounded-lg shadow-md hover:bg-green-700">Ajouter une Commande</a>
+        <a href="{{ route('commande.create') }}" class="bg-green-600 text-white px-6 py-3 rounded-lg shadow-md hover:bg-green-700 text-center w-full sm:w-auto">Ajouter une Commande</a>
     </div>
 
     <div class="bg-white shadow rounded-lg p-4 sm:p-6">
