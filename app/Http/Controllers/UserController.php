@@ -72,7 +72,7 @@ class UserController extends Controller
             'password' => $plainPassword
         ]);
     
-        // Option 1 : Téléchargement immédiat du PDF
+        // Téléchargement immédiat du PDF
         return $pdf->download('identifiants_' . $user->nom . '_' . $user->prenom . '.pdf');
     }
 
