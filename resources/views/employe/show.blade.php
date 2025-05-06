@@ -56,8 +56,8 @@
                 </div>
 
                 <!-- Popup Modal -->
-                <div id="photoPopup" class="fixed inset-0 bg-gray-800/40 flex items-center justify-center hidden">
-                    <div class="bg-white p-4 rounded shadow-lg relative">
+                <div id="photoPopup" class="fixed inset-0 bg-gray-800/40 flex items-center justify-center hidden" onclick="closePopup(event)">
+                    <div class="bg-white p-4 rounded shadow-lg relative" onclick="event.stopPropagation()">
                         <button onclick="closePopup()" class="absolute top-2 right-2 text-gray-500 hover:text-gray-700 text-2xl">&times;</button>
                         <img id="popupImage" src="" alt="Photo agrandie" class="max-w-full max-h-screen">
                     </div>
@@ -71,17 +71,13 @@
                         popup.classList.remove('hidden');
                     }
 
-                    function closePopup() {
-                        const popup = document.getElementById('photoPopup');
-                        popup.classList.add('hidden');
+                    function closePopup(event) {
+                        if (!event || event.target.id === 'photoPopup') {
+                            const popup = document.getElementById('photoPopup');
+                            popup.classList.add('hidden');
+                        }
                     }
                 </script>
-            </div>
-
-            <div class="mt-6 flex justify-end">
-            @if(auth()->user()->role->nom === 'admin')
-            <a href="{{ route('employe.index') }}" class="inline-block text-gray-500 hover:underline transition">Retour à la liste des employés</a>
-            @endif
             </div>
 
             <div class="mt-4 flex justify-between align-center item-center">
@@ -89,6 +85,12 @@
             <a href="{{ route('employe.edit', ['id' => $user->id]) }}" class="inline-block text-blue-500 hover:underline transition">Modifier</a>
             @endif
             <a href="{{ route('home') }}" class="inline-block text-gray-500 hover:underline transition">Retour à l'accueil</a>
+            </div>
+
+            <div class="mt-6 flex justify-end">
+            @if(auth()->user()->role->nom === 'admin')
+            <a href="{{ route('employe.index') }}" class="inline-block text-red-500 hover:underline transition">Retour à la liste des employés</a>
+            @endif
             </div>
         </div>
     </div>
