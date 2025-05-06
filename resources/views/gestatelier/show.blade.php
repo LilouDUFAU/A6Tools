@@ -3,7 +3,7 @@
 @section('content')
 <div class="min-h-screen">
     <div class="max-w-6xl mx-auto my-4 py-8 px-6 bg-white shadow-md rounded-lg">
-        <h1 class="text-3xl font-extrabold text-gray-800 mb-8">Récapitulatif de la Préparation Atelier</h1>
+        <h1 class="text-3xl font-extrabold text-gray-800 mb-8 text-center sm:text-left">Récapitulatif de la Préparation Atelier</h1>
 
         <!-- Partie Informations Générales -->
         <div class="border-l-4 border-green-600 pl-4 mb-8">
@@ -34,22 +34,22 @@
             @if ($prepAtelier->etapes->count())
                 <ul class="list-disc pl-5 space-y-2">
                     @foreach ($prepAtelier->etapes as $etape)
-                        <li class="flex justify-between items-center">
-                        <form action="{{ route('etapes.update', $etape->id) }}" method="POST">
-                            @csrf
-                            @method('PUT')
-                            <label class="flex items-center space-x-3">
-                                <input 
-                                    type="checkbox" 
-                                    class="form-checkbox h-5 w-5 text-green-600" 
-                                    name="is_done"
-                                    value="1"
-                                    {{ $etape->is_done ? 'checked' : '' }}
-                                    onchange="this.form.submit()"
-                                >
-                                <span>{{ $etape->intitule }}</span>
-                            </label>
-                        </form>
+                        <li class="flex flex-col sm:flex-row justify-between items-start sm:items-center">
+                            <form action="{{ route('etapes.update', $etape->id) }}" method="POST" class="w-full sm:w-auto">
+                                @csrf
+                                @method('PUT')
+                                <label class="flex items-center space-x-3">
+                                    <input 
+                                        type="checkbox" 
+                                        class="form-checkbox h-5 w-5 text-green-600" 
+                                        name="is_done"
+                                        value="1"
+                                        {{ $etape->is_done ? 'checked' : '' }}
+                                        onchange="this.form.submit()"
+                                    >
+                                    <span>{{ $etape->intitule }}</span>
+                                </label>
+                            </form>
                         </li>
                     @endforeach
                 </ul>
@@ -59,7 +59,7 @@
         </div>
         
         <!-- Boutons -->
-        <div class="flex justify-between mt-8">
+        <div class="flex flex-col sm:flex-row justify-between mt-8 space-y-4 sm:space-y-0">
             <a href="{{ route('prepatelier.edit', $prepAtelier->id) }}" class="text-green-600 font-medium hover:underline">Modifier</a>
             <a href="{{ route('prepatelier.index') }}" class="text-gray-600 hover:underline">Retour à la liste</a>
         </div>
