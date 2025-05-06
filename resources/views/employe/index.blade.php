@@ -146,7 +146,7 @@
                                 <form action="{{ route('employe.destroy', $user->id) }}" method="POST">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="button" onclick="openModal({{ $user->id }})" class="text-red-600 hover:underline">Supprimer</button>
+                                    <button type="button" onclick="event.stopPropagation(); openModal({{ $user->id }})" class="text-red-600 hover:underline">Supprimer</button>
                                 </form>
                             </td>
                         </tr>
