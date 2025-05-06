@@ -4,7 +4,7 @@
 
 <div class="min-h-screen">
     <div class="max-w-6xl mx-auto my-4 py-8 px-6 bg-white shadow-md rounded-lg">
-        <h1 class="text-3xl font-extrabold text-gray-800 mb-8">Récapitulatif de la commande</h1>
+        <h1 class="text-3xl font-extrabold text-gray-800 mb-8 text-center">Récapitulatif de la commande</h1>
 
         <!-- Partie Commande -->
         <div class="border-l-4 border-green-600 pl-4 mb-8">
@@ -41,7 +41,7 @@
             @endphp
 
             @if($lieuxStockCommande && $lieuxStockCommande->isNotEmpty())
-                <ul>
+                <ul class="list-disc pl-5">
                     @foreach($lieuxStockCommande as $lieu)
                         <li><strong>Site :</strong> {{ $lieu ?? '/' }}</li>
                     @endforeach
@@ -126,7 +126,7 @@
         </div>
 
         <!-- Boutons -->
-        <div class="flex justify-between mt-8">
+        <div class="flex flex-col sm:flex-row justify-between mt-8 space-y-4 sm:space-y-0">
             <a href="{{ route('commande.edit', $commande->id) }}" class="text-green-600 font-medium hover:underline">Modifier</a>
             <a href="{{ route('commande.index') }}" class="text-gray-600 hover:underline">Retour à la liste</a>
         </div>
