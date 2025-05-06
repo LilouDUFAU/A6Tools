@@ -12,22 +12,22 @@
         url.searchParams.set('view', this.view); // On garde la vue
         window.location = url.toString();
     }
-}">
-    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex items-center justify-between mb-6">
-            <h1 class="text-2xl font-bold text-gray-800">Liste des employés</h1>
+}">       
+        <div class="container mx-auto py-8 px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col sm:flex-row items-center justify-between mb-6">
+        <h1 class="text-3xl font-bold mb-8 px-4 pt-10 text-gray-800 text-center sm:text-left">Liste des employés ({{ $users->count() }})</h1>
             <button 
                 @click="view = view === 'grid' ? 'list' : 'grid'" 
-                class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-xl transition"
+                class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-xl transition w-full sm:w-auto"
             >
                 <span x-text="view === 'grid' ? 'Afficher en liste' : 'Afficher en mosaïque'"></span>
             </button>
         </div>
 
         {{-- Filtrage --}}
-        <div class="mb-6 flex space-x-4">
+        <div class="mb-6 flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
             {{-- Filtre par Rôle --}}
-            <div class="w-1/2">
+            <div class="w-full sm:w-1/2">
                 <label for="role" class="block text-sm font-medium text-gray-700">Filtrer par rôle</label>
                 <select 
                     id="role" 
@@ -43,7 +43,7 @@
             </div>
 
             {{-- Filtre par Service --}}
-            <div class="w-1/2">
+            <div class="w-full sm:w-1/2">
                 <label for="service" class="block text-sm font-medium text-gray-700">Filtrer par service</label>
                 <select 
                     id="service" 
@@ -59,10 +59,10 @@
             </div>
 
             {{-- Bouton Réinitialiser --}}
-            <div>
+            <div class="w-full sm:w-auto">
                 <button 
                     @click="selectedRole = ''; selectedService = ''; filterEmployees()" 
-                    class="px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded-md transition"
+                    class="px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded-md transition w-full sm:w-auto"
                 >
                     Réinitialiser
                 </button>
@@ -70,7 +70,7 @@
         </div>
 
         <div class="mb-6 flex justify-end">
-            <a href="{{ route('employe.create') }}" class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-xl transition">
+            <a href="{{ route('employe.create') }}" class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-xl transition w-full sm:w-auto text-center">
                 Créer un nouvel employé
             </a>
         </div>
