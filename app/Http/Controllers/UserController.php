@@ -52,7 +52,7 @@ class UserController extends Controller
             'telephone' => 'required|string|max:20',
             'email' => 'required|email|unique:users,email',
             'password' => 'required|string|min:8',
-            'photo' => 'nullable|string',
+            'photo' => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif,svg', 'max:2048'],
             'service_id' => 'required|exists:services,id',
             'role_id' => 'required|exists:roles,id',
         ]);
@@ -64,6 +64,7 @@ class UserController extends Controller
         $validatedData['password'] = bcrypt($validatedData['password']);
     
         // Créez l'utilisateur
+        $validatedData['photo'] = isset($validatedData['photo']) ? $validatedData['photo']->store('photos', 'public') : null;
         $user = User::create($validatedData);
     
         // Générez le PDF
@@ -107,7 +108,7 @@ class UserController extends Controller
             'telephone' => 'sometimes|required|string|max:20',
             'email' => 'sometimes|required|email|unique:users,email,' . $user->id,
             'password' => 'nullable|string|min:8',
-            'photo' => 'nullable|string',
+            'photo' => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif,svg', 'max:2048'],
             'service_id' => 'sometimes|required|exists:services,id',
             'role_id' => 'sometimes|required|exists:roles,id',
         ]);
@@ -118,6 +119,9 @@ class UserController extends Controller
             unset($validatedData['password']);
         }
 
+        $user->update($validatedData);
+
+        $validatedData['photo'] = isset($validatedData['photo']) ? $validatedData['photo']->store('photos', 'public') : null;
         $user->update($validatedData);
 
         return redirect()->route('employe.index')->with('success', 'Utilisateur mis à jour avec succès.');
