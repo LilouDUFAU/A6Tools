@@ -2,13 +2,14 @@
 
 @section('content')
 <div class="min-h-screen py-10" x-data="{ 
-    view: 'grid',
+    view: '{{ request('view', 'grid') }}',
     selectedRole: '{{ request('role', '') }}',
     selectedService: '{{ request('service', '') }}',
     filterEmployees() {
         const url = new URL(window.location);
         url.searchParams.set('role', this.selectedRole);
         url.searchParams.set('service', this.selectedService);
+        url.searchParams.set('view', this.view); // On garde la vue
         window.location = url.toString();
     }
 }">
@@ -58,14 +59,14 @@
             </div>
 
             {{-- Bouton Réinitialiser --}}
-    <div>
-        <button 
-            @click="selectedRole = ''; selectedService = ''; filterEmployees()" 
-            class="px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded-md transition"
-        >
-            Réinitialiser
-        </button>
-    </div>
+            <div>
+                <button 
+                    @click="selectedRole = ''; selectedService = ''; filterEmployees()" 
+                    class="px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded-md transition"
+                >
+                    Réinitialiser
+                </button>
+            </div>
         </div>
 
         <div class="mb-6 flex justify-end">
@@ -96,7 +97,7 @@
                             </div>
                         @endif
                         <h3 class="text-lg font-semibold text-gray-900">{{ $user->nom }} {{ $user->prenom }}</h3>
-                        <p class="text-sm text-gray-600">{{ $user->service->nom ?? 'Service inconnu' }} | {{ $user->role->nom ?? 'Role inconnu' }}</p>
+                        <p class="text-sm text-gray-600">{{ $user->service->nom ?? 'Service inconnu' }} | {{ $user->role->nom ?? 'Rôle inconnu' }}</p>
                     </a>
 
                     <div class="mt-4 flex justify-center space-x-2">
@@ -156,6 +157,7 @@
     </div>
 </div>
 
+{{-- Modal --}}
 <div id="modal" class="fixed inset-0 z-50 hidden bg-gray-800/40 flex items-center justify-center">
     <div class="bg-white rounded-lg shadow-lg w-11/12 sm:w-1/2 lg:w-1/3">
         <div class="px-4 py-2 flex justify-between items-center">
