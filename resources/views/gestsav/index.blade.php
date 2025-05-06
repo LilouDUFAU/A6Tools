@@ -21,11 +21,11 @@
         @endforeach
     </div>
 
-    <div class="flex justify-between items-center mb-4 px-4">
-        <button id="resetFilters" class="bg-gray-600 text-white px-6 py-3 rounded-lg shadow-md hover:bg-gray-700">
+    <div class="flex flex-col sm:flex-row justify-between items-center mb-4 px-4 space-y-4 sm:space-y-0 sm:space-x-4">
+        <button id="resetFilters" class="w-full sm:w-auto bg-gray-600 text-white px-6 py-3 rounded-lg shadow-md hover:bg-gray-700">
             Réinitialiser les filtres
         </button>
-        <a href="{{ route('panne.create') }}" class="bg-green-600 text-white px-6 py-3 rounded-lg shadow-md hover:bg-green-700">
+        <a href="{{ route('panne.create') }}" class="w-full sm:w-auto bg-green-600 text-white px-6 py-3 rounded-lg shadow-md hover:bg-green-700 text-center">
             Ajouter une panne
         </a>
     </div>
