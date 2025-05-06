@@ -3,16 +3,16 @@
 @section('content')
 
 <div class="container mx-auto py-8 px-4 sm:px-6 lg:px-8 min-h-screen">
-    <h1 class="text-3xl font-bold mb-8 px-4 pt-10 text-gray-800">Gestion des Préparations Atelier</h1>
+    <h1 class="text-3xl font-bold mb-8 px-4 pt-10 text-gray-800 text-center sm:text-left">Gestion des Préparations Atelier</h1>
 
-    <div class="flex justify-end items-center mb-4 px-4">
-        <a href="{{ route('prepatelier.create') }}" class="bg-green-600 text-white px-6 py-3 rounded-lg shadow-md hover:bg-green-700">
+    <div class="flex flex-col sm:flex-row justify-between items-center mb-4 px-4">
+        <a href="{{ route('prepatelier.create') }}" class="bg-green-600 text-white px-6 py-3 rounded-lg shadow-md hover:bg-green-700 text-center">
             Ajouter une préparation
         </a>
     </div>
 
     <div class="bg-white shadow rounded-lg p-4 sm:p-6">
-        <h2 class="text-xl sm:text-2xl font-semibold text-gray-800 mb-4">Liste des Préparations Atelier</h2>
+        <h2 class="text-xl sm:text-2xl font-semibold text-gray-800 mb-4 text-center sm:text-left">Liste des Préparations Atelier</h2>
         <div class="overflow-x-auto">
             <table class="min-w-full border-collapse border border-gray-200">
                 <thead>
@@ -53,7 +53,7 @@
                                 {{ $etapesRestantes }}
                             </td>
                             <td class="py-3 px-4 border border-gray-200 {{ $cellClass }}">
-                                <div class="inline-flex space-x-2">
+                                <div class="inline-flex flex-wrap space-x-2">
                                     <a href="{{ route('prepatelier.show', $atelier->id) }}" class="text-green-600 font-semibold hover:underline">Détails</a>
                                     <a href="{{ route('prepatelier.edit', $atelier->id) }}" class="text-yellow-600 font-semibold hover:underline">Modifier</a>
                                     <form action="{{ route('prepatelier.destroy', $atelier->id) }}" method="POST" class="inline-block">
