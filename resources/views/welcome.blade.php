@@ -48,9 +48,6 @@
                     <a href="{{ route('login') }}" class="bg-green-600 text-white hover:bg-green-700 font-semibold py-2 px-4 rounded-lg shadow-md transition">
                         Connexion
                     </a>
-                    <a href="{{ route('register') }}" class="bg-green-600 text-white hover:bg-green-700 font-semibold py-2 px-4 rounded-lg shadow-md transition">
-                        Inscription
-                    </a>
                 </div>
                 @endauth
             </div>
