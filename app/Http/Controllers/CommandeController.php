@@ -22,6 +22,8 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Database\QueryException;
 use Exception;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\Log;
 
 /**
  * @class CommandeController
@@ -37,8 +39,60 @@ class CommandeController extends Controller
     public function index()
     {
         $commandes = Commande::with(['client', 'employe'])->get();
-        return view('gestock.index', compact('commandes'));
+        $alerteCommandes = [];
+        
+        Log::debug('Début de la vérification des alertes de commandes.');
+        
+        foreach ($commandes as $commande) {
+            Log::debug("Commande ID: {$commande->id}, Date installation prévue: {$commande->date_installation_prevue}, Délai installation: {$commande->delai_installation}");
+        
+            $produits = DB::table('commande_produit')
+                ->join('produits', 'commande_produit.produit_id', '=', 'produits.id')
+                ->where('commande_produit.commande_id', $commande->id)
+                ->select('produits.*')
+                ->get();
+        
+            foreach ($produits as $produit) {
+                Log::debug("Produit: {$produit->nom}, Date livraison fournisseur: {$produit->date_livraison_fournisseur}");
+        
+                if ($commande->date_installation_prevue && $produit->date_livraison_fournisseur) {
+                    $dateInstallation = Carbon::parse($commande->date_installation_prevue);
+                    $dateLivraison = Carbon::parse($produit->date_livraison_fournisseur);
+        
+                    // Calculer les dates avec les ajouts de jours (7 jours et 7 jours + délai d'installation)
+                    $dateLivraisonPlus7 = $dateLivraison->copy()->addDays(7);
+                    $dateLivraisonPlusDelaiPlus7 = $dateLivraison->copy()->addDays(($commande->delai_installation ?? 0) + 7);
+        
+                    // Vérifier si l'une des conditions est vraie
+                    $condition1 = $dateLivraisonPlus7->isSameDay($dateInstallation) || $dateLivraisonPlus7->greaterThanOrEqualTo($dateInstallation);
+                    $condition2 = $dateLivraisonPlusDelaiPlus7->isSameDay($dateInstallation) || $dateLivraisonPlusDelaiPlus7->greaterThanOrEqualTo($dateInstallation);
+    
+                    if ($condition1 || $condition2) {
+                        // Calculer la différence en jours
+                        $difference = $dateInstallation->diffInDays($dateLivraison);
+                        
+                        $alerteCommandes[$commande->id] = [
+                            'commande' => $commande,
+                            'produit' => $produit->nom,
+                            'dateLivraison' => $dateLivraison->format('d/m/Y'),
+                            'dateInstallation' => $dateInstallation->format('d/m/Y'),
+                            'difference' => $difference, // Ajouter la différence de jours
+                        ];
+                        Log::debug("ALERTE déclenchée pour la commande ID: {$commande->id}");
+                        break; // Une alerte par commande suffit
+                    }
+                } else {
+                    Log::debug("Dates manquantes pour la commande ID: {$commande->id} ou le produit: {$produit->nom}");
+                }
+            }
+        }
+    
+        Log::debug('Vérification terminée. Nombre d\'alertes trouvées : ' . count($alerteCommandes));
+        
+        return view('gestock.index', compact('commandes', 'alerteCommandes'));
     }
+    
+    
 
     /**
      * Affiche le formulaire de création d'une nouvelle commande.
@@ -80,7 +134,7 @@ class CommandeController extends Controller
 
         $validated['employe_id'] = auth()->id();
 
-        // Création ou association d’un client
+        // Création ou association d'un client
         if ($request->filled('client_id')) {
             $validated['client_id'] = $request->input('client_id');
         } elseif ($request->filled('new_client.nom')) {
@@ -93,7 +147,7 @@ class CommandeController extends Controller
 
         $commande = Commande::create($validated);
 
-        // Création ou association d’un fournisseur
+        // Création ou association d'un fournisseur
         $fournisseur_id = null;
         if ($request->filled('fournisseur_id')) {
             $fournisseur_id = $request->input('fournisseur_id');
@@ -179,7 +233,7 @@ class CommandeController extends Controller
     }
 
     /**
-     * Affiche le formulaire d’édition d’une commande.
+     * Affiche le formulaire d'édition d'une commande.
      * 
      * @param string $id
      * @return \Illuminate\View\View
@@ -243,7 +297,7 @@ class CommandeController extends Controller
             $commande->client_id = $client->id;
         }
 
-        // Fournisseur (inchangé si rien n’est sélectionné)
+        // Fournisseur (inchangé si rien n'est sélectionné)
         $fournisseur_id = $request->input('fournisseur_id', $commande->fournisseur_id);
 
         // Réinitialisation des produits associés à la commande
