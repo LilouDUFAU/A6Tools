@@ -12,7 +12,7 @@
         <div class="space-y-2">
             @foreach($alerteCommandes as $id => $alerte)
             <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-6 rounded-md">
-            <p><i class="fa-solid fa-circle-exclamation" style="color: #fa0000;"></i><strong>Attention</strong>,après avoir pris en compte tous les éléments perinents (date de livraison fournisseur, délai d'installation, et date d'installation prévue), il semble que la <a href="{{ route('commande.show', $id) }}" class="underline hover:text-red-300 font-semibold">Commande n°{{ $id }}</a> (Client: {{ $alerte['commande']->client?->code_client ?? 'Non défini' }}) présente un risque potentiel de retard. Nous vous prions de bien vouloir contacter le founisseur afin de clarifier la situation et, si nécessaire, informer le client.</p>
+            <p><i class="fa-solid fa-circle-exclamation" style="color: #C53030;"></i> <strong> Attention</strong>,après avoir pris en compte tous les éléments perinents (date de livraison fournisseur, délai d'installation, et date d'installation prévue), il semble que la <a href="{{ route('commande.show', $id) }}" class="underline hover:text-red-300 font-semibold">Commande n°{{ $id }}</a> (Client: {{ $alerte['commande']->client?->code_client ?? 'Non défini' }}) présente un risque potentiel de retard. Nous vous prions de bien vouloir contacter le founisseur afin de clarifier la situation et, si nécessaire, informer le client.</p>
             </div>
             @endforeach
         </div>
