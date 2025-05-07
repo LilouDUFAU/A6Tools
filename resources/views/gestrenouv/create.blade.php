@@ -20,7 +20,7 @@
 
             <div class="mb-4">
                 <label for="caracteristiques" class="block text-gray-700 font-bold mb-2">Caractéristique</label>
-                <input type="text" name="caracteristiques" id="caracteristiques" class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1" maxlength="255">
+                <textarea name="caracteristiques" id="caracteristiques" class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1" rows="4" maxlength="255"></textarea>
             </div>
 
             <div class="mb-4">
