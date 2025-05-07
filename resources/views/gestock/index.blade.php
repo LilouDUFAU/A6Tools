@@ -5,6 +5,20 @@
 <div class="container mx-auto py-8 px-4 sm:px-6 lg:px-8">
     <h1 class="text-3xl font-bold mb-8 px-4 pt-10 text-gray-800">Tableau de Bord des Commandes</h1>
 
+    {{-- Alertes de délai de livraison --}}
+    @if(!empty($alerteCommandes))
+    <div class="">
+        <h2 class="text-xl font-bold mb-2">⚠️ Alerte Délai de Livraison</h2>
+        <div class="space-y-2">
+            @foreach($alerteCommandes as $id => $alerte)
+            <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-6 rounded-md">
+            <p><i class="fa-solid fa-circle-exclamation" style="color: #fa0000;"></i><strong>Attention</strong>,après avoir pris en compte tous les éléments perinents (date de livraison fournisseur, délai d'installation, et date d'installation prévue), il semble que la <a href="{{ route('commande.show', $id) }}" class="underline hover:text-red-300 font-semibold">Commande n°{{ $id }}</a> (Client: {{ $alerte['commande']->client?->code_client ?? 'Non défini' }}) présente un risque potentiel de retard. Nous vous prions de bien vouloir contacter le founisseur afin de clarifier la situation et, si nécessaire, informer le client.</p>
+            </div>
+            @endforeach
+        </div>
+    </div>
+    @endif
+
     {{-- Filtres et Statistiques --}}
     <h2 class="text-2xl font-semibold px-4 py-2 text-gray-700">Commandes par Site</h2>
     @php
@@ -117,6 +131,8 @@
             "<button type='button' class='text-yellow-600 hover:text-yellow-700 font-semibold mr-2' onclick=\"window.location.href='".route('commande.edit',$c->id)."'\">Modifier</button>".
             "<button type='button' onclick=\"openModal({$c->id})\" class='text-red-600 hover:text-red-700 font-semibold'>Supprimer</button>".
             "</form>";
+        // Check if this command has an alert
+        $hasAlert = isset($alerteCommandes[$c->id]);
         return [
             'id'=>$c->id,
             'client'=>$c->client?->code_client?:'<p class="text-red-500">Pas de client</p>',
@@ -125,6 +141,7 @@
             'produits'=>$produits,
             'etat'=>strtolower($c->etat),
             'urgence'=>strtolower($c->urgence),
+            'hasAlert'=>$hasAlert,
             'actions'=>$actions];
     });
 @endphp
@@ -220,8 +237,11 @@
         (!activeFilters.urgence.size || activeFilters.urgence.has(cmd.urgence));
 
     const rowHTML = cmd => `
-        <tr class="border-t hover:bg-gray-50">
-            <td class="py-3 px-4 border border-gray-200">Cmde n° ${cmd.id}</td>
+        <tr class="border-t hover:bg-gray-50 ${cmd.hasAlert ? 'bg-red-100' : ''}">
+            <td class="py-3 px-4 border border-gray-200">
+                Cmde n° ${cmd.id}
+                ${cmd.hasAlert ? '<span class="inline-block ml-2 bg-red-600 text-white px-2 py-1 text-xs rounded-full">⚠️</span>' : ''}
+            </td>
             <td class="py-3 px-4 border border-gray-200">${cmd.client}</td>
             <td class="py-3 px-4 border border-gray-200">${cmd.fournisseur}</td>
             <td class="py-3 px-4 border border-gray-200">${cmd.lieux}</td>
