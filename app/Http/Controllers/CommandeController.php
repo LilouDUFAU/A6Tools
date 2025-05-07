@@ -161,13 +161,14 @@ class CommandeController extends Controller
         // Traitement du produit
         $produitData = $request->input('produit');
         if (!empty($produitData)) {
-            $produit = Produit::firstOrCreate(
+            $produit = Produit::updateOrCreate(
                 ['reference' => $produitData['reference']],
                 [
                     'nom' => $produitData['nom'],
                     'prix_referencement' => $produitData['prix_referencement'] ?? 0,
                     'lien_produit_fournisseur' => $produitData['lien_produit_fournisseur'] ?? null,
                     'date_livraison_fournisseur' => $produitData['date_livraison_fournisseur'] ?? null,
+                    'updated_at' => now(),
                 ]
             );
 
