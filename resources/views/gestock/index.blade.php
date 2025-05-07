@@ -1,7 +1,6 @@
 @extends('layouts.app')
 
 @section('content')
-
 <div class="min-h-screen">
 <div class="container mx-auto py-8 px-4 sm:px-6 lg:px-8">
     <h1 class="text-3xl font-bold mb-8 px-4 pt-10 text-gray-800">Tableau de Bord des Commandes</h1>
@@ -75,7 +74,7 @@
             <table class="min-w-full bg-white shadow-md rounded-lg">
                 <thead>
                     <tr id="table-headers" class="bg-gray-100 text-left text-sm font-semibold text-gray-700">
-                    <th class="py-3 px-4 border border-gray-200">N° commande</th>
+                        <th class="py-3 px-4 border border-gray-200">N° commande</th>
                         <th class="py-3 px-4 border border-gray-200">Client</th>
                         <th class="py-3 px-4 border border-gray-200">Fournisseur</th>
                         <th class="py-3 px-4 border border-gray-200">Site</th>
@@ -99,10 +98,10 @@
             ->join('stocks','produit_stock.stock_id','=','stocks.id')
             ->where('produit_stock.commande_id',$c->id)
             ->distinct()->pluck('stocks.lieux')->implode(', ');
-        $produits = DB::table('produit_stock')
-            ->join('produits','produit_stock.produit_id','=','produits.id')
-            ->where('produit_stock.commande_id',$c->id)
-            ->select('produits.nom as nom','produit_stock.quantite as quantite')
+        $produits = DB::table('commande_produit')
+            ->join('produits','commande_produit.produit_id','=','produits.id')
+            ->where('commande_produit.commande_id',$c->id)
+            ->select('produits.nom as nom','commande_produit.quantite_totale as quantite')
             ->get()->map(fn($p)=>['nom'=>$p->nom,'quantite'=>$p->quantite]);
         $fourn = $produits->isNotEmpty()
             ? DB::table('fournisseur_produit')
