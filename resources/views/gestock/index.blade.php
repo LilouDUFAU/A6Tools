@@ -237,10 +237,9 @@
         (!activeFilters.urgence.size || activeFilters.urgence.has(cmd.urgence));
 
     const rowHTML = cmd => `
-        <tr class="border-t hover:bg-gray-50 ${cmd.hasAlert ? 'bg-red-100' : ''}">
+        <tr class="border-t hover:bg-gray-50">
             <td class="py-3 px-4 border border-gray-200">
                 Cmde n° ${cmd.id}
-                ${cmd.hasAlert ? '<span class="inline-block ml-2 bg-red-600 text-white px-2 py-1 text-xs rounded-full">⚠️</span>' : ''}
             </td>
             <td class="py-3 px-4 border border-gray-200">${cmd.client}</td>
             <td class="py-3 px-4 border border-gray-200">${cmd.fournisseur}</td>
