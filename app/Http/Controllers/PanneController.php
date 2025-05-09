@@ -240,7 +240,7 @@ public function update(Request $request, string $id)
         }
     }
 
-    return redirect()->route('panne.index')->with('success', 'Panne mise à jour avec succès');
+    return redirect()->route('gestsav.index')->with('success', 'Panne mise à jour avec succès');
 }
 
         
@@ -253,6 +253,6 @@ public function update(Request $request, string $id)
         $panne->clients()->detach();
         $panne->actions()->delete();
         $panne->delete();
-        return redirect()->route('panne.index')->with('success', 'Panne supprimée avec succès');
+        return redirect()->route('gestsav.index')->with('success', 'Panne supprimée avec succès');
     }
 }
