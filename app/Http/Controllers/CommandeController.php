@@ -55,34 +55,37 @@ class CommandeController extends Controller
             foreach ($produits as $produit) {
                 Log::debug("Produit: {$produit->nom}, Date livraison fournisseur: {$produit->date_livraison_fournisseur}");
         
-                if ($commande->date_installation_prevue && $produit->date_livraison_fournisseur) {
+                if ($commande->date_installation_prevue) {
                     $dateInstallation = Carbon::parse($commande->date_installation_prevue);
-                    $dateLivraison = Carbon::parse($produit->date_livraison_fournisseur);
-        
-                    // Calculer les dates avec les ajouts de jours (7 jours et 7 jours + délai d'installation)
-                    $dateLivraisonPlus7 = $dateLivraison->copy()->addDays(7);
-                    $dateLivraisonPlusDelaiPlus7 = $dateLivraison->copy()->addDays(($commande->delai_installation ?? 0) + 7);
-        
-                    // Vérifier si l'une des conditions est vraie
-                    $condition1 = $dateLivraisonPlus7->isSameDay($dateInstallation) || $dateLivraisonPlus7->greaterThanOrEqualTo($dateInstallation);
-                    $condition2 = $dateLivraisonPlusDelaiPlus7->isSameDay($dateInstallation) || $dateLivraisonPlusDelaiPlus7->greaterThanOrEqualTo($dateInstallation);
-    
-                    if ($condition1 || $condition2) {
-                        // Calculer la différence en jours
-                        $difference = $dateInstallation->diffInDays($dateLivraison);
-                        
+                    
+                    if ($produit->date_livraison_fournisseur) {
+                        $dateLivraison = Carbon::parse($produit->date_livraison_fournisseur);
+                        $dateLivraisonPlus7 = $dateLivraison->copy()->addDays(7);
+                        $dateLivraisonPlusDelaiPlus7 = $dateLivraison->copy()->addDays(($commande->delai_installation ?? 0) + 7);
+            
+                        $condition1 = $dateLivraisonPlus7->greaterThanOrEqualTo($dateInstallation);
+                        $condition2 = $dateLivraisonPlusDelaiPlus7->greaterThanOrEqualTo($dateInstallation);
+                    } else {
+                        $condition1 = $condition2 = false;
+                    }
+            
+                    $condition3 = !$produit->date_livraison_fournisseur && Carbon::now()->addDays(7)->greaterThanOrEqualTo($dateInstallation);
+                    $condition4 = !$produit->date_livraison_fournisseur && $commande->delai_installation &&
+                                  Carbon::now()->addDays($commande->delai_installation + 7)->greaterThanOrEqualTo($dateInstallation);
+            
+                    if ($condition1 || $condition2 || $condition3 || $condition4) {
                         $alerteCommandes[$commande->id] = [
                             'commande' => $commande,
                             'produit' => $produit->nom,
-                            'dateLivraison' => $dateLivraison->format('d/m/Y'),
+                            'dateLivraison' => $produit->date_livraison_fournisseur ? Carbon::parse($produit->date_livraison_fournisseur)->format('d/m/Y') : 'Non renseignée',
                             'dateInstallation' => $dateInstallation->format('d/m/Y'),
-                            'difference' => $difference, // Ajouter la différence de jours
+                            'difference' => $produit->date_livraison_fournisseur ? $dateInstallation->diffInDays($dateLivraison) : 'N/A',
                         ];
                         Log::debug("ALERTE déclenchée pour la commande ID: {$commande->id}");
-                        break; // Une alerte par commande suffit
+                        break;
                     }
                 } else {
-                    Log::debug("Dates manquantes pour la commande ID: {$commande->id} ou le produit: {$produit->nom}");
+                    Log::debug("Date installation prévue manquante pour commande ID: {$commande->id}");
                 }
             }
         }
