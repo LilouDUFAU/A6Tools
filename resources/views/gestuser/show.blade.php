@@ -68,6 +68,9 @@
                         const popup = document.getElementById('photoPopup');
                         const popupImage = document.getElementById('popupImage');
                         popupImage.src = imageUrl;
+                        popupImage.style.maxHeight = '60vh'; // Set max height
+                        popupImage.style.minHeight = '60vh'; // Set min height
+                        popupImage.style.width = 'auto'; // Set width to auto
                         popup.classList.remove('hidden');
                     }
 
