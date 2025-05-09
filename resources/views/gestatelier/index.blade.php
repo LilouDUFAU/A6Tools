@@ -8,7 +8,7 @@
     </h1>
 
     <div class="flex flex-col sm:flex-row justify-end items-center mb-4 px-4">
-        <a href="{{ route('prepatelier.create') }}" class="bg-green-600 text-white px-6 py-3 rounded-lg shadow-md hover:bg-green-700 text-center">
+        <a href="{{ route('gestatelier.create') }}" class="bg-green-600 text-white px-6 py-3 rounded-lg shadow-md hover:bg-green-700 text-center">
             Ajouter une préparation
         </a>
     </div>
@@ -56,9 +56,9 @@
                             </td>
                             <td class="py-3 px-4 border border-gray-200 {{ $cellClass }}">
                                 <div class="inline-flex flex-wrap space-x-2">
-                                    <a href="{{ route('prepatelier.show', $atelier->id) }}" class="text-green-600 font-semibold hover:underline">Détails</a>
-                                    <a href="{{ route('prepatelier.edit', $atelier->id) }}" class="text-yellow-600 font-semibold hover:underline">Modifier</a>
-                                    <form action="{{ route('prepatelier.destroy', $atelier->id) }}" method="POST" class="inline-block">
+                                    <a href="{{ route('gestatelier.show', $atelier->id) }}" class="text-green-600 font-semibold hover:underline">Détails</a>
+                                    <a href="{{ route('gestatelier.edit', $atelier->id) }}" class="text-yellow-600 font-semibold hover:underline">Modifier</a>
+                                    <form action="{{ route('gestatelier.destroy', $atelier->id) }}" method="POST" class="inline-block">
                                         @csrf
                                         @method('DELETE')
                                         <button type="button" onclick="openModal({{ $atelier->id }})" class="text-red-600 hover:text-red-700 font-semibold">Supprimer</button>
@@ -84,7 +84,7 @@
         </div>
         <div class="px-4 py-2 flex justify-end space-x-4">
             <button id="cancelModal" class="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700">Annuler</button>
-            <form id="deleteForm" method="POST" action="{{ route('prepatelier.destroy', 0) }}">
+            <form id="deleteForm" method="POST" action="{{ route('gestatelier.destroy', 0) }}">
                 @csrf
                 @method('DELETE')
                 <button type="submit" class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700">Supprimer</button>
@@ -99,7 +99,7 @@
     const closeModal = document.getElementById('closeModal');
     const cancelModal = document.getElementById('cancelModal');
     const deleteForm = document.getElementById('deleteForm');
-    const deleteRouteTemplate = "{{ route('prepatelier.destroy', ':id') }}";
+    const deleteRouteTemplate = "{{ route('gestatelier.destroy', ':id') }}";
 
     function openModal(id) {
         deleteForm.action = deleteRouteTemplate.replace(':id', id);

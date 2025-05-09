@@ -29,7 +29,7 @@ class UserController extends Controller
         $roles = Role::all();
         $services = Service::all();
 
-        return view('employe.index', compact('users', 'roles', 'services'));
+        return view('gestuser.index', compact('users', 'roles', 'services'));
     }
     /**
      * Show the form for creating a new resource.
@@ -38,7 +38,7 @@ class UserController extends Controller
     {
         $roles = Role::all();
         $services = Service::all();
-        return view('employe.create', compact('roles', 'services'));
+        return view('gestuser.create', compact('roles', 'services'));
     }
 
     /**
@@ -83,7 +83,7 @@ class UserController extends Controller
     public function show(string $id)
     {
         $user = User::findOrFail($id);
-        return view('employe.show', compact('user'));
+        return view('gestuser.show', compact('user'));
     }
 
     /**
@@ -92,7 +92,7 @@ class UserController extends Controller
     public function edit(string $id)
     {
         $user = User::findOrFail($id);
-        return view('employe.edit', compact('user'));
+        return view('gestuser.edit', compact('user'));
     }
 
     /**
@@ -128,7 +128,7 @@ class UserController extends Controller
         }
         $user->update($validatedData);
 
-        return redirect()->route('employe.index')->with('success', 'Utilisateur mis à jour avec succès.');
+        return redirect()->route('gestuser.index')->with('success', 'Utilisateur mis à jour avec succès.');
     }
 
     /**
@@ -139,6 +139,6 @@ class UserController extends Controller
         $user = User::findOrFail($id);
         $user->delete();
 
-        return redirect()->route('employe.index')->with('success', 'Utilisateur supprimé avec succès.');
+        return redirect()->route('gestuser.index')->with('success', 'Utilisateur supprimé avec succès.');
     }
 }

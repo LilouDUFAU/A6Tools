@@ -107,8 +107,8 @@
 
         <!-- Boutons -->
         <div class="flex justify-between mt-8">
-            <a href="{{ route('panne.edit', $panne->id) }}" class="text-green-600 font-medium hover:underline">Modifier</a>
-            <a href="{{ route('panne.index') }}" class="text-gray-600 hover:underline">Retour à la liste</a>
+            <a href="{{ route('gestsav.edit', $panne->id) }}" class="text-green-600 font-medium hover:underline">Modifier</a>
+            <a href="{{ route('gestsav.index') }}" class="text-gray-600 hover:underline">Retour à la liste</a>
         </div>
     </div>
 </div>

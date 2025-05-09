@@ -3,7 +3,7 @@
 @section('content')
 <div class="container mx-auto py-8 px-4 sm:px-6 lg:px-8 min-h-screen">
 <h1 class="text-3xl font-extrabold text-gray-800 mb-8">Prêter le PCRenouv</h1>
-    <form action="{{ route('gestrenouv.addLocPret', $pcrenouv->id) }}" method="POST" class="space-y-6">
+    <form action="{{ route('gestrenouv.addLocPret', $pcrenouv->id) }}" method="POST" class="space-y-6 bg-white shadow-md rounded-lg p-6">
         @csrf
         @method('PUT')
 

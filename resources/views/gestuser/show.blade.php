@@ -82,10 +82,10 @@
 
             <div class="mt-8 flex justify-between items-center w-full">
                 @if(auth()->user()->role->nom === 'admin')
-                    <a href="{{ route('employe.edit', ['id' => $user->id]) }}" class="text-blue-500 hover:underline transition">
+                    <a href="{{ route('gestuser.edit', ['id' => $user->id]) }}" class="text-blue-500 hover:underline transition">
                         Modifier
                     </a>
-                    <a href="{{ route('employe.index') }}" class="text-red-500 hover:underline transition">
+                    <a href="{{ route('gestuser.index') }}" class="text-red-500 hover:underline transition">
                         Retour à la liste des employés
                     </a>
                 @endif

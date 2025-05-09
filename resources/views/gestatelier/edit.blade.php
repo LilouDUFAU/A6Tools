@@ -4,7 +4,7 @@
 <div class="min-h-screen">
 <div class="max-w-6xl mx-auto my-4 py-8 px-6 bg-white shadow-md rounded-lg">
     <h1 class="text-3xl font-extrabold text-gray-800 mb-8">Modifier la Préparation</h1>
-    <form action="{{ route('prepatelier.update', $preparation->id) }}" method="POST" class="space-y-6">
+    <form action="{{ route('gestatelier.update', $preparation->id) }}" method="POST" class="space-y-6">
         @csrf
         @method('PUT')
         
@@ -99,7 +99,7 @@
     </form>
 
     <div class="text-right mt-4 p-4">
-        <a href="{{ route('prepatelier.index') }}" class="text-gray-500 hover:underline">Retour</a>
+        <a href="{{ route('gestatelier.index') }}" class="text-gray-500 hover:underline">Retour</a>
     </div>
 </div>
 </div>

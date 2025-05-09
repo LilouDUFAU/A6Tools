@@ -70,7 +70,7 @@
         </div>
 
         <div class="mb-6 flex justify-end">
-            <a href="{{ route('employe.create') }}" class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-xl transition w-full sm:w-auto text-center">
+            <a href="{{ route('gestuser.create') }}" class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-xl transition w-full sm:w-auto text-center">
                 Créer un nouvel employé
             </a>
         </div>
@@ -88,7 +88,7 @@
         >
             @foreach($users as $user)
                 <div class="bg-white rounded-2xl shadow p-6 text-center hover:shadow-lg transition-all">
-                    <a href="{{ route('employe.show', $user->id) }}" class="block">
+                    <a href="{{ route('gestuser.show', $user->id) }}" class="block">
                         @if($user->photo)
                             <img src="{{ asset('storage/' . $user->photo) }}" alt="{{ $user->nom }}" class="mx-auto w-24 h-24 rounded-full object-cover mb-4">
                         @else
@@ -101,8 +101,8 @@
                     </a>
 
                     <div class="mt-4 flex justify-center space-x-2">
-                        <a href="{{ route('employe.edit', $user->id) }}" class="text-blue-600 hover:underline">Modifier</a>
-                        <form action="{{ route('employe.destroy', $user->id) }}" method="POST">
+                        <a href="{{ route('gestuser.edit', $user->id) }}" class="text-blue-600 hover:underline">Modifier</a>
+                        <form action="{{ route('gestuser.destroy', $user->id) }}" method="POST">
                             @csrf
                             @method('DELETE')
                             <button type="button" onclick="openModal({{ $user->id }})" class="text-red-600 hover:underline">Supprimer</button>
@@ -135,15 +135,15 @@
                 </thead>
                 <tbody class="divide-y divide-gray-200 text-sm text-gray-800">
                     @foreach($users as $user)
-                        <tr class="hover:bg-gray-50 cursor-pointer" onclick="window.location='{{ route('employe.show', $user->id) }}';">
+                        <tr class="hover:bg-gray-50 cursor-pointer" onclick="window.location='{{ route('gestuser.show', $user->id) }}';">
                             <td class="px-6 py-4">
                                 {{ $user->nom }} {{ $user->prenom }}
                             </td>
                             <td class="px-6 py-4">{{ $user->service->nom ?? 'Service inconnu' }}</td>
                             <td class="px-6 py-4">{{ $user->role->nom ?? 'Rôle inconnu' }}</td>
                             <td class="px-6 py-4 flex space-x-2">
-                                <a href="{{ route('employe.edit', $user->id) }}" class="text-blue-600 hover:underline" onclick="event.stopPropagation();">Modifier</a>
-                                <form action="{{ route('employe.destroy', $user->id) }}" method="POST">
+                                <a href="{{ route('gestuser.edit', $user->id) }}" class="text-blue-600 hover:underline" onclick="event.stopPropagation();">Modifier</a>
+                                <form action="{{ route('gestuser.destroy', $user->id) }}" method="POST">
                                     @csrf
                                     @method('DELETE')
                                     <button type="button" onclick="event.stopPropagation(); openModal({{ $user->id }})" class="text-red-600 hover:underline">Supprimer</button>
@@ -169,7 +169,7 @@
         </div>
         <div class="px-4 py-2 flex justify-end space-x-4">
             <button id="cancelModal" class="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700">Annuler</button>
-            <form id="deleteForm" method="POST" action="{{ route('employe.destroy', 0) }}">
+            <form id="deleteForm" method="POST" action="{{ route('gestuser.destroy', 0) }}">
                 @csrf
                 @method('DELETE')
                 <button type="submit" class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700">Supprimer</button>
@@ -183,7 +183,7 @@
     const closeModal = document.getElementById('closeModal');
     const cancelModal = document.getElementById('cancelModal');
     const deleteForm = document.getElementById('deleteForm');
-    const deleteRouteTemplate = "{{ route('employe.destroy', ':id') }}";
+    const deleteRouteTemplate = "{{ route('gestuser.destroy', ':id') }}";
 
     function openModal(id) {
         deleteForm.action = deleteRouteTemplate.replace(':id', id);

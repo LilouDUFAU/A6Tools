@@ -25,7 +25,7 @@
         <button id="resetFilters" class="w-full sm:w-auto bg-gray-600 text-white px-6 py-3 rounded-lg shadow-md hover:bg-gray-700">
             Réinitialiser les filtres
         </button>
-        <a href="{{ route('panne.create') }}" class="w-full sm:w-auto bg-green-600 text-white px-6 py-3 rounded-lg shadow-md hover:bg-green-700 text-center">
+        <a href="{{ route('gestsav.create') }}" class="w-full sm:w-auto bg-green-600 text-white px-6 py-3 rounded-lg shadow-md hover:bg-green-700 text-center">
             Ajouter une panne
         </a>
     </div>
@@ -59,9 +59,9 @@
                             </td>
                             <td class="py-3 px-4 border border-gray-200">
                                 <div class="inline-flex space-x-2">
-                                    <a href="{{ route('panne.show', $panne->id) }}" class="text-green-600 font-semibold hover:underline">Détails</a>
-                                    <a href="{{ route('panne.edit', $panne->id) }}" class="text-yellow-600 font-semibold hover:underline">Modifier</a>
-                                    <form action="{{ route('panne.destroy', $panne->id) }}" method="POST" class="inline-block">
+                                    <a href="{{ route('gestsav.show', $panne->id) }}" class="text-green-600 font-semibold hover:underline">Détails</a>
+                                    <a href="{{ route('gestsav.edit', $panne->id) }}" class="text-yellow-600 font-semibold hover:underline">Modifier</a>
+                                    <form action="{{ route('gestsav.destroy', $panne->id) }}" method="POST" class="inline-block">
                                         @csrf
                                         @method('DELETE')
                                         <button type="button" onclick="openModal({{ $panne->id }})" class="text-red-600 hover:text-red-700 font-semibold">Supprimer</button> 
@@ -87,7 +87,7 @@
         </div>
         <div class="px-4 py-2 flex justify-end space-x-4">
             <button id="cancelModal" class="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700">Annuler</button>
-            <form id="deleteForm" method="POST" action="{{ route('panne.destroy', 0) }}">
+            <form id="deleteForm" method="POST" action="{{ route('gestsav.destroy', 0) }}">
                 @csrf
                 @method('DELETE')
                 <button type="submit" class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700">Supprimer</button>
@@ -100,7 +100,7 @@
     const closeModal = document.getElementById('closeModal');
     const cancelModal = document.getElementById('cancelModal');
     const deleteForm = document.getElementById('deleteForm');
-    const deleteRouteTemplate = "{{ route('panne.destroy', ':id') }}";
+    const deleteRouteTemplate = "{{ route('gestsav.destroy', ':id') }}";
 
     function openModal(id) {
         deleteForm.action = deleteRouteTemplate.replace(':id', id);

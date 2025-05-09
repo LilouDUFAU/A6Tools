@@ -212,7 +212,7 @@ class CommandeController extends Controller
             ]);
         }
 
-        return redirect()->route('commande.index')->with('success', 'Commande créée avec succès.');
+        return redirect()->route('gestock.index')->with('success', 'Commande créée avec succès.');
     }
 
     /**
@@ -352,7 +352,7 @@ class CommandeController extends Controller
 
         $commande->save();
 
-        return redirect()->route('commande.index')->with('success', 'Commande mise à jour avec succès.');
+        return redirect()->route('gestock.index')->with('success', 'Commande mise à jour avec succès.');
     }
 
     /**
@@ -377,6 +377,6 @@ class CommandeController extends Controller
         // Suppression de la commande
         $commande->delete();
 
-        return redirect()->route('commande.index')->with('success', 'Commande et ses préparations associées supprimées avec succès.');
+        return redirect()->route('gestock.index')->with('success', 'Commande et ses préparations associées supprimées avec succès.');
     }
 }

@@ -25,7 +25,7 @@
                 <div class="mt-12">
                     <h2 class="text-3xl md:text-4xl font-bold text-gray-800 mb-6 lg:mb-20">Applications</h2>
                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-                        <a href="{{ route('commande.index') }}" class="flex flex-col items-center text-gray-800 hover:text-green-600 transition">
+                        <a href="{{ route('gestock.index') }}" class="flex flex-col items-center text-gray-800 hover:text-green-600 transition">
                             <i class="nav-icon fas fa-box-open text-6xl mb-4"></i>
                             <span class="text-lg md:text-xl">Gestock</span>
                         </a>
@@ -33,11 +33,11 @@
                             <i class="nav-icon fa-solid fa-desktop text-6xl mb-4"></i>
                             <span class="text-lg md:text-xl">GestRenouv</span>
                         </a>
-                        <a href="{{ route('prepatelier.index') }}" class="flex flex-col items-center text-gray-800 hover:text-green-600 transition">
+                        <a href="{{ route('gestatelier.index') }}" class="flex flex-col items-center text-gray-800 hover:text-green-600 transition">
                             <i class="nav-icon fa-solid fa-wrench text-6xl mb-4"></i>
                             <span class="text-lg md:text-xl">GestAtelier</span>
                         </a>
-                        <a href="{{ route('panne.index') }}" class="flex flex-col items-center text-gray-800 hover:text-green-600 transition">
+                        <a href="{{ route('gestsav.index') }}" class="flex flex-col items-center text-gray-800 hover:text-green-600 transition">
                             <i class="nav-icon fa-solid fa-bolt text-6xl mb-4"></i>
                             <span class="text-lg md:text-xl">GestSAV</span>
                         </a>

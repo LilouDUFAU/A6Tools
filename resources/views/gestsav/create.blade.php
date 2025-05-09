@@ -4,7 +4,7 @@
 <div class="min-h-screen">
 <div class="max-w-6xl mx-auto my-4 py-8 px-6 bg-white shadow-md rounded-lg">
     <h1 class="text-3xl font-extrabold text-gray-800 mb-8">Nouvelle Panne</h1>
-    <form action="{{ route('panne.store') }}" method="POST" class="space-y-6">
+    <form action="{{ route('gestsav.store') }}" method="POST" class="space-y-6">
         @csrf
         <div class="border-l-4 border-green-600 pl-4">
             <h2 class="text-2xl font-bold text-gray-800 mb-4">Panne</h2>
@@ -150,7 +150,7 @@ function removeActionField(button) {
             Enregistrer
         </button>
         <div class="text-right mt-4 p-4">
-        <a href="{{ route('panne.index') }}" class="text-gray-500 hover:underline">Retour</a>
+        <a href="{{ route('gestsav.index') }}" class="text-gray-500 hover:underline">Retour</a>
     </div>
         </div>
         

@@ -19,50 +19,50 @@ Auth::routes();
 Route::get('/home', [HomeController::class, 'index'])->name('home');
 
 Route::middleware(['auth'])->group(function () {
-    Route::get('/commandes', [CommandeController::class, 'index'])->name('commande.index');
-    Route::get('/commandes/create', [CommandeController::class, 'create'])->name('commande.create');
-    Route::post('/commandes', [CommandeController::class, 'store'])->name('commande.store');
-    Route::get('/commandes/{id}', [CommandeController::class, 'show'])->name('commande.show');
-    Route::get('/commandes/{id}/edit', [CommandeController::class, 'edit'])->name('commande.edit');
-    Route::put('/commandes/{id}', [CommandeController::class, 'update'])->name('commande.update');
-    Route::delete('/commandes/{id}', [CommandeController::class, 'destroy'])->name('commande.destroy');
+    Route::get('/gestock', [CommandeController::class, 'index'])->name('gestock.index');
+    Route::get('/gestock/create', [CommandeController::class, 'create'])->name('gestock.create');
+    Route::post('/gestock', [CommandeController::class, 'store'])->name('gestock.store');
+    Route::get('/gestock/{id}', [CommandeController::class, 'show'])->name('gestock.show');
+    Route::get('/gestock/{id}/edit', [CommandeController::class, 'edit'])->name('gestock.edit');
+    Route::put('/gestock/{id}', [CommandeController::class, 'update'])->name('gestock.update');
+    Route::delete('/gestock/{id}', [CommandeController::class, 'destroy'])->name('gestock.destroy');
 
-    Route::get('/pcrenouv', [PCRenouvController::class, 'index'])->name('gestrenouv.index');
-    Route::get('/pcrenouv/create', [PCRenouvController::class, 'create'])->name('gestrenouv.create');
-    Route::post('/pcrenouv', [PCRenouvController::class, 'store'])->name('gestrenouv.store');
-    Route::get('/pcrenouv/{id}', [PCRenouvController::class, 'show'])->name('gestrenouv.show');
-    Route::get('/pcrenouv/{id}/edit', [PCRenouvController::class, 'edit'])->name('gestrenouv.edit');
-    Route::put('/pcrenouv/{id}', [PCRenouvController::class, 'update'])->name('gestrenouv.update');
-    Route::delete('/pcrenouv/{id}', [PCRenouvController::class, 'destroy'])->name('gestrenouv.destroy');
-    Route::get('/pcrenouv{id}/louer', [PCRenouvController::class, 'louer'])->name('gestrenouv.louer');
-    Route::get('/pcrenouv{id}/preter', [PCRenouvController::class, 'preter'])->name('gestrenouv.preter');
+    Route::get('/gestrenouv', [PCRenouvController::class, 'index'])->name('gestrenouv.index');
+    Route::get('/gestrenouv/create', [PCRenouvController::class, 'create'])->name('gestrenouv.create');
+    Route::post('/gestrenouv', [PCRenouvController::class, 'store'])->name('gestrenouv.store');
+    Route::get('/gestrenouv/{id}', [PCRenouvController::class, 'show'])->name('gestrenouv.show');
+    Route::get('/gestrenouv/{id}/edit', [PCRenouvController::class, 'edit'])->name('gestrenouv.edit');
+    Route::put('/gestrenouv/{id}', [PCRenouvController::class, 'update'])->name('gestrenouv.update');
+    Route::delete('/gestrenouv/{id}', [PCRenouvController::class, 'destroy'])->name('gestrenouv.destroy');
+    Route::get('/gestrenouv{id}/louer', [PCRenouvController::class, 'louer'])->name('gestrenouv.louer');
+    Route::get('/gestrenouv{id}/preter', [PCRenouvController::class, 'preter'])->name('gestrenouv.preter');
     Route::put('/gestrenouv/{id}/addLocPret', [PCRenouvController::class, 'addLocPret'])->name('gestrenouv.addLocPret');
-    Route::put('/pcrenouv/{id}/retour', [PCRenouvController::class, 'retour'])->name('gestrenouv.retour');
+    Route::put('/gestrenouv/{id}/retour', [PCRenouvController::class, 'retour'])->name('gestrenouv.retour');
 
-    Route::get('/prepatelier', [PrepAtelierController::class, 'index'])->name('prepatelier.index');
-    Route::get('/prepatelier/create', [PrepAtelierController::class, 'create'])->name('prepatelier.create');
-    Route::post('/prepatelier', [PrepAtelierController::class, 'store'])->name('prepatelier.store');
-    Route::get('/prepatelier/{id}', [PrepAtelierController::class, 'show'])->name('prepatelier.show');
-    Route::get('/prepatelier/{id}/edit', [PrepAtelierController::class, 'edit'])->name('prepatelier.edit');
-    Route::put('/prepatelier/{id}', [PrepAtelierController::class, 'update'])->name('prepatelier.update');
-    Route::delete('/prepatelier/{id}', [PrepAtelierController::class, 'destroy'])->name('prepatelier.destroy');
+    Route::get('/gestatelier', [PrepAtelierController::class, 'index'])->name('gestatelier.index');
+    Route::get('/gestatelier/create', [PrepAtelierController::class, 'create'])->name('gestatelier.create');
+    Route::post('/gestatelier', [PrepAtelierController::class, 'store'])->name('gestatelier.store');
+    Route::get('/gestatelier/{id}', [PrepAtelierController::class, 'show'])->name('gestatelier.show');
+    Route::get('/gestatelier/{id}/edit', [PrepAtelierController::class, 'edit'])->name('gestatelier.edit');
+    Route::put('/gestatelier/{id}', [PrepAtelierController::class, 'update'])->name('gestatelier.update');
+    Route::delete('/gestatelier/{id}', [PrepAtelierController::class, 'destroy'])->name('gestatelier.destroy');
 
-    Route::get('/panne', [PanneController::class, 'index'])->name('panne.index');
-    Route::get('/panne/create', [PanneController::class, 'create'])->name('panne.create');
-    Route::post('/panne', [PanneController::class, 'store'])->name('panne.store');
-    Route::get('/panne/{id}', [PanneController::class, 'show'])->name('panne.show');
-    Route::get('/panne/{id}/edit', [PanneController::class, 'edit'])->name('panne.edit');
-    Route::put('/panne/{id}', [PanneController::class, 'update'])->name('panne.update');
-    Route::delete('/panne/{id}', [PanneController::class, 'destroy'])->name('panne.destroy');
+    Route::get('/gestsav', [PanneController::class, 'index'])->name('gestsav.index');
+    Route::get('/gestsav/create', [PanneController::class, 'create'])->name('gestsav.create');
+    Route::post('/gestsav', [PanneController::class, 'store'])->name('gestsav.store');
+    Route::get('/gestsav/{id}', [PanneController::class, 'show'])->name('gestsav.show');
+    Route::get('/gestsav/{id}/edit', [PanneController::class, 'edit'])->name('gestsav.edit');
+    Route::put('/gestsav/{id}', [PanneController::class, 'update'])->name('gestsav.update');
+    Route::delete('/gestsav/{id}', [PanneController::class, 'destroy'])->name('gestsav.destroy');
 
     Route::put('/etapes/{id}/update', [EtapeController::class, 'update'])->name('etapes.update');
 
 
-    Route::get('/employe', [UserController::class, 'index'])->name('employe.index');
-    Route::get('/employe/create', [UserController::class, 'create'])->name('employe.create');    
-    Route::post('/employe', [UserController::class, 'store'])->name('employe.store');
-    Route::get('/employe/{id}', [UserController::class, 'show'])->name('employe.show');
-    Route::get('/employe/{id}/edit', [UserController::class, 'edit'])->name('employe.edit');
-    Route::put('/employe/{id}', [UserController::class, 'update'])->name('employe.update');
-    Route::delete('/employe/{id}', [UserController::class, 'destroy'])->name('employe.destroy');
+    Route::get('/gestuser', [UserController::class, 'index'])->name('gestuser.index');
+    Route::get('/gestuser/create', [UserController::class, 'create'])->name('gestuser.create');    
+    Route::post('/gestuser', [UserController::class, 'store'])->name('gestuser.store');
+    Route::get('/gestuser/{id}', [UserController::class, 'show'])->name('gestuser.show');
+    Route::get('/gestuser/{id}/edit', [UserController::class, 'edit'])->name('gestuser.edit');
+    Route::put('/gestuser/{id}', [UserController::class, 'update'])->name('gestuser.update');
+    Route::delete('/gestuser/{id}', [UserController::class, 'destroy'])->name('gestuser.destroy');
 });

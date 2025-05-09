@@ -143,7 +143,7 @@ class PanneController extends Controller
         // Log de fin de méthode
         Log::info('Fin de la méthode store', ['panne_id' => $panne->id]);
     
-        return redirect()->route('panne.index')->with('success', 'Panne créée avec succès');
+        return redirect()->route('gestsav.index')->with('success', 'Panne créée avec succès');
     }
     
     

@@ -18,7 +18,7 @@
             <p><strong>ID :</strong> {{ $prepAtelier->commande->id }}</p>
             <p><strong>Client :</strong> {{ $prepAtelier->commande->client->nom }} ({{ $prepAtelier->commande->client->code_client }})</p>
             <p><strong>Voir la commande :</strong>
-                <a href="{{ route('commande.show', ['id' => $prepAtelier->commande->id]) }}" class="text-blue-600 hover:underline">Voir la Commande</a>
+                <a href="{{ route('gestock.show', ['id' => $prepAtelier->commande->id]) }}" class="text-blue-600 hover:underline">Voir la Commande</a>
             </p>
         </div>
 
@@ -60,8 +60,8 @@
         
         <!-- Boutons -->
         <div class="flex flex-col sm:flex-row justify-between mt-8 space-y-4 sm:space-y-0">
-            <a href="{{ route('prepatelier.edit', $prepAtelier->id) }}" class="text-green-600 font-medium hover:underline">Modifier</a>
-            <a href="{{ route('prepatelier.index') }}" class="text-gray-600 hover:underline">Retour à la liste</a>
+            <a href="{{ route('gestatelier.edit', $prepAtelier->id) }}" class="text-green-600 font-medium hover:underline">Modifier</a>
+            <a href="{{ route('gestatelier.index') }}" class="text-gray-600 hover:underline">Retour à la liste</a>
         </div>
     </div>
 </div>

@@ -8,7 +8,7 @@
         console.log('Formulaire soumis');
     });
 </script>
-    <form action="{{ route('gestrenouv.addLocPret', $pcrenouv->id) }}" method="POST" class="space-y-6">
+    <form action="{{ route('gestrenouv.addLocPret', $pcrenouv->id) }}" method="POST" class="space-y-6 bg-white shadow-md rounded-lg p-6">
         @csrf
         @method('PUT')
 

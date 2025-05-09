@@ -113,22 +113,22 @@
                     @endphp
                     <p><strong>Technicien :</strong> {{ $technicien ? $technicien->prenom : '/' }} {{ $technicien ? $technicien->nom : '/' }}</p>
                         <p><strong>Voir la préparation :</strong>
-                            <a href="{{ route('prepatelier.show', $preparation->id) }}" class="text-blue-600 hover:underline">Voir la Préparation</a>
+                            <a href="{{ route('gestatelier.show', $preparation->id) }}" class="text-blue-600 hover:underline">Voir la Préparation</a>
                         </p>
                     </div>
                 </div>
             @else
                 <p>Aucune préparation liée à cette commande.</p>
                 @if($commande->client)
-                    <a href="{{ route('prepatelier.create', ['commande_id' => $commande->id]) }}" class="text-blue-600 font-medium hover:underline">Créer une Préparation</a>
+                    <a href="{{ route('gestatelier.create', ['commande_id' => $commande->id]) }}" class="text-blue-600 font-medium hover:underline">Créer une Préparation</a>
                 @endif
             @endif
         </div>
 
         <!-- Boutons -->
         <div class="flex flex-col sm:flex-row justify-between mt-8 space-y-4 sm:space-y-0">
-            <a href="{{ route('commande.edit', $commande->id) }}" class="text-green-600 font-medium hover:underline">Modifier</a>
-            <a href="{{ route('commande.index') }}" class="text-gray-600 hover:underline">Retour à la liste</a>
+            <a href="{{ route('gestock.edit', $commande->id) }}" class="text-green-600 font-medium hover:underline">Modifier</a>
+            <a href="{{ route('gestock.index') }}" class="text-gray-600 hover:underline">Retour à la liste</a>
         </div>
     </div>
 </div>

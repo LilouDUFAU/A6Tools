@@ -89,7 +89,7 @@ class PrepAtelierController extends Controller
         Log::debug('Préparation et étapes créées avec succès.');
         
         // Retourner vers la liste avec un message de succès
-        return redirect()->route('prepatelier.index')->with('success', 'Préparation créée avec succès!');
+        return redirect()->route('gestatelier.index')->with('success', 'Préparation créée avec succès!');
     }
      
                 
