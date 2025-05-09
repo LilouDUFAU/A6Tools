@@ -189,7 +189,7 @@ class PrepAtelierController extends Controller
         }
     
         // Retourner la préparation mise à jour avec un message de succès
-        return redirect()->route('prepatelier.index')->with('success', 'Préparation mise à jour avec succès!');
+        return redirect()->route('gestatelier.index')->with('success', 'Préparation mise à jour avec succès!');
     }
     
     
@@ -206,6 +206,6 @@ class PrepAtelierController extends Controller
         // Supprimer la préparation elle-même
         $prepAtelier->delete();
 
-        return redirect()->route('prepatelier.index')->with('success', 'Préparation et ses étapes associées supprimées avec succès!');
+        return redirect()->route('gestatelier.index')->with('success', 'Préparation et ses étapes associées supprimées avec succès!');
     }
 }
