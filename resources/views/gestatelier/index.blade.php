@@ -3,7 +3,9 @@
 @section('content')
 
 <div class="container mx-auto py-8 px-4 sm:px-6 lg:px-8 min-h-screen">
-    <h1 class="text-3xl font-bold mb-8 px-4 pt-10 text-gray-800 text-center sm:text-left">Gestion des Préparations Atelier</h1>
+    <h1 class="text-3xl font-bold mb-8 px-4 pt-10 text-gray-800 text-center sm:text-left">
+        Liste des Préparations Atelier ({{ $prepAteliers->count() }})
+    </h1>
 
     <div class="flex flex-col sm:flex-row justify-end items-center mb-4 px-4">
         <a href="{{ route('prepatelier.create') }}" class="bg-green-600 text-white px-6 py-3 rounded-lg shadow-md hover:bg-green-700 text-center">
