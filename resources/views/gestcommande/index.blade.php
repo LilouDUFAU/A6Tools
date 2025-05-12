@@ -141,6 +141,7 @@
         $hasAlert = isset($alerteCommandes[$c->id]);
         return [
             'id'=>$c->id,
+            'numero_commande_fournisseur'=>$c->numero_commande_fournisseur ?? 'Non défini',
             'client'=>$c->client?->code_client?:'<p class="text-red-500">Pas de client</p>',
             'fournisseur'=>$fourn,
             'lieux'=>$lieux?:'Non défini',
@@ -246,12 +247,27 @@
 const rowHTML = cmd => `
     <tr class="border-t hover:bg-gray-50">
         <td class="py-3 px-4 border border-gray-200">
-            Cmde n° ${cmd.id}
+            ${cmd.numero_commande_fournisseur}
         </td>
         <td class="py-3 px-4 border border-gray-200">${cmd.client}</td>
         <td class="py-3 px-4 border border-gray-200">${cmd.fournisseur}</td>
         <td class="py-3 px-4 border border-gray-200">
-            ${cmd.produits.map(p => `<p>${p.nom} (${p.quantite})</p>`).join('')}
+            ${cmd.produits.map(p => {
+                // Vérifie si le lien produit existe
+                if (p.lien) {
+                    return `<p>
+                        <a href="${p.lien}" 
+                           target="_blank" 
+                           class="text-blue-600 hover:underline" 
+                           title="Voir le produit chez le fournisseur">
+                            ${p.nom}
+                        </a>
+                    </p>`;
+                } else {
+                    // Si pas de lien, affichage normal
+                    return `<p>${p.nom}</p>`;
+                }
+            }).join('')}
         </td>
         <td class="py-3 px-4 border border-gray-200">${cmd.lieux}</td>
         <td class="py-3 px-4 border border-gray-200">

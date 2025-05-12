@@ -14,6 +14,11 @@
         <div class="border-l-4 border-green-600 pl-4">
             <h2 class="text-2xl font-bold text-gray-800 mb-4">Commande</h2>
 
+                <div class="mb-4">
+                    <label for="numero_commande_fournisseur" class="block text-sm font-semibold text-gray-700">* Numéro de commande fournisseur</label>
+                    <input type="text" id="numero_commande_fournisseur" name="numero_commande_fournisseur" value="{{ $commande->numero_commande_fournisseur }}" class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1">
+                </div>
+
             <div class="mb-4">
                 <label for="etat" class="block text-sm font-semibold text-gray-700">* État</label>
                 <select id="etat" name="etat" class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm   px-2 py-1" required>

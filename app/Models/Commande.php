@@ -14,6 +14,7 @@ class Commande extends Model
     //attributs de la table//
     /////////////////////////
     protected $fillable = [
+        'numero_commande_fournisseur',
         'etat',
         'urgence',
         'remarque',

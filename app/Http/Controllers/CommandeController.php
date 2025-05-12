@@ -41,10 +41,8 @@ class CommandeController extends Controller
         $commandes = Commande::with(['client', 'employe'])->get();
         $alerteCommandes = [];
         
-        Log::debug('Début de la vérification des alertes de commandes.');
         
         foreach ($commandes as $commande) {
-            Log::debug("Commande ID: {$commande->id}, Date installation prévue: {$commande->date_installation_prevue}, Délai installation: {$commande->delai_installation}");
         
             $produits = DB::table('commande_produit')
                 ->join('produits', 'commande_produit.produit_id', '=', 'produits.id')
@@ -53,7 +51,6 @@ class CommandeController extends Controller
                 ->get();
         
             foreach ($produits as $produit) {
-                Log::debug("Produit: {$produit->nom}, Date livraison fournisseur: {$produit->date_livraison_fournisseur}");
         
                 if ($commande->date_installation_prevue) {
                     $dateInstallation = Carbon::parse($commande->date_installation_prevue);
@@ -81,17 +78,13 @@ class CommandeController extends Controller
                             'dateInstallation' => $dateInstallation->format('d/m/Y'),
                             'difference' => $produit->date_livraison_fournisseur ? $dateInstallation->diffInDays($dateLivraison) : 'N/A',
                         ];
-                        Log::debug("ALERTE déclenchée pour la commande ID: {$commande->id}");
                         break;
                     }
                 } else {
                     Log::debug("Date installation prévue manquante pour commande ID: {$commande->id}");
                 }
             }
-        }
-    
-        Log::debug('Vérification terminée. Nombre d\'alertes trouvées : ' . count($alerteCommandes));
-        
+        }        
         return view('gestcommande.index', compact('commandes', 'alerteCommandes'));
     }
     
@@ -126,6 +119,7 @@ class CommandeController extends Controller
     {
         // Validation des champs de base
         $validated = $request->validate([
+            'numero_commande_fournisseur' => 'required|string|max:255',
             'etat' => 'required|string|max:255',
             'remarque' => 'nullable|string',
             'delai_installation' => 'nullable|integer',
@@ -277,6 +271,7 @@ class CommandeController extends Controller
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
+            'numero_commande_fournisseur' => 'required|string|max:255',
             'etat' => 'required|string|max:255',
             'remarque' => 'nullable|string',
             'delai_installation' => 'nullable|integer',

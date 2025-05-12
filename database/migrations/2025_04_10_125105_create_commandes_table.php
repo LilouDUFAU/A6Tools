@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('commandes', function (Blueprint $table) {
             $table->id();
+            $table->string('numero_commande_fournisseur')->unique(); // Numéro de commande fournisseur
             $table->enum('etat', ['A faire','Commandé', 'Reçu', 'Prévenu', 'Délais']); // Etat de la commande
             $table->enum('urgence', ['pas urgent', 'urgent']); // Urgence
             $table->text('remarque')->nullable(); // Remarques sur la commande
