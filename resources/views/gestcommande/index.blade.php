@@ -258,7 +258,7 @@ const rowHTML = cmd => `
             <div class="relative">
                 <select
                     data-commande-id="${cmd.id}"
-                    class="state-select appearance-none w-full pl-3 pr-10 py-2 rounded-md border focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                    class="state-select appearance-none w-full pl-3 pr-10 py-2 rounded-md border focus:outline-none ${
                         {
                             'a faire': 'border-green-600',
                             'commandé': 'border-yellow-600',
@@ -439,6 +439,8 @@ document.querySelectorAll('.state-select').forEach(select => {
     });
 });
 
+// Modifications du script précédent
+
 // Fonction pour rendre les cellules de fournisseur modifiables
 function makeSupplierEditable() {
     const supplierCells = document.querySelectorAll('.supplier-cell');
@@ -485,6 +487,11 @@ function makeSupplierEditable() {
                         
                         if (response.ok) {
                             cell.innerHTML = newValue;
+                            // Mettre à jour les données du client
+                            const cmdIndex = données.findIndex(cmd => cmd.id == commandeId);
+                            if (cmdIndex !== -1) {
+                                données[cmdIndex].fournisseur = newValue;
+                            }
                             showToast('Fournisseur mis à jour avec succès', 'success');
                         } else {
                             // Restaurer la valeur originale en cas d'erreur
@@ -513,6 +520,67 @@ function makeSupplierEditable() {
     });
 }
 
+// Fonction pour réactiver les écouteurs d'événements sur les sélecteurs d'état
+function reactivateStateSelectors() {
+    document.querySelectorAll('.state-select').forEach(select => {
+        select.addEventListener('change', async function() {
+            const commandeId = this.dataset.commandeId;
+            const newState = this.value;
+            const loadingIndicator = this.parentElement.querySelector('.loading-indicator');
+            
+            // Show loading indicator
+            loadingIndicator.classList.remove('hidden');
+            
+            try {
+                const response = await fetch(`/commandes/${commandeId}/etat`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    },
+                    body: JSON.stringify({ etat: newState })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    // Update border color based on new state
+                    const borderColors = {
+                        'a faire': 'border-green-600',
+                        'commandé': 'border-yellow-600',
+                        'reçu': 'border-amber-600',
+                        'prévenu': 'border-orange-600',
+                        'délais': 'border-red-600'
+                    };
+                    
+                    // Remove all border colors and add new one
+                    Object.values(borderColors).forEach(color => this.classList.remove(color));
+                    this.classList.add(borderColors[newState]);
+                    
+                    // Mettre à jour les données du client
+                    const cmdIndex = données.findIndex(cmd => cmd.id == commandeId);
+                    if (cmdIndex !== -1) {
+                        données[cmdIndex].etat = newState;
+                    }
+                    
+                    showToast('État mis à jour avec succès', 'success');
+                    
+                    // Update the count in state filters
+                    updateFilterCounts();
+                } else {
+                    throw new Error(data.message || 'Une erreur est survenue');
+                }
+            } catch (error) {
+                showToast(error.message, 'error');
+                // Revert select to previous value
+                this.value = this.querySelector('[selected]').value;
+            } finally {
+                loadingIndicator.classList.add('hidden');
+            }
+        });
+    });
+}
+
 // Modification de la fonction renderDefault pour ajouter la classe supplier-cell
 function renderDefault() {
     titre.textContent = 'Liste des Commandes';
@@ -527,9 +595,10 @@ function renderDefault() {
     }).join('');
     updateFilterCounts();
     makeSupplierEditable();
+    reactivateStateSelectors();
 }
 
-// Modification des autres fonctions de rendu pour préserver l'éditabilité
+// Modification des autres fonctions de rendu pour préserver l'éditabilité et les sélecteurs
 const originalRenderByArticle = renderByArticle;
 renderByArticle = function() {
     originalRenderByArticle();
@@ -542,9 +611,8 @@ renderByFournisseur = function() {
     // Ne pas ajouter l'éditabilité pour le groupement par fournisseur
 };
 
-// Appeler makeSupplierEditable après le rendu initial
+// Appeler makeSupplierEditable et reactivateStateSelectors après le rendu initial
 renderDefault();
-makeSupplierEditable();
 </script>
 
 @endsection
