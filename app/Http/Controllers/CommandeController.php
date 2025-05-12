@@ -92,7 +92,7 @@ class CommandeController extends Controller
     
         Log::debug('Vérification terminée. Nombre d\'alertes trouvées : ' . count($alerteCommandes));
         
-        return view('gestock.index', compact('commandes', 'alerteCommandes'));
+        return view('gestcommande.index', compact('commandes', 'alerteCommandes'));
     }
     
     
@@ -110,7 +110,7 @@ class CommandeController extends Controller
         $urgences = Commande::URGENCES;
         $stocks = Stock::LIEUX;
 
-        return view('gestock.create', compact('clients', 'etats', 'urgences', 'stocks', 'fournisseurs'));
+        return view('gestcommande.create', compact('clients', 'etats', 'urgences', 'stocks', 'fournisseurs'));
     }
 
     /**
@@ -212,7 +212,7 @@ class CommandeController extends Controller
             ]);
         }
 
-        return redirect()->route('gestock.index')->with('success', 'Commande créée avec succès.');
+        return redirect()->route('gestcommande.index')->with('success', 'Commande créée avec succès.');
     }
 
     /**
@@ -233,7 +233,7 @@ class CommandeController extends Controller
             'preparation'
         ])->findOrFail($id);
 
-        return view('gestock.show', compact('commande'));
+        return view('gestcommande.show', compact('commande'));
     }
 
     /**
@@ -258,7 +258,7 @@ class CommandeController extends Controller
         $etats = Commande::ETATS;
         $urgences = Commande::URGENCES;
 
-        return view('gestock.edit', compact('commande', 'clients', 'stocks', 'etats', 'urgences', 'fournisseurs', 'produits'));
+        return view('gestcommande.edit', compact('commande', 'clients', 'stocks', 'etats', 'urgences', 'fournisseurs', 'produits'));
     }
 
     /**
@@ -352,7 +352,7 @@ class CommandeController extends Controller
 
         $commande->save();
 
-        return redirect()->route('gestock.index')->with('success', 'Commande mise à jour avec succès.');
+        return redirect()->route('gestcommande.index')->with('success', 'Commande mise à jour avec succès.');
     }
 
     /**
@@ -377,6 +377,6 @@ class CommandeController extends Controller
         // Suppression de la commande
         $commande->delete();
 
-        return redirect()->route('gestock.index')->with('success', 'Commande et ses préparations associées supprimées avec succès.');
+        return redirect()->route('gestcommande.index')->with('success', 'Commande et ses préparations associées supprimées avec succès.');
     }
 }

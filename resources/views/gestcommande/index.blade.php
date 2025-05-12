@@ -12,7 +12,7 @@
         <div class="space-y-2">
             @foreach($alerteCommandes as $id => $alerte)
             <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-6 rounded-md">
-            <p><i class="fa-solid fa-circle-exclamation" style="color: #C53030;"></i> <strong> Attention</strong>, après avoir pris en compte tous les éléments pertinents (date de livraison fournisseur, délai d'installation, et date d'installation prévue), il semble que la <a href="{{ route('gestock.show', $id) }}" class="underline hover:text-red-300 font-semibold">Commande n°{{ $id }}</a> (Client : {{ $alerte['commande']->client?->code_client ?? 'Non défini' }}) présente un risque potentiel de retard. Nous vous prions de bien vouloir contacter le founisseur afin de clarifier la situation et, si nécessaire, informer le client.</p>
+            <p><i class="fa-solid fa-circle-exclamation" style="color: #C53030;"></i> <strong> Attention</strong>, après avoir pris en compte tous les éléments pertinents (date de livraison fournisseur, délai d'installation, et date d'installation prévue), il semble que la <a href="{{ route('gestcommande.show', $id) }}" class="underline hover:text-red-300 font-semibold">Commande n°{{ $id }}</a> (Client : {{ $alerte['commande']->client?->code_client ?? 'Non défini' }}) présente un risque potentiel de retard. Nous vous prions de bien vouloir contacter le founisseur afin de clarifier la situation et, si nécessaire, informer le client.</p>
             </div>
             @endforeach
         </div>
@@ -79,7 +79,7 @@
             <button id="groupByArticle" class="bg-blue-600 text-white px-6 py-3 rounded-lg shadow-md hover:bg-blue-700 w-full sm:w-auto">Grouper par Article</button>
             <button id="groupByFournisseur" class="bg-purple-600 text-white px-6 py-3 rounded-lg shadow-md hover:bg-purple-700 w-full sm:w-auto">Grouper par Fournisseur</button>
         </div>
-        <a href="{{ route('gestock.create') }}" class="bg-green-600 text-white px-6 py-3 rounded-lg shadow-md hover:bg-green-700 text-center w-full sm:w-auto">Ajouter une Commande</a>
+        <a href="{{ route('gestcommande.create') }}" class="bg-green-600 text-white px-6 py-3 rounded-lg shadow-md hover:bg-green-700 text-center w-full sm:w-auto">Ajouter une Commande</a>
     </div>
 
     <div class="bg-white shadow rounded-lg p-4 sm:p-6">
@@ -124,11 +124,11 @@
                 ->where('commande_id',$c->id)->value('fournisseurs.nom')
             : '/';
         $actions = 
-            "<form action='".route('gestock.destroy',$c->id)."' method='POST' class='inline'>".
+            "<form action='".route('gestcommande.destroy',$c->id)."' method='POST' class='inline'>".
             "<input type='hidden' name='_token' value='{$csrf}'>".
             "<input type='hidden' name='_method' value='DELETE'>".
-            "<button type='button' class='text-green-600 hover:text-green-700 font-semibold mr-2' onclick=\"window.location.href='".route('gestock.show',$c->id)."'\">Détails</button>".
-            "<button type='button' class='text-yellow-600 hover:text-yellow-700 font-semibold mr-2' onclick=\"window.location.href='".route('gestock.edit',$c->id)."'\">Modifier</button>".
+            "<button type='button' class='text-green-600 hover:text-green-700 font-semibold mr-2' onclick=\"window.location.href='".route('gestcommande.show',$c->id)."'\">Détails</button>".
+            "<button type='button' class='text-yellow-600 hover:text-yellow-700 font-semibold mr-2' onclick=\"window.location.href='".route('gestcommande.edit',$c->id)."'\">Modifier</button>".
             "<button type='button' onclick=\"openModal({$c->id})\" class='text-red-600 hover:text-red-700 font-semibold'>Supprimer</button>".
             "</form>";
         // Check if this command has an alert
@@ -157,7 +157,7 @@
         </div>
         <div class="px-4 py-2 flex justify-end space-x-4">
             <button id="cancelModal" class="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700">Annuler</button>
-            <form id="deleteForm" method="POST" action="{{ route('gestock.destroy', 0) }}">
+            <form id="deleteForm" method="POST" action="{{ route('gestcommande.destroy', 0) }}">
                 @csrf
                 @method('DELETE')
                 <button type="submit" class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700">Supprimer</button>
@@ -172,7 +172,7 @@
     const closeModal = document.getElementById('closeModal');
     const cancelModal = document.getElementById('cancelModal');
     const deleteForm = document.getElementById('deleteForm');
-    const deleteRouteTemplate = "{{ route('gestock.destroy', ':id') }}";
+    const deleteRouteTemplate = "{{ route('gestcommande.destroy', ':id') }}";
 
     function openModal(id) {
         deleteForm.action = deleteRouteTemplate.replace(':id', id);

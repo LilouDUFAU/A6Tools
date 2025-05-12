@@ -20,13 +20,13 @@ Auth::routes();
 Route::get('/home', [HomeController::class, 'index'])->name('home');
 
 Route::middleware(['auth'])->group(function () {
-    Route::get('/gestock', [CommandeController::class, 'index'])->name('gestock.index');
-    Route::get('/gestock/create', [CommandeController::class, 'create'])->name('gestock.create');
-    Route::post('/gestock', [CommandeController::class, 'store'])->name('gestock.store');
-    Route::get('/gestock/{id}', [CommandeController::class, 'show'])->name('gestock.show');
-    Route::get('/gestock/{id}/edit', [CommandeController::class, 'edit'])->name('gestock.edit');
-    Route::put('/gestock/{id}', [CommandeController::class, 'update'])->name('gestock.update');
-    Route::delete('/gestock/{id}', [CommandeController::class, 'destroy'])->name('gestock.destroy');
+    Route::get('/gestcommande', [CommandeController::class, 'index'])->name('gestcommande.index');
+    Route::get('/gestcommande/create', [CommandeController::class, 'create'])->name('gestcommande.create');
+    Route::post('/gestcommande', [CommandeController::class, 'store'])->name('gestcommande.store');
+    Route::get('/gestcommande/{id}', [CommandeController::class, 'show'])->name('gestcommande.show');
+    Route::get('/gestcommande/{id}/edit', [CommandeController::class, 'edit'])->name('gestcommande.edit');
+    Route::put('/gestcommande/{id}', [CommandeController::class, 'update'])->name('gestcommande.update');
+    Route::delete('/gestcommande/{id}', [CommandeController::class, 'destroy'])->name('gestcommande.destroy');
 
     Route::get('/gestrenouv', [PCRenouvController::class, 'index'])->name('gestrenouv.index');
     Route::get('/gestrenouv/create', [PCRenouvController::class, 'create'])->name('gestrenouv.create');

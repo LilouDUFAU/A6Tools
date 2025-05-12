@@ -25,9 +25,9 @@
                 <div class="mt-12">
                     <h2 class="text-3xl md:text-4xl font-bold text-gray-800 mb-6 lg:mb-20">Applications</h2>
                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-                        <a href="{{ route('gestock.index') }}" class="flex flex-col items-center text-gray-800 hover:text-green-600 transition">
+                        <a href="{{ route('gestcommande.index') }}" class="flex flex-col items-center text-gray-800 hover:text-green-600 transition">
                             <i class="nav-icon fas fa-box-open text-6xl mb-4"></i>
-                            <span class="text-lg md:text-xl">Gestock</span>
+                            <span class="text-lg md:text-xl">GestCommande</span>
                         </a>
                         <a href="{{ route('gestrenouv.index') }}" class="flex flex-col items-center text-gray-800 hover:text-green-600 transition">
                             <i class="nav-icon fa-solid fa-desktop text-6xl mb-4"></i>

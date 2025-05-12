@@ -4,8 +4,8 @@
         <a href="{{ route('welcome') }}" class="flex md:hidden {{ Route::is('welcome') ? 'bg-green-700 px-2 py-1 text-white font-semibold' : 'hover:bg-green-700 hover:px-2 hover:py-1 hover:text-white transition-all duration-300 hover:font-semibold' }} rounded-lg">
             <i class="fa-solid fa-house"></i> <span class="ml-2">Accueil</span>
         </a>
-        <a href="{{ route('gestock.index') }}" class="{{ Route::is('gestock.index') ? 'bg-green-700 px-2 py-1 text-white font-semibold' : 'hover:bg-green-700 hover:px-2 hover:py-1 hover:text-white transition-all duration-300 hover:font-semibold' }} rounded-lg">
-            <i class="fa-solid fa-box-open"></i> <span class="ml-2">Gestock</span>
+        <a href="{{ route('gestcommande.index') }}" class="{{ Route::is('gestcommande.index') ? 'bg-green-700 px-2 py-1 text-white font-semibold' : 'hover:bg-green-700 hover:px-2 hover:py-1 hover:text-white transition-all duration-300 hover:font-semibold' }} rounded-lg">
+            <i class="fa-solid fa-box-open"></i> <span class="ml-2">GestCommande</span>
         </a>
         <a href="{{ route('gestrenouv.index') }}" class="{{ Route::is('gestrenouv.index') ? 'bg-green-700 px-2 py-1 text-white font-semibold' : 'hover:bg-green-700 hover:px-2 hover:py-1 hover:text-white transition-all duration-300 hover:font-semibold' }} rounded-lg">
             <i class="fa-solid fa-desktop"></i> <span class="ml-2">GestRenouv</span>

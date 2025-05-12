@@ -127,8 +127,8 @@
 
         <!-- Boutons -->
         <div class="flex flex-col sm:flex-row justify-between mt-8 space-y-4 sm:space-y-0">
-            <a href="{{ route('gestock.edit', $commande->id) }}" class="text-green-600 font-medium hover:underline">Modifier</a>
-            <a href="{{ route('gestock.index') }}" class="text-gray-600 hover:underline">Retour à la liste</a>
+            <a href="{{ route('gestcommande.edit', $commande->id) }}" class="text-green-600 font-medium hover:underline">Modifier</a>
+            <a href="{{ route('gestcommande.index') }}" class="text-gray-600 hover:underline">Retour à la liste</a>
         </div>
     </div>
 </div>

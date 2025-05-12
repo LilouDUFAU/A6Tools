@@ -18,7 +18,7 @@
             <p><strong>ID :</strong> {{ $prepAtelier->commande->id }}</p>
             <p><strong>Client :</strong> {{ $prepAtelier->commande->client->nom }} ({{ $prepAtelier->commande->client->code_client }})</p>
             <p><strong>Voir la commande :</strong>
-                <a href="{{ route('gestock.show', ['id' => $prepAtelier->commande->id]) }}" class="text-blue-600 hover:underline">Voir la Commande</a>
+                <a href="{{ route('gestcommande.show', ['id' => $prepAtelier->commande->id]) }}" class="text-blue-600 hover:underline">Voir la Commande</a>
             </p>
         </div>
 
