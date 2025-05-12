@@ -127,7 +127,7 @@
                             <input type="text" id="produit_reference" name="produit[reference]" class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1">
                         </div>
                         <div class="mb-4">
-                            <label for="produit_prix_referencement" class="block text-sm font-semibold text-gray-700">Prix de réferencement</label>
+                            <label for="produit_prix_referencement" class="block text-sm font-semibold text-gray-700">Prix d'achat</label>
                             <input type="number" id="produit_prix_referencement" name="produit[prix_referencement]" step="0.01" class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1">
                         </div>
                         <div class="mb-4">
