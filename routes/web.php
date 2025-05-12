@@ -9,6 +9,7 @@ use App\Http\Controllers\PrepAtelierController;
 use App\Http\Controllers\EtapeController;
 use App\Http\Controllers\PanneController;
 use App\Http\Controllers\UserController;
+use App\Http\Middleware\IsAdmin;
 
 Route::get('/', function () {
     return view('welcome');
@@ -58,11 +59,13 @@ Route::middleware(['auth'])->group(function () {
     Route::put('/etapes/{id}/update', [EtapeController::class, 'update'])->name('etapes.update');
 
 
-    Route::get('/gestuser', [UserController::class, 'index'])->name('gestuser.index');
-    Route::get('/gestuser/create', [UserController::class, 'create'])->name('gestuser.create');    
-    Route::post('/gestuser', [UserController::class, 'store'])->name('gestuser.store');
+    Route::middleware([IsAdmin::class])->group(function () {
+        Route::get('/gestuser', [UserController::class, 'index'])->name('gestuser.index');
+        Route::get('/gestuser/create', [UserController::class, 'create'])->name('gestuser.create');    
+        Route::post('/gestuser', [UserController::class, 'store'])->name('gestuser.store');
+        Route::get('/gestuser/{id}/edit', [UserController::class, 'edit'])->name('gestuser.edit');
+        Route::put('/gestuser/{id}', [UserController::class, 'update'])->name('gestuser.update');
+        Route::delete('/gestuser/{id}', [UserController::class, 'destroy'])->name('gestuser.destroy');
+    });
     Route::get('/gestuser/{id}', [UserController::class, 'show'])->name('gestuser.show');
-    Route::get('/gestuser/{id}/edit', [UserController::class, 'edit'])->name('gestuser.edit');
-    Route::put('/gestuser/{id}', [UserController::class, 'update'])->name('gestuser.update');
-    Route::delete('/gestuser/{id}', [UserController::class, 'destroy'])->name('gestuser.destroy');
 });
