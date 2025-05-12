@@ -14,12 +14,15 @@ class Panne extends Model
     //attributs de la table//
     /////////////////////////
     protected $fillable = [
+        'numero_sav',
         'etat_client',
         'categorie_materiel',
         'categorie_panne',
         'detail_panne',
         'date_commande',
         'date_panne',
+        'demande',
+        'statut',
         'fournisseur_id',
     ];
 
@@ -30,6 +33,13 @@ class Panne extends Model
         'Ordi de prêt',
         'Échangé',
         'En attente',
+    ];
+
+    const STATUT = [
+        'Remboursement',
+        'Transit',
+        'Envoyé',
+        'Échange anticipé'
     ];
 
 

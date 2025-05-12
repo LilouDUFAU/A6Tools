@@ -15,6 +15,11 @@
             <h2 class="text-2xl font-bold text-gray-800 mb-4">Panne</h2>
 
             <div class="mb-4">
+                <label for="numero_sav" class="block text-sm font-semibold text-gray-700">Numéro SAV</label>
+                <input type="text" id="numero_sav" name="numero_sav" value="{{ old('numero_sav', $panne->numero_sav) }}" class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1">
+            </div>
+
+            <div class="mb-4">
                 <label for="date_commande" class="block text-sm font-semibold text-gray-700">Date de commande</label>
                 <input type="date" id="date_commande" name="date_commande" value="{{ old('date_commande', $panne->date_commande) }}" class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1">
             </div>
@@ -37,6 +42,21 @@
             <div class="mb-4">
                 <label for="detail_panne" class="block text-sm font-semibold text-gray-700">Détail de la panne</label>
                 <textarea id="detail_panne" name="detail_panne" rows="4" class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1">{{ old('detail_panne', $panne->detail_panne) }}</textarea>
+            </div>
+
+
+            <div class="mb-4">
+                <label for="demande" class="block text-sm font-semibold text-gray-700">Demande</label>
+                <input type="text" id="demande" name="demande" value="{{ old('demande', $panne->demande) }}" class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1">
+            </div>
+
+            <div class="mb-4">
+                <label for="statut" class="block text-sm font-semibold text-gray-700">Statut</label>
+                <select id="statut" name="statut" class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1">
+                    @foreach($statut as $statut)
+                        <option value="{{ $statut }}" {{ old('statut', $panne->statut) == $statut ? 'selected' : '' }}>{{ ucfirst($statut) }}</option>
+                    @endforeach
+                </select>
             </div>
         </div>
 
@@ -77,30 +97,6 @@
             </div>
         </div>
 
-<!-- Partie Actions -->
-<div class="border-l-4 border-green-600 pl-4">
-    <h2 class="text-2xl font-bold text-gray-800 mb-4">Actions</h2>
-    <div id="actions-container">
-        @foreach($panne->actions as $action)
-        <div class="flex space-x-2 mb-2">
-            <input
-                type="text"
-                name="actions[{{ $action->id }}]"
-                value="{{ $action->intitule }}"
-                placeholder="Action"
-                class="block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1">
-            <select name="status[{{ $action->id }}]" class="border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1">
-                @foreach ($statut as $statut_option)
-                <option value="{{ $statut_option }}" {{ $action->statut == $statut_option ? 'selected' : '' }}>{{ ucfirst($statut_option) }}</option>
-                @endforeach
-            </select>
-        </div>
-        @endforeach
-    </div>
-    <div class="text-right mt-4">
-        <button type="button" onclick="addActionField()" class="bg-green-600 text-white px-4 py-2 rounded-lg shadow hover:bg-green-700 focus:ring-2 focus:ring-green-500">Ajouter une action</button>
-    </div>
-</div>
 
         <button type="submit" class="w-full bg-green-600 text-white px-6 py-3 rounded-lg shadow hover:bg-green-700 focus:ring-2 focus:ring-green-500 flex items-center justify-center">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
@@ -114,25 +110,5 @@
 </div>
 </div>
 
-<script>
-function addActionField() {
-    const container = document.getElementById('actions-container');
-    const newActionField = document.createElement('div');
-    newActionField.className = 'flex space-x-2 mb-2';
-    newActionField.innerHTML = `
-        <input type="text" name="new_actions[]" placeholder="Nouvelle action" class="block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1">
-        <select name="new_status[]" class="border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1">
-            <option value="A faire">A faire</option>
-            <option value="En cours">En cours</option>
-            <option value="Terminé">Terminé</option>
-        </select>
-        <button type="button" onclick="removeActionField(this)" class="bg-red-600 text-white px-4 py-2 rounded-lg shadow hover:bg-red-700 focus:ring-2 focus:ring-red-500">-</button>
-    `;
-    container.appendChild(newActionField);
-}
 
-function removeActionField(button) {
-    button.parentElement.remove();
-}
-</script>
 @endsection

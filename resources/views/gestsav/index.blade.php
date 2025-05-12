@@ -21,6 +21,25 @@
         @endforeach
     </div>
 
+    <h2 class="text-2xl font-semibold px-4 py-2 text-gray-700">Répartition des pannes selon le statut</h2>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8 px-4">
+        @php
+            $statuts = [
+                'Remboursement' => 'bg-green-600 hover:bg-green-700',
+                'Transit' => 'bg-yellow-600 hover:bg-yellow-700',
+                'Envoyé' => 'bg-orange-600 hover:bg-orange-700',
+                'Échange anticipé' => 'bg-red-600 hover:bg-red-700',
+            ];
+        @endphp
+        @foreach($statuts as $statut => $classes)
+        <div class="filter-btn {{ $classes }} text-white text-center py-6 rounded-lg shadow-md cursor-pointer" data-filter="{{ strtolower($statut) }}" data-type="statut">
+            <div class="text-3xl font-bold count-display">{{ $pannes->where('statut', $statut)->count() }}</div>
+            <div class="text-lg">{{ $statut }}</div>
+        </div>
+        @endforeach
+    </div>
+
+
     <div class="flex flex-col sm:flex-row justify-between items-center mb-4 px-4 space-y-4 sm:space-y-0 sm:space-x-4">
         <button id="resetFilters" class="w-full sm:w-auto bg-gray-600 text-white px-6 py-3 rounded-lg shadow-md hover:bg-gray-700">
             Réinitialiser les filtres
@@ -36,27 +55,28 @@
             <table class="min-w-full border-collapse border border-gray-200">
                 <thead>
                     <tr class="bg-gray-100 text-left text-sm font-semibold text-gray-700">
+                        <th class="py-3 px-4 border border-gray-200">N° SAV</th>
                         <th class="py-3 px-4 border border-gray-200">Client</th>
                         <th class="py-3 px-4 border border-gray-200">Fournisseur</th>
                         <th class="py-3 px-4 border border-gray-200">Etat client</th>
+                        <th class="py-3 px-4 border border-gray-200">Demande</th>
+                        <th class="py-3 px-4 border border-gray-200">Statut</th>
                         <th class="py-3 px-4 border border-gray-200">Catégorie panne</th>
                         <th class="py-3 px-4 border border-gray-200">Date panne</th>
-                        <th class="py-3 px-4 border border-gray-200">Dernière action</th>
                         <th class="py-3 px-4 border border-gray-200">Actions</th>
                     </tr>
                 </thead>
                 <tbody id="pannes-body">
                     @foreach($pannes as $panne)
-                        <tr class="border-t hover:bg-gray-50" data-etat="{{ strtolower($panne->etat_client) }}">
+                        <tr class="border-t hover:bg-gray-50" data-etat="{{ strtolower($panne->etat_client) }}" data-statut="{{ strtolower($panne->statut) }}">
+                            <td class="py-3 px-4 border border-gray-200">{{ $panne->numero_sav }}</td>
                             <td class="py-3 px-4 border border-gray-200">{{ $panne->clients->first()->nom ?? 'N/A' }}</td>
                             <td class="py-3 px-4 border border-gray-200">{{ $panne->fournisseur->nom ?? 'N/A' }}</td>
                             <td class="py-3 px-4 border border-gray-200">{{ $panne->etat_client }}</td>
+                            <td class="py-3 px-4 border border-gray-200">{{ $panne->demande }}</td>
+                            <td class="py-3 px-4 border border-gray-200">{{ $panne->statut }}</td>
                             <td class="py-3 px-4 border border-gray-200">{{ $panne->categorie_panne }}</td>
                             <td class="py-3 px-4 border border-gray-200">{{ $panne->date_panne }}</td>
-                            <td class="py-3 px-4 border border-gray-200">
-                                {{ $panne->actions->last()->intitule ?? 'Aucune action' }} 
-                                ({{ $panne->actions->last()->statut ?? 'N/A' }})
-                            </td>
                             <td class="py-3 px-4 border border-gray-200">
                                 <div class="inline-flex space-x-2">
                                     <a href="{{ route('gestsav.show', $panne->id) }}" class="text-green-600 font-semibold hover:underline">Détails</a>
@@ -117,55 +137,75 @@
         if (e.target === modal) closeModalHandler();
     });
 </script>
+
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        let activeFilters = new Set();
+        const activeFilters = {
+            etat: new Set(),
+            statut: new Set()
+        };
+
         const pannesBody = document.getElementById('pannes-body');
         const allRows = pannesBody.querySelectorAll('tr');
 
         function updateTable() {
-            let visibleCount = 0;
             allRows.forEach(row => {
                 const etat = row.dataset.etat;
-                const shouldShow = activeFilters.size === 0 || activeFilters.has(etat);
+                const statut = row.dataset.statut;
+
+                const matchEtat = activeFilters.etat.size === 0 || activeFilters.etat.has(etat);
+                const matchStatut = activeFilters.statut.size === 0 || activeFilters.statut.has(statut);
+
+                const shouldShow = matchEtat && matchStatut;
                 row.style.display = shouldShow ? '' : 'none';
-                if (shouldShow) visibleCount++;
             });
 
-            // Update filter counts
+            // Mise à jour des compteurs (optionnel)
             document.querySelectorAll('.filter-btn').forEach(btn => {
-                const filterValue = btn.dataset.filter;
-                const count = Array.from(allRows).filter(row => 
-                    row.dataset.etat === filterValue && 
-                    (activeFilters.size === 0 || activeFilters.has(row.dataset.etat))
-                ).length;
+                const type = btn.dataset.type;
+                const value = btn.dataset.filter;
+
+                const count = Array.from(allRows).filter(row => {
+                    const rowValue = row.dataset[type];
+                    const rowEtat = row.dataset.etat;
+                    const rowStatut = row.dataset.statut;
+
+                    const matchEtat = activeFilters.etat.size === 0 || activeFilters.etat.has(rowEtat);
+                    const matchStatut = activeFilters.statut.size === 0 || activeFilters.statut.has(rowStatut);
+
+                    return rowValue === value && matchEtat && matchStatut;
+                }).length;
+
                 btn.querySelector('.count-display').textContent = count;
             });
         }
 
         document.querySelectorAll('.filter-btn').forEach(btn => {
             btn.addEventListener('click', () => {
-                const filterValue = btn.dataset.filter;
-                if (activeFilters.has(filterValue)) {
-                    activeFilters.delete(filterValue);
+                const type = btn.dataset.type;
+                const value = btn.dataset.filter;
+
+                if (activeFilters[type].has(value)) {
+                    activeFilters[type].delete(value);
                     btn.classList.remove('ring-4', 'ring-blue-500');
                 } else {
-                    activeFilters.add(filterValue);
+                    activeFilters[type].add(value);
                     btn.classList.add('ring-4', 'ring-blue-500');
                 }
+
                 updateTable();
             });
         });
 
         document.getElementById('resetFilters').addEventListener('click', () => {
-            activeFilters.clear();
+            activeFilters.etat.clear();
+            activeFilters.statut.clear();
             document.querySelectorAll('.filter-btn').forEach(btn => {
                 btn.classList.remove('ring-4', 'ring-blue-500');
             });
             updateTable();
         });
 
-        // Initial update to ensure counts are correct
         updateTable();
     });
 </script>

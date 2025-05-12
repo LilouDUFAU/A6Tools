@@ -12,6 +12,11 @@
             <h2 class="text-2xl font-bold text-gray-800 mb-4">Panne</h2>
 
             <div class="mb-4">
+                <label for="numero_sav" class="block text-sm font-semibold text-gray-700">Numéro SAV</label>
+                <p class="mt-2 text-gray-800">{{ $panne->numero_sav }}</p>
+            </div>
+
+            <div class="mb-4">
                 <label for="date_commande" class="block text-sm font-semibold text-gray-700">Date de commande</label>
                 <p class="mt-2 text-gray-800">{{ $panne->date_commande }}</p>
             </div>
@@ -34,6 +39,16 @@
             <div class="mb-4">
                 <label for="detail_panne" class="block text-sm font-semibold text-gray-700">Détail de la panne</label>
                 <p class="mt-2 text-gray-800">{{ $panne->detail_panne }}</p>
+            </div>
+
+            <div class="mb-4">
+                <label for="demande" class="block text-sm font-semibold text-gray-700">Demande</label>
+                <p class="mt-2 text-gray-800">{{ $panne->demande ?? 'Non spécifiée' }}</p>
+            </div>
+
+            <div class="mb-4">
+                <label for="statut" class="block text-sm font-semibold text-gray-700">Statut</label>
+                <p class="mt-2 text-gray-800">{{ ucfirst($panne->statut) ?? 'Non défini' }}</p>
             </div>
         </div>
 
@@ -66,44 +81,6 @@
             </div>
         </div>
 
-        <div class="border-l-4 border-green-600 pl-4 mt-6">
-            <h2 class="text-2xl font-bold text-gray-800 mb-4">Historique des Actions</h2>
-            @if($panne->actions->isNotEmpty())
-            <div class="space-y-6">
-                @foreach($panne->actions->sortBy('created_at') as $action)
-                <div class="p-4 bg-gray-100 rounded-lg shadow-md">
-                    <h3 class="text-lg font-semibold text-gray-700 justify-between flex uppercase">
-                        {{ $action->intitule }}
-                        <span class="rounded-full border px-2 py-1 text-base normal-case
-                            @if($action->statut === 'A faire') bg-red-600 bg-opacity-75 text-white 
-                            @elseif($action->statut === 'En cours') bg-yellow-600 bg-opacity-75 text-white 
-                            @elseif($action->statut === 'Terminé') bg-green-600 bg-opacity-75 text-white 
-                            @endif">
-                            {{ $action->statut }}
-                        </span>
-                    </h3>
-                    <p class="text-sm text-gray-600">
-                    <strong>Posté par :</strong>
-                    {{ $action->employe->prenom ?? 'Utilisateur' }}
-                    {{ $action->employe->nom ?? '' }}
-                    </p>
-                    <p class="text-sm text-gray-600">
-                    <strong>Créé le :</strong>
-                    {{ $action->created_at->format('d/m/Y H:i') }}
-                    </p>
-                    @if($action->updated_at->ne($action->created_at))
-                    <p class="text-sm text-gray-600">
-                        <strong>Modifié le :</strong>
-                        {{ $action->updated_at->format('d/m/Y H:i') }}
-                    </p>
-                    @endif
-                </div>
-                @endforeach
-            </div>
-            @else
-            <p class="mt-2 text-gray-800">Aucune action associée</p>
-            @endif
-        </div>
 
         <!-- Boutons -->
         <div class="flex justify-between mt-8">

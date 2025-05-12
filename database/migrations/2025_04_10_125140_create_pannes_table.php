@@ -13,6 +13,9 @@ return new class extends Migration
     {
         Schema::create('pannes', function (Blueprint $table) {
             $table->id();
+            $table->string('numero_sav')->unique(); // Numéro de SAV
+            $table->enum('statut', ['Remboursement', 'Transit', 'Envoyé', 'Échange anticipé']); // Statut de la panne
+            $table->string('demande')->nullable(); // Demande du client
             $table->enum('etat_client', ['Ordi de prêt', 'Échangé', 'En attente']); // Etat de la panne vu par le client
             $table->string('categorie_materiel'); // Catégorie du matériel concerné par la panne
             $table->string('categorie_panne'); // Catégorie de la panne
