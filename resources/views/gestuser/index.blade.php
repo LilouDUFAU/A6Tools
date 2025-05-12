@@ -105,7 +105,7 @@
                         <form action="{{ route('gestuser.destroy', $user->id) }}" method="POST">
                             @csrf
                             @method('DELETE')
-                            <button type="button" onclick="openModal({{ $user->id }})" class="text-red-600 hover:underline">Supprimer</button>
+                            <button type="button" onclick="openModal({{ $user->id }}, '{{ $user->prenom }}', '{{ $user->nom }}')" class="text-red-600 hover:underline">Supprimer</button>
                         </form>
                     </div>
                 </div>
@@ -146,7 +146,7 @@
                                 <form action="{{ route('gestuser.destroy', $user->id) }}" method="POST">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="button" onclick="event.stopPropagation(); openModal({{ $user->id }})" class="text-red-600 hover:underline">Supprimer</button>
+                                    <button type="button" onclick="event.stopPropagation(); openModal({{ $user->id }}, '{{ $user->prenom }}', '{{ $user->nom }}')" class="text-red-600 hover:underline">Supprimer</button>
                                 </form>
                             </td>
                         </tr>
@@ -165,7 +165,10 @@
             <button id="closeModal" class="text-gray-600 hover:text-gray-800">&times;</button>
         </div>
         <div class="p-4">
-            <p class="text-gray-700">Êtes-vous sûr de vouloir supprimer <strong>{{ $user->prenom ?? 'cet utilisateur' }} {{ $user->nom ?? '' }}</strong> ? Cette action est irréversible.</p>
+        <p class="text-gray-700">
+            Êtes-vous sûr de vouloir supprimer 
+            <strong id="modalUserName">cet utilisateur</strong> ? Cette action est irréversible.
+        </p>
         </div>
         <div class="px-4 py-2 flex justify-end space-x-4">
             <button id="cancelModal" class="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700">Annuler</button>
@@ -183,10 +186,12 @@
     const closeModal = document.getElementById('closeModal');
     const cancelModal = document.getElementById('cancelModal');
     const deleteForm = document.getElementById('deleteForm');
+    const modalUserName = document.getElementById('modalUserName');
     const deleteRouteTemplate = "{{ route('gestuser.destroy', ':id') }}";
 
-    function openModal(id) {
+    function openModal(id, prenom, nom) {
         deleteForm.action = deleteRouteTemplate.replace(':id', id);
+        modalUserName.textContent = `${prenom} ${nom}`;
         modal.classList.remove('hidden');
     }
 
