@@ -47,7 +47,7 @@
                     <select id="urgence" name="urgence" class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1" required>
                         <option value="">-- Sélectionner une urgence --</option>    
                         @foreach ($urgences as $urgence)
-                            <option value="{{ $urgence }}">{{ ucfirst($urgence) }}</option>
+                            <option value="{{ $urgence }}" {{ $urgence === 'pas urgent' ? 'selected' : '' }}>{{ ucfirst($urgence) }}</option>
                         @endforeach
                     </select>
                 </div>
