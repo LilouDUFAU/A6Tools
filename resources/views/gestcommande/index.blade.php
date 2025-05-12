@@ -91,6 +91,7 @@
                         <th class="py-3 px-4 border border-gray-200">N° cmde fournisseur</th>
                         <th class="py-3 px-4 border border-gray-200">Client</th>
                         <th class="py-3 px-4 border border-gray-200">Fournisseur</th>
+                        <th class="py-3 px-4 border border-gray-200">Produit</th>
                         <th class="py-3 px-4 border border-gray-200">Site</th>
                         <th class="py-3 px-4 border border-gray-200">État</th>
                         <th class="py-3 px-4 border border-gray-200">Urgence</th>
@@ -225,6 +226,7 @@
         <th class="py-3 px-4 border border-gray-200">N° cmde fournisseur</th>
         <th class="py-3 px-4 border border-gray-200">Client</th>
         <th class="py-3 px-4 border border-gray-200">Fournisseur</th>
+        <th class="py-3 px-4 border border-gray-200">Produit</th>
         <th class="py-3 px-4 border border-gray-200">Site</th>
         <th class="py-3 px-4 border border-gray-200">État</th>
         <th class="py-3 px-4 border border-gray-200">Urgence</th>
@@ -243,6 +245,9 @@
             </td>
             <td class="py-3 px-4 border border-gray-200">${cmd.client}</td>
             <td class="py-3 px-4 border border-gray-200">${cmd.fournisseur}</td>
+            <td class="py-3 px-4 border border-gray-200">
+                ${cmd.produits.map(p => `<p><a href="${p.lien_produit_fournisseur}" class="text-blue-600 hover:underline" target="_blank">Voir le produit</a></p>`).join('')}
+            </td>
             <td class="py-3 px-4 border border-gray-200">${cmd.lieux}</td>
             <td class="py-3 px-4 border border-gray-200">${cmd.etat}</td>
             <td class="py-3 px-4 border border-gray-200">${cmd.urgence}</td>
