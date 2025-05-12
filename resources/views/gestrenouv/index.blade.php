@@ -227,7 +227,7 @@
 
     const rowHTML = r => `        
         <tr class="border-t hover:bg-gray-50">
-            <td class="py-3 px-4 border border-gray-200">${r.numero_serie}</td>
+            <td class="py-3 px-4 border border-gray-200">${r.reference}</td>
             <td class="py-3 px-4 border border-gray-200">${r.numero_serie ?? '<span class="block text-center font-bold">-</span>'}</td>
             <td class="py-3 px-4 border border-gray-200">${r.code_client}</td>
             <td class="py-3 px-4 border border-gray-200">${r.lieux}</td>
