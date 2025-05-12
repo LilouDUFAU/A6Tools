@@ -26,13 +26,13 @@
             <div class="mb-4">
                 <label for="numero_serie" class="block text-gray-700 font-bold mb-2">N° série</label>
                 <input type="text" name="numero_serie" id="numero_serie"
-                    value="{{ old('numero_serie', $pcrenouv->numero_serie) }}"
+                    value="{{ old('reference', 'location-' . $pcrenouv->numero_serie) }}"
                     class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1 cursor-not-allowed"
                     required maxlength="255" readonly>
             </div>
 
             <div class="mb-4">
-                <label for="quantite" class="block text-gray-700 font-bold mb-2">Quantité</label>
+                <label for="quantite" class="block text-gray-700 font-bold mb-2">Quantité (il reste {{ $pcrenouv->quantite }} pcrenouv)</label>
                 <input type="number" name="quantite" id="quantite"
                     value=""
                     class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1"
