@@ -18,7 +18,7 @@ return new class extends Migration
             $table->text('remarque')->nullable(); // Remarques sur la commande
             $table->integer('delai_installation')->nullable(); // Date de livraison fournisseur
             $table->date('date_installation_prevue')->nullable(); // Date d'installation prévue
-            $table->string('reference_devis')->nullable(); // Référence du devis
+            $table->string('reference_devis')->unique(); // Référence du devis
             $table->unsignedBigInteger('client_id')->nullable(); // Clé étrangère vers la table clients
             $table->unsignedBigInteger('employe_id'); // Clé étrangère vers la table users
             $table->timestamps(); // created_at, updated_at
