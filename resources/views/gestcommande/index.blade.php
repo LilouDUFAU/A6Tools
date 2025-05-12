@@ -104,6 +104,11 @@
             </table>
         </div>
     </div>
+    <div id="toast" class="fixed bottom-4 right-4 hidden">
+    <div class="px-4 py-3 rounded-lg shadow-lg flex items-center space-x-2">
+        <span class="message"></span>
+    </div>
+</div>
 </div>
 
 @php
@@ -238,22 +243,49 @@
         (!activeFilters.etat.size || activeFilters.etat.has(cmd.etat)) &&
         (!activeFilters.urgence.size || activeFilters.urgence.has(cmd.urgence));
 
-    const rowHTML = cmd => `
-        <tr class="border-t hover:bg-gray-50">
-            <td class="py-3 px-4 border border-gray-200">
-                Cmde n° ${cmd.id}
-            </td>
-            <td class="py-3 px-4 border border-gray-200">${cmd.client}</td>
-            <td class="py-3 px-4 border border-gray-200">${cmd.fournisseur}</td>
-            <td class="py-3 px-4 border border-gray-200">
-                ${cmd.produits.map(p => `<p><a href="${p.lien_produit_fournisseur}" class="text-blue-600 hover:underline" target="_blank">Voir le produit</a></p>`).join('')}
-            </td>
-            <td class="py-3 px-4 border border-gray-200">${cmd.lieux}</td>
-            <td class="py-3 px-4 border border-gray-200">${cmd.etat}</td>
-            <td class="py-3 px-4 border border-gray-200">${cmd.urgence}</td>
-            <td class="py-3 px-4 border border-gray-200">${cmd.actions}</td>
-        </tr>
-    `;
+const rowHTML = cmd => `
+    <tr class="border-t hover:bg-gray-50">
+        <td class="py-3 px-4 border border-gray-200">
+            Cmde n° ${cmd.id}
+        </td>
+        <td class="py-3 px-4 border border-gray-200">${cmd.client}</td>
+        <td class="py-3 px-4 border border-gray-200">${cmd.fournisseur}</td>
+        <td class="py-3 px-4 border border-gray-200">
+            ${cmd.produits.map(p => `<p>${p.nom} (${p.quantite})</p>`).join('')}
+        </td>
+        <td class="py-3 px-4 border border-gray-200">${cmd.lieux}</td>
+        <td class="py-3 px-4 border border-gray-200">
+            <div class="relative">
+                <select
+                    data-commande-id="${cmd.id}"
+                    class="state-select appearance-none w-full pl-3 pr-10 py-2 rounded-md border focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                        {
+                            'a faire': 'border-green-600',
+                            'commandé': 'border-yellow-600',
+                            'reçu': 'border-amber-600',
+                            'prévenu': 'border-orange-600',
+                            'délais': 'border-red-600'
+                        }[cmd.etat] || ''
+                    }"
+                >
+                    ${['A faire', 'Commandé', 'Reçu', 'Prévenu', 'Délais']
+                        .map(etat => `<option value="${etat.toLowerCase()}" ${
+                            cmd.etat === etat.toLowerCase() ? 'selected' : ''
+                        }>${etat}</option>`).join('')}
+                </select>
+                <div class="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none loading-indicator hidden">
+                    <div class="animate-spin rounded-full h-5 w-5 border-b-2 border-gray-900"></div>
+                </div>
+            </div>
+        </td>
+        <td class="py-3 px-4 border border-gray-200">
+            <span class="${cmd.urgence === 'urgent' ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'} px-2 py-1 rounded">
+                ${cmd.urgence}
+            </span>
+        </td>
+        <td class="py-3 px-4 border border-gray-200">${cmd.actions}</td>
+    </tr>
+`;
 
     function renderDefault() {
         titre.textContent = 'Liste des Commandes';
@@ -338,6 +370,75 @@
     document.getElementById('groupByFournisseur').addEventListener('click', renderByFournisseur);
 
     renderDefault();
+
+
+
+
+    // Toast notification handling
+const toast = document.getElementById('toast');
+const toastContent = toast.querySelector('.message');
+
+function showToast(message, type) {
+    const bgColor = type === 'success' ? 'bg-green-600' : 'bg-red-600';
+    toast.firstElementChild.className = `px-4 py-3 rounded-lg shadow-lg flex items-center space-x-2 text-white ${bgColor}`;
+    toastContent.textContent = message;
+    toast.classList.remove('hidden');
+    setTimeout(() => toast.classList.add('hidden'), 3000);
+}
+
+// State change handling
+document.querySelectorAll('.state-select').forEach(select => {
+    select.addEventListener('change', async function() {
+        const commandeId = this.dataset.commandeId;
+        const newState = this.value;
+        const loadingIndicator = this.parentElement.querySelector('.loading-indicator');
+        
+        // Show loading indicator
+        loadingIndicator.classList.remove('hidden');
+        
+        try {
+            const response = await fetch(`/commandes/${commandeId}/etat`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                },
+                body: JSON.stringify({ etat: newState })
+            });
+            
+            const data = await response.json();
+            
+            if (response.ok) {
+                // Update border color based on new state
+                const borderColors = {
+                    'a faire': 'border-green-600',
+                    'commandé': 'border-yellow-600',
+                    'reçu': 'border-amber-600',
+                    'prévenu': 'border-orange-600',
+                    'délais': 'border-red-600'
+                };
+                
+                // Remove all border colors and add new one
+                Object.values(borderColors).forEach(color => this.classList.remove(color));
+                this.classList.add(borderColors[newState]);
+                
+                showToast('État mis à jour avec succès', 'success');
+                
+                // Update the count in state filters
+                updateFilterCounts();
+            } else {
+                throw new Error(data.message || 'Une erreur est survenue');
+            }
+        } catch (error) {
+            showToast(error.message, 'error');
+            // Revert select to previous value
+            this.value = this.querySelector('[selected]').value;
+        } finally {
+            loadingIndicator.classList.add('hidden');
+        }
+    });
+});
+
 </script>
 
 @endsection

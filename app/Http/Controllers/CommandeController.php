@@ -380,4 +380,19 @@ class CommandeController extends Controller
 
         return redirect()->route('gestcommande.index')->with('success', 'Commande et ses préparations associées supprimées avec succès.');
     }
+
+    public function updateEtat(Request $request, Commande $commande)
+    {
+        $validated = $request->validate([
+            'etat' => 'required|in:a faire,commandé,reçu,prévenu,délais'
+        ]);
+
+        $commande->update(['etat' => $validated['etat']]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'État mis à jour avec succès'
+        ]);
+    }
+
 }
