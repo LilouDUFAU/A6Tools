@@ -24,6 +24,7 @@
             @if($commande->client)
                 <p><strong>Nom :</strong> {{ $commande->client->nom }}</p>
                 <p><strong>Code client :</strong> {{ $commande->client->code_client ?? '/' }}</p>
+                <p><strong>Numéro téléphone :</strong> {{ $commande->client->numero_telephone ?? '/' }}</p>
             @else
                 <p>Aucun client associé.</p>
             @endif

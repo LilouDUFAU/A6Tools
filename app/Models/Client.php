@@ -16,6 +16,7 @@ class Client extends Model
     protected $fillable = [
         'nom',
         'code_client',
+        'numero_telephone',
     ];
     
     //////////////////////////////

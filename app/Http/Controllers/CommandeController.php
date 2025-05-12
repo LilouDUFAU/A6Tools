@@ -144,6 +144,7 @@ class CommandeController extends Controller
             $client = Client::create([
                 'nom' => $request->input('new_client.nom'),
                 'code_client' => $request->input('new_client.code_client'),
+                'numero_telephone' => $request->input('new_client.numero_telephone'),
             ]);
             $validated['client_id'] = $client->id;
         }

@@ -105,6 +105,10 @@
                         <label for="code_client" class="block text-sm font-semibold text-gray-700">Code client</label>
                         <input type="text" id="code_client" name="new_client[code_client]" class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1">
                     </div>
+                    <div class="mb-4">
+                        <label for="numero_telephone" class="block text-sm font-semibold text-gray-700">Numéro téléphone client</label>
+                        <input type="text" id="numero_telephone" name="new_client[numero_telephone]" class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1">
+                    </div>
                 </div>
 
                 <div id="selected_client" class="mb-6 p-4 bg-green-50 rounded-lg border border-green-200 hidden">

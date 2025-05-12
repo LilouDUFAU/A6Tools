@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('nom'); // Nom du client
             $table->string('code_client')->unique(); // Code client unique
+            $table->string('numero_telephone')->nullable(); // Numéro de téléphone du client
             $table->timestamps(); // created_at, updated_at
         });
     }

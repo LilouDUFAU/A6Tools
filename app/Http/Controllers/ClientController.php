@@ -56,6 +56,7 @@ class ClientController extends Controller
         $validated = $request->validate([
             'nom' => 'required|string|max:255',
             'code_client' => 'required|string|max:255|unique:clients,code_client',
+            'numero_telephone' => 'nullable|string|max:14',
         ]);
 
         // Créer un nouveau client avec les données validées
@@ -114,6 +115,7 @@ class ClientController extends Controller
         $validated = $request->validate([
             'nom' => 'required|string|max:255',
             'code_client' => 'required|string|max:255|unique:clients,code_client,' . $client->id,
+            'numero_telephone' => 'nullable|string|max:14',
         ]);
 
         // Mettre à jour le client avec les nouvelles données
