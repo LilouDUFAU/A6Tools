@@ -45,7 +45,7 @@ class PanneController extends Controller
             'detail_panne' => 'required|string',
             'etat' => 'required|in:Ordi de prêt,Échangé,En attente',
             'demande' => 'nullable|string',
-            'numero_sav' => 'string',
+            'numero_sav' => 'nullable|string',
             'statut' => 'required|in:Remboursement,Transit,Envoyé,Échange anticipé',
         ]);
     
@@ -143,7 +143,7 @@ public function update(Request $request, string $id)
 {
     // Validation des données du formulaire
     $validated = $request->validate([
-        'numero_sav' => 'string',
+        'numero_sav' => 'nullable|string',
         'date_commande' => 'nullable|date',
         'date_panne' => 'required|date',
         'categorie_materiel' => 'required|string',

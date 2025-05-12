@@ -69,7 +69,7 @@
                 <tbody id="pannes-body">
                     @foreach($pannes as $panne)
                         <tr class="border-t hover:bg-gray-50" data-etat="{{ strtolower($panne->etat_client) }}" data-statut="{{ strtolower($panne->statut) }}">
-                            <td class="py-3 px-4 border border-gray-200">{{ $panne->numero_sav }}</td>
+                            <td class="py-3 px-4 border border-gray-200 text-center font-bold">{{ $panne->numero_sav ?? '-' }}</td>
                             <td class="py-3 px-4 border border-gray-200">{{ $panne->clients->first()->nom ?? 'N/A' }}</td>
                             <td class="py-3 px-4 border border-gray-200">{{ $panne->fournisseur->nom ?? 'N/A' }}</td>
                             <td class="py-3 px-4 border border-gray-200">{{ $panne->etat_client }}</td>
