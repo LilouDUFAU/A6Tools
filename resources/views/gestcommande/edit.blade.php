@@ -15,7 +15,7 @@
             <h2 class="text-2xl font-bold text-gray-800 mb-4">Commande</h2>
 
             <div class="mb-4">
-                <label for="etat" class="block text-sm font-semibold text-gray-700">État</label>
+                <label for="etat" class="block text-sm font-semibold text-gray-700">* État</label>
                 <select id="etat" name="etat" class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm   px-2 py-1" required>
                     @foreach ($etats as $etat)
                         <option value="{{ $etat }}" @if($commande->etat === $etat) selected @endif>{{ ucfirst($etat) }}</option>
@@ -39,12 +39,12 @@
             </div>
 
             <div class="mb-4">
-                <label for="reference_devis" class="block text-sm font-semibold text-gray-700">Référence devis de la commande</label>
+                <label for="reference_devis" class="block text-sm font-semibold text-gray-700">* Référence devis de la commande</label>
                 <input type="text" id="reference_devis" name="reference_devis" value="{{ $commande->reference_devis }}" class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm   px-2 py-1">
             </div>
 
             <div class="mb-4">
-                <label for="urgence" class="block text-sm font-semibold text-gray-700">Urgence</label>
+                <label for="urgence" class="block text-sm font-semibold text-gray-700">* Urgence</label>
                 <select id="urgence" name="urgence" class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm   px-2 py-1" required>
                     @foreach ($urgences as $urgence)
                         <option value="{{ $urgence }}" @if($commande->urgence === $urgence) selected @endif>{{ ucfirst($urgence) }}</option>
@@ -57,7 +57,7 @@
         <div class="border-l-4 border-green-600 pl-4">
             <h2 class="text-2xl font-bold text-gray-800 mb-4">Magasin</h2>
             <div class="mb-4">
-                <label for="stock_id" class="block text-sm font-semibold text-gray-700">Choisir un site</label>
+                <label for="stock_id" class="block text-sm font-semibold text-gray-700">* Choisir un site</label>
                 @php
                     $stockProduitCommande = DB::table('produit_stock')
                         ->join('stocks', 'produit_stock.stock_id', '=', 'stocks.id')
@@ -79,13 +79,18 @@
             @if($commande->client)
             <div id="client-details" class="space-y-4">
             <div class="mb-4">
-                <label for="client_nom" class="block text-sm font-semibold text-gray-700">Nom du Client</label>
+                <label for="client_nom" class="block text-sm font-semibold text-gray-700">* Nom du Client</label>
                 <input type="text" id="client_nom" name="client[nom]" value="{{ $commande->client->nom ?? '' }}" class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm px-2 py-1">
             </div>
 
             <div class="mb-4">
-                <label for="client_code" class="block text-sm font-semibold text-gray-700">Code Client</label>
+                <label for="client_code" class="block text-sm font-semibold text-gray-700">* Code Client</label>
                 <input type="text" id="client_code" name="client[code_client]" value="{{ $commande->client->code_client ?? '' }}" class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm px-2 py-1">
+            </div>
+
+            <div class="mb-4">
+                <label for="numero_telephone" class="block text-sm font-semibold text-gray-700">Numéro téléphone Client</label>
+                <input type="text" id="numero_telephone" name="client[numero_telephone]" value="{{ $commande->client->numero_telephone ?? '' }}" class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm px-2 py-1">
             </div>
             </div>
             @else
@@ -100,12 +105,12 @@
             <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
                 @foreach($commande->produits as $produit)
                     <div class="mb-4">
-                        <label for="produit_nom" class="block text-sm font-semibold text-gray-700">Nom</label>
+                        <label for="produit_nom" class="block text-sm font-semibold text-gray-700">* Nom</label>
                         <input type="text" id="produit_nom" name="produit[nom]" value="{{ old('produit.nom', $produit->pivot->nom ?? $produit->nom) }}" class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm   px-2 py-1" required>
                     </div>
 
                     <div class="mb-4">
-                        <label for="produit_reference" class="block text-sm font-semibold text-gray-700">Référence produit</label>
+                        <label for="produit_reference" class="block text-sm font-semibold text-gray-700">* Référence produit</label>
                         <input type="text" id="produit_reference" name="produit[reference]" value="{{ old('produit.reference', $produit->pivot->reference ?? $produit->reference) }}" class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm   px-2 py-1">
                     </div>
 
@@ -126,7 +131,7 @@
                     
 
                     <div class="mb-4">
-                        <label for="produit_quantite_totale" class="block text-sm font-semibold text-gray-700">Quantité totale</label>
+                        <label for="produit_quantite_totale" class="block text-sm font-semibold text-gray-700">* Quantité totale</label>
                         <input type="number" id="produit_quantite_totale" name="produit[quantite_totale]" value="{{ old('produit.quantite_totale', $produit->pivot->quantite_totale ?? '') }}" class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm   px-2 py-1">
                     </div>
 
@@ -145,7 +150,7 @@
         <div class="border-l-4 border-green-600 pl-4">
             <h2 class="text-2xl font-bold text-gray-800 mb-4">Fournisseur</h2>
             <div class="mb-4">
-            <label for="fournisseur_id" class="block text-sm font-semibold text-gray-700">Fournisseur</label>
+            <label for="fournisseur_id" class="block text-sm font-semibold text-gray-700">* Choisir un fournisseur</label>
             <select id="fournisseur_id" name="fournisseur_id" class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm px-2 py-1" onchange="fetchFournisseurDetails(this.value)">
             @php
                 $selectedFournisseurId = null;
