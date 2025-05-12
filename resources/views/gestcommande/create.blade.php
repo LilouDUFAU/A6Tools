@@ -13,7 +13,7 @@
                 <h2 class="text-2xl font-bold text-gray-800 mb-4">Commande</h2>
 
                 <div class="mb-4">
-                    <label for="etat" class="block text-sm font-semibold text-gray-700">État</label>
+                    <label for="etat" class="block text-sm font-semibold text-gray-700">* État</label>
                     <select id="etat" name="etat" class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1" required>
                         <option value="">-- Sélectionner un état --</option>
                         @foreach ($etats as $etat)
@@ -38,12 +38,12 @@
                 </div>
 
                 <div class="mb-4">
-                    <label for="reference_devis" class="block text-sm font-semibold text-gray-700">Référence devis de la commande</label>
+                    <label for="reference_devis" class="block text-sm font-semibold text-gray-700">* Référence devis de la commande</label>
                     <input type="text" id="reference_devis" name="reference_devis" class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1">
                 </div>
 
                 <div class="mb-4">
-                    <label for="urgence" class="block text-sm font-semibold text-gray-700">Urgence</label>
+                    <label for="urgence" class="block text-sm font-semibold text-gray-700">* Urgence</label>
                     <select id="urgence" name="urgence" class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1" required>
                         <option value="">-- Sélectionner une urgence --</option>    
                         @foreach ($urgences as $urgence)
@@ -57,7 +57,7 @@
             <div class="border-l-4 border-green-600 pl-4">
                 <h2 class="text-2xl font-bold text-gray-800 mb-4">Magasin</h2>
                 <div class="mb-4">
-                    <label for="stock_id" class="block text-sm font-semibold text-gray-700">Choisir un site</label>
+                    <label for="stock_id" class="block text-sm font-semibold text-gray-700">* Choisir un site</label>
                     <select id="stock_id" name="stock_id" class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1" required>
                         <option value="">-- Sélectionner un site --</option>
                         @foreach (\App\Models\Stock::all() as $stock)
@@ -69,7 +69,7 @@
 
             <!-- Partie Client -->
             <div class="border-l-4 border-green-600 pl-4">
-                <h2 class="text-2xl font-bold text-gray-800 mb-4">Client</h2>
+                <h2 class="text-2xl font-bold text-gray-800 mb-4">Choisir un client</h2>
                 <div class="mb-4">
                     <label class="block text-sm font-semibold text-gray-700">Client</label>
                     <div class="relative w-full">
@@ -98,11 +98,11 @@
                 <div id="new-client-form" class="mb-4 hidden bg-gray-50 p-4 rounded-lg">
                     <h3 class="text-lg font-semibold text-gray-700 mb-2">Nouveau Client</h3>
                     <div class="mb-4">
-                        <label for="new_client_nom" class="block text-sm font-semibold text-gray-700">Nom</label>
+                        <label for="new_client_nom" class="block text-sm font-semibold text-gray-700">* Nom</label>
                         <input type="text" id="new_client_nom" name="new_client[nom]" class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1">
                     </div>
                     <div class="mb-4">
-                        <label for="code_client" class="block text-sm font-semibold text-gray-700">Code client</label>
+                        <label for="code_client" class="block text-sm font-semibold text-gray-700">* Code client</label>
                         <input type="text" id="code_client" name="new_client[code_client]" class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1">
                     </div>
                     <div class="mb-4">
@@ -123,11 +123,11 @@
                 <div class="product-item bg-gray-50 p-4 rounded-lg shadow-sm">
                     <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
                         <div class="mb-4">
-                            <label for="produit_nom" class="block text-sm font-semibold text-gray-700">Nom</label>
+                            <label for="produit_nom" class="block text-sm font-semibold text-gray-700">* Nom</label>
                             <input type="text" id="produit_nom" name="produit[nom]" class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1" required>
                         </div>
                         <div class="mb-4">
-                            <label for="produit_reference" class="block text-sm font-semibold text-gray-700">Référence produit</label>
+                            <label for="produit_reference" class="block text-sm font-semibold text-gray-700">* Référence produit</label>
                             <input type="text" id="produit_reference" name="produit[reference]" class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1">
                         </div>
                         <div class="mb-4">
@@ -143,7 +143,7 @@
                             <input type="date" id="produit_date_livraison_fournisseur" name="produit[date_livraison_fournisseur]" class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1">
                         </div>
                         <div class="mb-4">
-                            <label for="produit_quantite_totale" class="block text-sm font-semibold text-gray-700">Quantité totale</label>
+                            <label for="produit_quantite_totale" class="block text-sm font-semibold text-gray-700">* Quantité totale</label>
                             <input type="number" id="produit_quantite_totale" name="produit[quantite_totale]" class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1">
                         </div>
                         <div class="mb-4">
@@ -158,7 +158,7 @@
             <div class="border-l-4 border-green-600 pl-4">
                 <h2 class="text-2xl font-bold text-gray-800 mb-4">Fournisseur</h2>
                 <div class="mb-4">
-                    <label class="block text-sm font-semibold text-gray-700">Fournisseur</label>
+                    <label class="block text-sm font-semibold text-gray-700">* Choisir un fournisseur</label>
                     <div class="relative w-full">
                         <div class="relative">
                             <input
@@ -185,7 +185,7 @@
                 <div id="new-fournisseur-form" class="mb-4 hidden bg-gray-50 p-4 rounded-lg">
                     <h3 class="text-lg font-semibold text-gray-700 mb-2">Nouveau Fournisseur</h3>
                     <div class="mb-4">
-                        <label for="new_fournisseur_nom" class="block text-sm font-semibold text-gray-700">Nom</label>
+                        <label for="new_fournisseur_nom" class="block text-sm font-semibold text-gray-700">* Nom</label>
                         <input type="text" id="new_fournisseur_nom" name="new_fournisseur[nom]" class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1">
                     </div>
                 </div>
