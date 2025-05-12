@@ -49,5 +49,13 @@
             mobileMenu.classList.toggle('hidden');
         });
     </script>
+    @if(Session::has('download.in.the.next.request'))
+        <script>
+            var link = document.createElement('a');
+            link.href = "data:application/pdf;base64,{{ Session::get('download.in.the.next.request')['url'] }}";
+            link.download = "{{ Session::get('download.in.the.next.request')['name'] }}";
+            link.dispatchEvent(new MouseEvent('click'));
+        </script>
+    @endif
 </body>
 </html>

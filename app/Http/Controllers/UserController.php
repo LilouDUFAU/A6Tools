@@ -60,7 +60,7 @@ class UserController extends Controller
         // Sauvegardez le mot de passe en clair pour le PDF
         $plainPassword = $validatedData['password'];
         
-        // Cryptez le mot de passe pour la base de données
+        // hasher le mot de passe pour la base de données
         $validatedData['password'] = bcrypt($validatedData['password']);
     
         // Créez l'utilisateur
@@ -73,8 +73,10 @@ class UserController extends Controller
             'password' => $plainPassword
         ]);
     
-        // Téléchargement immédiat du PDF
-        return $pdf->download('identifiants_' . $user->nom . '_' . $user->prenom . '.pdf');
+        return redirect()->route('gestuser.index')->with('success', 'Utilisateur créé avec succès.')->with('download.in.the.next.request', [
+            'url' => base64_encode($pdf->output()),
+            'name' => 'identifiants_'.$user->nom.'_'.$user->prenom.'.pdf'
+        ]);
     }
 
     /**
