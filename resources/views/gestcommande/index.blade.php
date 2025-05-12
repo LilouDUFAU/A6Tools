@@ -88,7 +88,7 @@
             <table class="min-w-full bg-white shadow-md rounded-lg">
                 <thead>
                     <tr id="table-headers" class="bg-gray-100 text-left text-sm font-semibold text-gray-700">
-                        <th class="py-3 px-4 border border-gray-200">N° commande</th>
+                        <th class="py-3 px-4 border border-gray-200">N° cmde fournisseur</th>
                         <th class="py-3 px-4 border border-gray-200">Client</th>
                         <th class="py-3 px-4 border border-gray-200">Fournisseur</th>
                         <th class="py-3 px-4 border border-gray-200">Site</th>
@@ -222,7 +222,7 @@
     };
 
     const defaultHeaders = `
-        <th class="py-3 px-4 border border-gray-200">N° commande</th>
+        <th class="py-3 px-4 border border-gray-200">N° cmde fournisseur</th>
         <th class="py-3 px-4 border border-gray-200">Client</th>
         <th class="py-3 px-4 border border-gray-200">Fournisseur</th>
         <th class="py-3 px-4 border border-gray-200">Site</th>
