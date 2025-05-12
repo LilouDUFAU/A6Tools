@@ -14,6 +14,11 @@
             </div>
 
             <div class="mb-4">
+                <label for="numero_serie" class="block text-gray-700 font-bold mb-2">Numéro de série</label>
+                <input type="text" name="numero_serie" id="numero_serie" class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1" required maxlength="255">
+            </div>
+
+            <div class="mb-4">
                 <label for="quantite" class="block text-gray-700 font-bold mb-2">Quantité</label>
                 <input type="number" name="quantite" id="quantite" class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1" required>
             </div>

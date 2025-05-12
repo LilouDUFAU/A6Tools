@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('p_c_renouvs', function (Blueprint $table) {
             $table->id();
+            $table->string('numero_serie')->unique(); // Numéro de série du PCRenouv
             $table->string('reference'); // Référence du PCRenouv
             $table->integer('quantite'); // Quantité
             $table->string('caracteristiques', 5000)->nullable(); // Caractéristiques du PCRenouv

@@ -64,6 +64,7 @@
                 <thead>
                     <tr class="bg-gray-100 text-left font-semibold text-gray-700">
                         <th class="py-3 px-4 border border-gray-200">Référence</th>
+                        <th class="py-3 px-4 border border-gray-200">N° série</th>
                         <th class="py-3 px-4 border border-gray-200">Client</th>
                         <th class="py-3 px-4 border border-gray-200">Site</th>
                         <th class="py-3 px-4 border border-gray-200">Type</th>
@@ -126,6 +127,7 @@
     </form>";
         return [
             'reference' => $r->reference,
+            'numero_serie' => $r->numero_serie ?? '<span class="block text-center font-bold">-</span>',
             'code_client' => $r->clients->isNotEmpty() ? $r->clients->pluck('code_client')->join(', ') : '<span class="block text-center font-bold">-</span>',
             'lieux' => strtolower($site),
             'type' => strtolower($r->type),
@@ -225,7 +227,8 @@
 
     const rowHTML = r => `        
         <tr class="border-t hover:bg-gray-50">
-            <td class="py-3 px-4 border border-gray-200">${r.reference}</td>
+            <td class="py-3 px-4 border border-gray-200">${r.numero_serie}</td>
+            <td class="py-3 px-4 border border-gray-200">${r.numero_serie ?? '<span class="block text-center font-bold">-</span>'}</td>
             <td class="py-3 px-4 border border-gray-200">${r.code_client}</td>
             <td class="py-3 px-4 border border-gray-200">${r.lieux}</td>
             <td class="py-3 px-4 border border-gray-200">${r.type}</td>

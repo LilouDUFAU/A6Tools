@@ -14,6 +14,11 @@
         </div>
 
         <div class="mb-4">
+            <p class="text-gray-700 font-bold">Numéro de série :</p>
+            <p class="text-gray-900">{{ $pcrenouv->numero_serie }}</p>
+        </div>
+
+        <div class="mb-4">
             <p class="text-gray-700 font-bold">Quantité :</p>
             <p class="text-gray-900">{{ $pcrenouv->stocks->first()?->pivot->quantite ?? '-' }}</p>
         </div>

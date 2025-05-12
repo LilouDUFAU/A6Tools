@@ -14,6 +14,7 @@ class PCRenouv extends Model
     //attributs de la table//
     /////////////////////////
     protected $fillable = [
+        'numero_serie',
         'reference',
         'quantite',
         'caracteristiques',
