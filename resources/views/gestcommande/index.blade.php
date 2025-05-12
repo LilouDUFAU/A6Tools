@@ -439,6 +439,112 @@ document.querySelectorAll('.state-select').forEach(select => {
     });
 });
 
+// Fonction pour rendre les cellules de fournisseur modifiables
+function makeSupplierEditable() {
+    const supplierCells = document.querySelectorAll('.supplier-cell');
+    supplierCells.forEach(cell => {
+        cell.addEventListener('click', function() {
+            // Ne pas réappliquer si déjà en mode édition
+            if (this.querySelector('input')) return;
+
+            const originalText = this.textContent.trim();
+            const commandeId = this.dataset.commandeId;
+            
+            // Créer un input pour éditer
+            const input = document.createElement('input');
+            input.type = 'text';
+            input.value = originalText;
+            input.classList.add('w-full', 'px-2', 'py-1', 'border', 'rounded');
+            
+            // Sauvegarder les anciens contenus
+            const oldContent = this.innerHTML;
+            this.innerHTML = '';
+            this.appendChild(input);
+            input.focus();
+
+            // Gestion de la perte de focus (annulation ou sauvegarde)
+            input.addEventListener('blur', async function() {
+                const newValue = this.value.trim();
+                
+                // Si la valeur est différente, envoyer une requête AJAX
+                if (newValue !== originalText) {
+                    try {
+                        const response = await fetch(`/commandes/${commandeId}/fournisseur`, {
+                            method: 'PATCH',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                            },
+                            body: JSON.stringify({ 
+                                fournisseur: newValue,
+                                commande_id: commandeId 
+                            })
+                        });
+                        
+                        const data = await response.json();
+                        
+                        if (response.ok) {
+                            cell.innerHTML = newValue;
+                            showToast('Fournisseur mis à jour avec succès', 'success');
+                        } else {
+                            // Restaurer la valeur originale en cas d'erreur
+                            cell.innerHTML = originalText;
+                            showToast(data.message || 'Une erreur est survenue', 'error');
+                        }
+                    } catch (error) {
+                        cell.innerHTML = originalText;
+                        showToast('Erreur de communication', 'error');
+                    }
+                } else {
+                    // Si pas de changement, restaurer le texte original
+                    cell.innerHTML = originalText;
+                }
+            });
+
+            // Permettre la sauvegarde avec la touche Entrée
+            input.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') {
+                    this.blur(); // Déclenche l'événement blur qui gère la sauvegarde
+                } else if (e.key === 'Escape') {
+                    cell.innerHTML = originalText;
+                }
+            });
+        });
+    });
+}
+
+// Modification de la fonction renderDefault pour ajouter la classe supplier-cell
+function renderDefault() {
+    titre.textContent = 'Liste des Commandes';
+    headers.innerHTML = defaultHeaders;
+    body.innerHTML = données.filter(filtreOK).map(cmd => {
+        const rowHtml = rowHTML(cmd);
+        // Modifier le HTML pour ajouter la classe et le data attribute
+        return rowHtml.replace(
+            `<td class="py-3 px-4 border border-gray-200">${cmd.fournisseur}</td>`, 
+            `<td class="py-3 px-4 border border-gray-200 supplier-cell cursor-pointer hover:bg-gray-200" data-commande-id="${cmd.id}">${cmd.fournisseur}</td>`
+        );
+    }).join('');
+    updateFilterCounts();
+    makeSupplierEditable();
+}
+
+// Modification des autres fonctions de rendu pour préserver l'éditabilité
+const originalRenderByArticle = renderByArticle;
+renderByArticle = function() {
+    originalRenderByArticle();
+    // Ne pas ajouter l'éditabilité pour le groupement par article
+};
+
+const originalRenderByFournisseur = renderByFournisseur;
+renderByFournisseur = function() {
+    originalRenderByFournisseur();
+    // Ne pas ajouter l'éditabilité pour le groupement par fournisseur
+};
+
+// Appeler makeSupplierEditable après le rendu initial
+renderDefault();
+makeSupplierEditable();
 </script>
 
 @endsection

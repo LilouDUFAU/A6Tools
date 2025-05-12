@@ -395,4 +395,67 @@ class CommandeController extends Controller
         ]);
     }
 
+    /**
+     * Mettre à jour le fournisseur d'une commande
+     */
+    public function updateFournisseur(Request $request)
+    {
+        // Valider les données entrantes
+        $validatedData = $request->validate([
+            'fournisseur' => 'required|string|max:255',
+            'commande_id' => 'required|exists:commandes,id'
+        ]);
+
+        try {
+            // Commencer une transaction de base de données
+            DB::beginTransaction();
+
+            // Récupérer la commande
+            $commande = Commande::findOrFail($request->input('commande_id'));
+
+            // Récupérer ou créer le fournisseur
+            $fournisseur = Fournisseur::firstOrCreate(
+                ['nom' => $validatedData['fournisseur']]
+            );
+
+            // Récupérer le premier produit de la commande
+            $produit = $commande->produits->first();
+
+            if ($produit) {
+                // Supprimer les liens fournisseur-produit existants pour cette commande
+                DB::table('fournisseur_produit')
+                    ->where('commande_id', $commande->id)
+                    ->delete();
+
+                // Créer un nouveau lien fournisseur-produit
+                DB::table('fournisseur_produit')->insert([
+                    'fournisseur_id' => $fournisseur->id,
+                    'produit_id' => $produit->id,
+                    'commande_id' => $commande->id,
+                    'created_at' => now(),
+                    'updated_at' => now()
+                ]);
+            }
+
+            // Valider la transaction
+            DB::commit();
+
+            // Retourner une réponse JSON de succès
+            return response()->json([
+                'message' => 'Fournisseur mis à jour avec succès',
+                'fournisseur' => $fournisseur->nom
+            ]);
+
+        } catch (\Exception $e) {
+            // En cas d'erreur, annuler la transaction
+            DB::rollBack();
+
+            // Retourner une réponse d'erreur
+            return response()->json([
+                'message' => 'Impossible de mettre à jour le fournisseur',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
 }

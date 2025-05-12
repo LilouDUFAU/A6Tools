@@ -29,7 +29,7 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('/gestcommande/{id}', [CommandeController::class, 'destroy'])->name('gestcommande.destroy');
 
     Route::patch('/commandes/{commande}/etat', [CommandeController::class, 'updateEtat'])->name('commande.update-etat');
-
+    Route::patch('/commandes/{commande}/fournisseur', [CommandeController::class, 'updateFournisseur'])->name('commandes.update-fournisseur');
 
     Route::get('/gestrenouv', [PCRenouvController::class, 'index'])->name('gestrenouv.index');
     Route::get('/gestrenouv/create', [PCRenouvController::class, 'create'])->name('gestrenouv.create');
