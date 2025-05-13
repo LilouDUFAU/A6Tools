@@ -55,22 +55,22 @@ class CommandeController extends Controller
                 if ($commande->date_installation_prevue) {
                     $dateInstallation = Carbon::parse($commande->date_installation_prevue);
                     
-                    if ($produit->date_livraison_fournisseur) {
-                        $dateLivraison = Carbon::parse($produit->date_livraison_fournisseur);
-                        $dateLivraisonPlus7 = $dateLivraison->copy()->addDays(7);
-                        $dateLivraisonPlusDelaiPlus7 = $dateLivraison->copy()->addDays(($commande->delai_installation ?? 0) + 7);
+                    // if ($produit->date_livraison_fournisseur) {
+                    //     $dateLivraison = Carbon::parse($produit->date_livraison_fournisseur);
+                    //     $dateLivraisonPlus7 = $dateLivraison->copy()->addDays(7);
+                    //     $dateLivraisonPlusDelaiPlus7 = $dateLivraison->copy()->addDays(($commande->delai_installation ?? 0) + 7);
             
-                        $condition1 = $dateLivraisonPlus7->greaterThanOrEqualTo($dateInstallation);
-                        $condition2 = $dateLivraisonPlusDelaiPlus7->greaterThanOrEqualTo($dateInstallation);
-                    } else {
-                        $condition1 = $condition2 = false;
-                    }
+                    //     $condition1 = $dateLivraisonPlus7->greaterThanOrEqualTo($dateInstallation);
+                    //     $condition2 = $dateLivraisonPlusDelaiPlus7->greaterThanOrEqualTo($dateInstallation);
+                    // } else {
+                    //     $condition1 = $condition2 = false;
+                    // }
             
                     $condition3 = !$produit->date_livraison_fournisseur && Carbon::now()->addDays(7)->greaterThanOrEqualTo($dateInstallation);
                     $condition4 = !$produit->date_livraison_fournisseur && $commande->delai_installation &&
                                   Carbon::now()->addDays($commande->delai_installation + 7)->greaterThanOrEqualTo($dateInstallation);
             
-                    if ($condition1 || $condition2 || $condition3 || $condition4) {
+                    if ( $condition3 || $condition4) { //$condition1 || $condition2 ||
                         $alerteCommandes[$commande->id] = [
                             'commande' => $commande,
                             'produit' => $produit->nom,
