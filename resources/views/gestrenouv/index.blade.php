@@ -4,7 +4,7 @@
 <div class="container mx-auto py-8 px-4 sm:px-6 lg:px-8 min-h-screen">
     <h1 class="text-3xl font-bold mb-8 px-4 pt-10 text-gray-800">Tableau de Bord des PCRenouvs</h1>
 
-    <h2 class="text-2xl font-semibold px-2 sm:px-4 py-2 text-gray-700 ">Nombre de PCRenouv par Site</h2>
+    <h2 class="text-2xl font-semibold px-2 sm:px-4 py-2 text-gray-700">Nombre de PCRenouv par Site</h2>
     {{-- Filtres par lieu --}}
     <div class='grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 mb-8 px-2 sm:px-4'>
         @foreach(['Mont de Marsan', 'Aire sur Adour'] as $lieu)
@@ -57,10 +57,27 @@
         </div>
     </div>
 
+    {{-- Barre de recherche --}}
+    <div class="mb-6 px-4">
+        <div class="relative">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <svg class="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
+                </svg>
+            </div>
+            <input
+                type="text"
+                id="searchInput"
+                class="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 shadow-sm"
+                placeholder="Rechercher par référence ou numéro de série..."
+            >
+        </div>
+    </div>
+
     <div class="bg-white shadow rounded-lg p-4 sm:p-6">
         <h2 id="table-title" class="text-xl sm:text-2xl font-semibold text-gray-800 mb-4">Liste des PCRenouv</h2>
         <div class="overflow-x-auto">
-            <table class="min-w-full border-collapse border border-gray-200 ">
+            <table class="min-w-full border-collapse border border-gray-200">
                 <thead>
                     <tr class="bg-gray-100 text-left font-semibold text-gray-700">
                         <th class="py-3 px-4 border border-gray-200">Référence</th>
@@ -80,6 +97,28 @@
             </table>
         </div>
     </div>
+</div>
+
+<!-- Modale de confirmation de suppression -->
+<div id="delete-modal" class="fixed inset-0 z-50 hidden bg-gray-800/40 flex items-center justify-center">
+    <div class="bg-white rounded-lg shadow-lg w-11/12 sm:w-1/2 lg:w-1/3">
+        <div class="px-4 py-2 flex justify-between items-center">
+            <h3 class="text-lg font-semibold text-gray-800">Confirmation de Suppression</h3>
+            <button id="closeModal" class="text-gray-600 hover:text-gray-800">&times;</button>
+        </div>
+        <div class="p-4">
+            <p class="text-gray-700">Êtes-vous sûr de vouloir supprimer ce PC Renouvo ? Cette action est irréversible.</p>
+        </div>
+        <div class="px-4 py-2 flex justify-end space-x-4">
+            <button id="cancelModal" class="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700">Annuler</button>
+            <form id="deleteForm" method="POST" action="{{ route('gestrenouv.destroy', 0) }}">
+                @csrf
+                @method('DELETE')
+                <button type="submit" class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700">Supprimer</button>
+            </form>
+        </div>
+    </div>
+</div>
 
 @php
     $csrf = csrf_token();
@@ -131,7 +170,7 @@
             'code_client' => $r->clients->isNotEmpty() ? $r->clients->pluck('code_client')->join(', ') : '<span class="block text-center font-bold">-</span>',
             'lieux' => strtolower($site),
             'type' => strtolower($r->type),
-            'statut' => strtolower($r->statut) === 'en stock' ?  strtolower($r->statut)  : strtolower($r->statut),
+            'statut' => strtolower($r->statut),
             'quantite' => $r->quantite,
             'option' => $option,
             'actions' => $actions
@@ -139,29 +178,13 @@
     });
 @endphp
 
-<!-- Modale de confirmation de suppression -->
-<div id="delete-modal" class="fixed inset-0 z-50 hidden bg-gray-800/40 flex items-center justify-center">
-    <div class="bg-white rounded-lg shadow-lg w-11/12 sm:w-1/2 lg:w-1/3">
-        <div class="px-4 py-2 flex justify-between items-center">
-            <h3 class="text-lg font-semibold text-gray-800">Confirmation de Suppression</h3>
-            <button id="closeModal" class="text-gray-600 hover:text-gray-800" onclick="closeDeleteModal()">&times;</button>
-        </div>
-        <div class="p-4">
-            <p class="text-gray-700">Êtes-vous sûr de vouloir supprimer ce PC Renouvo ? Cette action est irréversible.</p>
-        </div>
-        <div class="px-4 py-2 flex justify-end space-x-4">
-            <button id="cancelModal" class="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700" onclick="closeDeleteModal()">Annuler</button>
-            <form id="deleteForm" method="POST" action="{{ route('gestrenouv.destroy', 0) }}">
-                @csrf
-                @method('DELETE')
-                <button type="submit" class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700">Supprimer</button>
-            </form>
-        </div>
-    </div>
-</div>
-
-
 <script>
+    const données = @json($renouvellements);
+    let activeFilters = { lieu: new Set(), type: new Set(), statut: new Set() };
+    let searchTerm = '';
+    const body = document.getElementById('pcrenouv-body');
+    const searchInput = document.getElementById('searchInput');
+
     const modal = document.getElementById('delete-modal');
     const closeModal = document.getElementById('closeModal');
     const cancelModal = document.getElementById('cancelModal');
@@ -170,10 +193,7 @@
 
     // Fonction pour ouvrir la modale de confirmation de suppression
     function openDeleteModal(id) {
-        // Met à jour l'URL du formulaire de suppression avec l'ID de l'élément à supprimer
         deleteForm.action = deleteRouteTemplate.replace(':id', id);
-        
-        // Affiche la modale
         modal.classList.remove('hidden');
     }
 
@@ -182,25 +202,17 @@
         modal.classList.add('hidden');
     }
 
-    // Ajout des écouteurs d'événements
-    closeModal.addEventListener('click', closeDeleteModal);
-    cancelModal.addEventListener('click', closeDeleteModal);
-    window.addEventListener('click', (e) => {
-        if (e.target === modal) closeDeleteModal();
-    });
-</script>
-
-<script>
-    const données = @json($renouvellements);
-    let activeFilters = { lieu: new Set(), type: new Set(), statut: new Set() };
-    const body = document.getElementById('pcrenouv-body');
-
     const calculateCount = (type, value) => {
         const filteredData = données.filter(r => {
+            const searchMatch = 
+                searchTerm === '' || 
+                r.reference.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                (r.numero_serie && r.numero_serie.toLowerCase().includes(searchTerm.toLowerCase()));
+
             const lieuMatch = !activeFilters.lieu.size || [...activeFilters.lieu].some(f => r.lieux.includes(f));
             const typeMatch = !activeFilters.type.size || activeFilters.type.has(r.type);
             const statutMatch = !activeFilters.statut.size || activeFilters.statut.has(r.statut);
-            return r.quantite > 0 && lieuMatch && typeMatch && statutMatch;
+            return r.quantite > 0 && searchMatch && lieuMatch && typeMatch && statutMatch;
         });
 
         return filteredData.filter(r => {
@@ -219,11 +231,18 @@
         });
     };
 
-    const filtreOK = r =>
-        r.quantite > 0 &&
-        (!activeFilters.lieu.size || [...activeFilters.lieu].some(f => r.lieux.includes(f))) &&
-        (!activeFilters.type.size || activeFilters.type.has(r.type)) &&
-        (!activeFilters.statut.size || activeFilters.statut.has(r.statut));
+    const filtreOK = r => {
+        const searchMatch = 
+            searchTerm === '' || 
+            r.reference.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            (r.numero_serie && r.numero_serie.toLowerCase().includes(searchTerm.toLowerCase()));
+
+        return r.quantite > 0 &&
+            searchMatch &&
+            (!activeFilters.lieu.size || [...activeFilters.lieu].some(f => r.lieux.includes(f))) &&
+            (!activeFilters.type.size || activeFilters.type.has(r.type)) &&
+            (!activeFilters.statut.size || activeFilters.statut.has(r.statut));
+    };
 
     const rowHTML = r => `        
         <tr class="border-t hover:bg-gray-50">
@@ -240,9 +259,22 @@
     `;
 
     function renderTable() {
-        body.innerHTML = données.filter(filtreOK).map(rowHTML).join('');
+        const filteredData = données.filter(filtreOK);
+        body.innerHTML = filteredData.length > 0 
+            ? filteredData.map(rowHTML).join('')
+            : `<tr><td colspan="9" class="py-4 text-center text-gray-500">Aucun résultat trouvé. Veuillez modifier votre recherche ou réinitialiser les filtres.</td></tr>`;
         updateFilterCounts();
+        
+        // Mise à jour du titre avec le nombre de résultats
+        const tableTitle = document.getElementById('table-title');
+        tableTitle.textContent = `Liste des PCRenouvs ${filteredData.length > 0 ? `(${filteredData.length})` : ''}`;
     }
+
+    // Écouteurs d'événements
+    searchInput.addEventListener('input', (e) => {
+        searchTerm = e.target.value;
+        renderTable();
+    });
 
     document.querySelectorAll('.filter-btn').forEach(btn =>
         btn.addEventListener('click', () => {
@@ -258,10 +290,20 @@
 
     document.getElementById('resetFilters').addEventListener('click', () => {
         activeFilters = { lieu: new Set(), type: new Set(), statut: new Set() };
+        searchTerm = '';
+        searchInput.value = '';
         document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('ring-4', 'ring-blue-600'));
         renderTable();
     });
 
+    // Écouteurs pour la modale
+    closeModal.addEventListener('click', closeDeleteModal);
+    cancelModal.addEventListener('click', closeDeleteModal);
+    window.addEventListener('click', (e) => {
+        if (e.target === modal) closeDeleteModal();
+    });
+
+    // Initialisation
     renderTable();
 </script>
 
