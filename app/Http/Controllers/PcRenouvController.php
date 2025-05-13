@@ -74,16 +74,45 @@ public function store(Request $request)
 
     public function show(string $id)
     {
-        $pcrenouv = PCRenouv::with(['stocks', 'clients'])->findOrFail($id);
-        return view('gestrenouv.show', compact('pcrenouv'));
+        try {
+            Log::info('Fetching PCRenouv details', ['id' => $id]);
+            
+            $pcrenouv = PCRenouv::with(['stocks', 'clients'])->findOrFail($id);
+            
+            Log::info('PCRenouv details fetched successfully', [
+                'id' => $id,
+                'reference' => $pcrenouv->reference
+            ]);
+            
+            return view('gestrenouv.show', compact('pcrenouv'));
+        } catch (\Exception $e) {
+            Log::error('Error fetching PCRenouv details', [
+                'id' => $id,
+                'error' => $e->getMessage()
+            ]);
+            return redirect()->back()->with('error', 'Erreur lors de la récupération des détails du PCRenouv: ' . $e->getMessage());
+        }
     }
 
     public function edit(string $id)
     {
-        $pcrenouv = PCRenouv::with(['stocks', 'clients'])->findOrFail($id);
-        $type = PCRenouv::TYPES;
-        $statut = PCRenouv::STATUTS;
-        return view('gestrenouv.edit', compact('pcrenouv', 'type', 'statut'));
+        try {
+            Log::info('Fetching PCRenouv for editing', ['id' => $id]);
+            
+            $pcrenouv = PCRenouv::with(['stocks', 'clients'])->findOrFail($id);
+            Log::info('PCRenouv fetched successfully', ['id' => $id, 'reference' => $pcrenouv->reference]);
+            
+            $type = PCRenouv::TYPES;
+            $statut = PCRenouv::STATUTS;
+            
+            return view('gestrenouv.edit', compact('pcrenouv', 'type', 'statut'));
+        } catch (\Exception $e) {
+            Log::error('Error fetching PCRenouv for editing', [
+                'id' => $id,
+                'error' => $e->getMessage()
+            ]);
+            return redirect()->back()->with('error', 'Erreur lors de la récupération du PCRenouv: ' . $e->getMessage());
+        }
     }
 
     public function update(Request $request, string $id)
