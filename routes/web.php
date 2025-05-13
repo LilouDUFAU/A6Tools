@@ -59,7 +59,8 @@ Route::middleware(['auth'])->group(function () {
     Route::put('/gestsav/{id}', [PanneController::class, 'update'])->name('gestsav.update');
     Route::delete('/gestsav/{id}', [PanneController::class, 'destroy'])->name('gestsav.destroy');
 
-    Route::put('/etapes/{id}/update', [EtapeController::class, 'update'])->name('etapes.update');
+    Route::post('/gestsav/{id}/update-sav', [PanneController::class, 'updateSav'])->name('gestsav.update-sav');
+
 
 
     Route::middleware([IsAdmin::class])->group(function () {

@@ -184,4 +184,19 @@ public function update(Request $request, string $id)
         $panne->delete();
         return redirect()->route('gestsav.index')->with('success', 'Panne supprimée avec succès');
     }
+
+
+    public function updateSav(Request $request, $id)
+    {
+        $request->validate([
+            'numero_sav' => 'required|string|max:255'
+        ]);
+
+        $panne = Panne::findOrFail($id);
+        $panne->update(['numero_sav' => $request->numero_sav]);
+
+        return response()->json(['success' => true]);
+    }
+
+
 }

@@ -69,7 +69,22 @@
                 <tbody id="pannes-body">
                     @foreach($pannes as $panne)
                         <tr class="border-t hover:bg-gray-50" data-etat="{{ strtolower($panne->etat_client) }}" data-statut="{{ strtolower($panne->statut) }}">
-                            <td class="py-3 px-4 border border-gray-200 text-center font-bold">{{ $panne->numero_sav ?? '-' }}</td>
+                        <td class="py-3 px-4 border border-gray-200 text-center relative group">
+                            <div class="editable-sav" 
+                                data-id="{{ $panne->id }}" 
+                                data-value="{{ $panne->numero_sav ?? '-' }}">
+                                <div class="display-value font-bold cursor-pointer p-1 rounded transition-colors duration-150 group-hover:bg-blue-50 flex items-center justify-center">
+                                    {{ $panne->numero_sav ?? '-' }}
+                                </div>
+                                <div class="edit-container hidden">
+                                    <input type="text" 
+                                        class="w-full p-1 border border-blue-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                        value="{{ $panne->numero_sav ?? '-' }}"
+                                    >
+                                    <div class="error-message hidden absolute -bottom-5 left-0 right-0 text-red-500 text-xs bg-white p-1 shadow-sm"></div>
+                                </div>
+                            </div>
+                        </td>
                             <td class="py-3 px-4 border border-gray-200">{{ $panne->clients->first()->nom ?? 'N/A' }}</td>
                             <td class="py-3 px-4 border border-gray-200">{{ $panne->fournisseur->nom ?? 'N/A' }}</td>
                             <td class="py-3 px-4 border border-gray-200">{{ $panne->etat_client }}</td>
@@ -209,5 +224,99 @@
         updateTable();
     });
 </script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.editable-sav').forEach(container => {
+        const displayValue = container.querySelector('.display-value');
+        const editContainer = container.querySelector('.edit-container');
+        const input = editContainer.querySelector('input');
+        const errorMessage = container.querySelector('.error-message');
+        
+        let isEditing = false;
+        let isSaving = false;
+        
+        function showError(message) {
+            errorMessage.textContent = message;
+            errorMessage.classList.remove('hidden');
+        }
+        
+        function hideError() {
+            errorMessage.classList.add('hidden');
+        }
+        
+        function startEditing() {
+            if (isEditing || isSaving) return;
+            
+            isEditing = true;
+            displayValue.classList.add('hidden');
+            editContainer.classList.remove('hidden');
+            input.focus();
+            input.select();
+        }
+        
+        function stopEditing() {
+            isEditing = false;
+            displayValue.classList.remove('hidden');
+            editContainer.classList.add('hidden');
+            hideError();
+        }
+        
+        async function saveChanges() {
+            if (isSaving) return;
+            
+            const newValue = input.value.trim();
+            if (newValue === '') {
+                showError('Le numéro SAV ne peut pas être vide');
+                return;
+            }
+            
+            isSaving = true;
+            try {
+                const response = await fetch(`/gestsav/${container.dataset.id}/update-sav`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                    },
+                    body: JSON.stringify({ numero_sav: newValue })
+                });
+                
+                if (!response.ok) throw new Error('Échec de la mise à jour');
+                
+                displayValue.textContent = newValue;
+                stopEditing();
+            } catch (error) {
+                showError('Une erreur est survenue');
+            } finally {
+                isSaving = false;
+            }
+        }
+        
+        displayValue.addEventListener('click', startEditing);
+        
+        input.addEventListener('blur', () => {
+            if (!isSaving) {
+                if (input.value === container.dataset.value) {
+                    stopEditing();
+                } else {
+                    saveChanges();
+                }
+            }
+        });
+        
+        input.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                saveChanges();
+            } else if (e.key === 'Escape') {
+                input.value = container.dataset.value;
+                stopEditing();
+            }
+        });
+    });
+});
+</script>
+
 
 @endsection
