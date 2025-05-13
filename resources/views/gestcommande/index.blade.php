@@ -113,7 +113,7 @@
 
 @php
     $csrf = csrf_token();
-    $commandesData = $commandes->map(function($c) use($csrf) {
+     $commandesData = $commandes->map(function($c) use($csrf) {
         $lieux = DB::table('produit_stock')
             ->join('stocks','produit_stock.stock_id','=','stocks.id')
             ->where('produit_stock.commande_id',$c->id)
@@ -121,8 +121,8 @@
         $produits = DB::table('commande_produit')
             ->join('produits','commande_produit.produit_id','=','produits.id')
             ->where('commande_produit.commande_id',$c->id)
-            ->select('produits.nom as nom','commande_produit.quantite_totale as quantite')
-            ->get()->map(fn($p)=>['nom'=>$p->nom,'quantite'=>$p->quantite]);
+            ->select('produits.nom as nom', 'produits.lien_produit_fournisseur as lien', 'commande_produit.quantite_totale as quantite')
+            ->get()->map(fn($p)=>['nom'=>$p->nom, 'lien'=>$p->lien, 'quantite'=>$p->quantite]);
         $fourn = $produits->isNotEmpty()
             ? DB::table('fournisseur_produit')
                 ->join('fournisseurs','fournisseur_produit.fournisseur_id','=','fournisseurs.id')
