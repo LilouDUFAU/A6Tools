@@ -7,6 +7,25 @@
         @csrf
         @method('PUT')
 
+        @if(isset($pcrenouv->isGroup) && $pcrenouv->isGroup)
+            <div class="bg-blue-50 border-l-4 border-blue-500 p-4 mb-6">
+                <div class="flex">
+                    <div class="flex-shrink-0">
+                        <svg class="h-5 w-5 text-blue-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+                        </svg>
+                    </div>
+                    <div class="ml-3">
+                        <p class="text-sm text-blue-700">
+                            Vous allez prêter plusieurs PC avec la référence <strong>{{ $pcrenouv->reference }}</strong>.
+                            Il y a <strong>{{ $pcrenouv->totalQuantity }}</strong> unités disponibles au total.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <input type="hidden" name="is_group" value="1">
+        @endif
+
         <div class="border-l-4 border-green-600 pl-4">
             <h2 class="text-2xl font-bold text-gray-800 mb-4">PCRenouv</h2>
 
@@ -21,17 +40,22 @@
             <div class="mb-4">
                 <label for="numero_serie" class="block text-gray-700 font-bold mb-2">N° série</label>
                 <input type="text" name="numero_serie" id="numero_serie"
-                    value="{{ old('reference', 'prêt-' . $pcrenouv->numero_serie) }}"
+                    value="{{ old('reference', isset($pcrenouv->isGroup) && $pcrenouv->isGroup ? 'prêt-multiple' : 'prêt-' . $pcrenouv->numero_serie) }}"
                     class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1 cursor-not-allowed"
                     required maxlength="255" readonly>
             </div>
 
             <div class="mb-4">
-                <label for="quantite" class="block text-gray-700 font-bold mb-2">Quantité (il reste {{ $pcrenouv->quantite }} pcrenouv)</label>
+                <label for="quantite" class="block text-gray-700 font-bold mb-2">
+                    Quantité (il reste {{ isset($pcrenouv->isGroup) && $pcrenouv->isGroup ? $pcrenouv->totalQuantity : ($pcrenouv->stocks->first()?->pivot->quantite ?? 0) }} pcrenouv)
+                </label>
                 <input type="number" name="quantite" id="quantite"
-                    value=""
+                    value="1" min="1" max="{{ isset($pcrenouv->isGroup) && $pcrenouv->isGroup ? $pcrenouv->totalQuantity : ($pcrenouv->stocks->first()?->pivot->quantite ?? 1) }}"
                     class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1"
                     required>
+                <p class="text-sm text-gray-500 mt-1">
+                    Entrez le nombre d'unités à prêter (maximum: {{ isset($pcrenouv->isGroup) && $pcrenouv->isGroup ? $pcrenouv->totalQuantity : ($pcrenouv->stocks->first()?->pivot->quantite ?? 0) }})
+                </p>
             </div>
 
             <div class="mb-4">
@@ -136,7 +160,7 @@
             <div class="mb-4">
                 <label for="date_pret" class="block text-gray-700 font-bold mb-2">Date de prêt</label>
                 <input type="date" name="date_pret" id="date_pret"
-                    value="{{ old('date_pret') }}"
+                    value="{{ old('date_pret', date('Y-m-d')) }}"
                     class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1"
                     >
             </div>
@@ -149,8 +173,6 @@
                     >
             </div>
         </div>
-
-        
 
         <div class="flex items-center justify-between">
             <button type="submit"
@@ -173,10 +195,20 @@
 <script>
     let clients = @json($clients);
     let searchTimeout;
+    
+    // Get the max quantity available (either from group or individual item)
+    const maxQuantity = {{ isset($pcrenouv->isGroup) && $pcrenouv->isGroup ? $pcrenouv->totalQuantity : ($pcrenouv->stocks->first()?->pivot->quantite ?? 0) }};
 
     function toggleNewClientForm() {
         const form = document.getElementById('new-client-form');
         form.classList.toggle('hidden');
+        
+        // Clear client_id when adding a new client
+        if (!form.classList.contains('hidden')) {
+            document.getElementById('client_id').value = '';
+            document.getElementById('client_search').value = '';
+            document.getElementById('selected_client').classList.add('hidden');
+        }
     }
 
     function highlightMatch(text, query) {
@@ -191,6 +223,18 @@
         const clientIdInput = document.getElementById('client_id');
         const selectedClientDiv = document.getElementById('selected_client');
         const selectedClientInfo = document.getElementById('selected_client_info');
+        const quantityInput = document.getElementById('quantite');
+
+        // Validate quantity
+        quantityInput.addEventListener('change', function() {
+            const val = parseInt(this.value);
+            if (val > maxQuantity) {
+                this.value = maxQuantity;
+                alert(`La quantité maximum disponible est ${maxQuantity}`);
+            } else if (val < 1) {
+                this.value = 1;
+            }
+        });
 
         searchInput.addEventListener('input', function(e) {
             clearTimeout(searchTimeout);
@@ -239,8 +283,11 @@
             clientIdInput.value = client.id;
             searchResults.classList.add('hidden');
             
-            selectedClientInfo.textContent = `${client.nom} (ID: ${client.id})`;
+            selectedClientInfo.textContent = `${client.nom} (${client.code_client || 'Pas de code'})`;
             selectedClientDiv.classList.remove('hidden');
+            
+            // Hide new client form when an existing client is selected
+            document.getElementById('new-client-form').classList.add('hidden');
         }
 
         // Close dropdown when clicking outside

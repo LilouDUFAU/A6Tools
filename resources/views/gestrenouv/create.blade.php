@@ -10,22 +10,24 @@
             <h2 class="text-2xl font-bold text-gray-800 mb-4">PCRenouv</h2>
             <div class="mb-4">
                 <label for="reference" class="block text-gray-700 font-bold mb-2">Référence</label>
-                <input type="text" name="reference" id="reference" class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1" required maxlength="255">
+                <input type="text" name="reference" id="reference" value="{{ old('reference') }}" class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1" required maxlength="255">
+                <p class="text-sm text-gray-500 mt-1">Utilisez la même référence pour regrouper plusieurs PC similaires</p>
             </div>
 
             <div class="mb-4">
                 <label for="numero_serie" class="block text-gray-700 font-bold mb-2">Numéro de série</label>
-                <input type="text" name="numero_serie" id="numero_serie" class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1" required maxlength="255">
+                <input type="text" name="numero_serie" id="numero_serie" value="{{ old('numero_serie') }}" class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1" required maxlength="255">
+                <p class="text-sm text-gray-500 mt-1">Ce numéro doit être unique pour chaque PC</p>
             </div>
 
             <div class="mb-4">
                 <label for="quantite" class="block text-gray-700 font-bold mb-2">Quantité</label>
-                <input type="number" name="quantite" id="quantite" class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1" required>
+                <input type="number" name="quantite" id="quantite" value="{{ old('quantite', 1) }}" class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1" required min="1">
             </div>
 
             <div class="mb-4">
                 <label for="caracteristiques" class="block text-gray-700 font-bold mb-2">Caractéristique</label>
-                <textarea name="caracteristiques" id="caracteristiques" class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1" rows="4" maxlength="255"></textarea>
+                <textarea name="caracteristiques" id="caracteristiques" class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1" rows="4" maxlength="255">{{ old('caracteristiques') }}</textarea>
             </div>
 
             <div class="mb-4">
@@ -33,7 +35,9 @@
                 <select id="type" name="type" class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1" required>
                     <option value="">-- Sélectionner un type --</option>
                     @foreach ($type as $typeOption)
-                        <option value="{{ $typeOption }}">{{ ucfirst($typeOption) }}</option>
+                        <option value="{{ $typeOption }}" {{ old('type') == $typeOption ? 'selected' : '' }}>
+                            {{ ucfirst($typeOption) }}
+                        </option>
                     @endforeach
                 </select>
             </div>
@@ -43,7 +47,7 @@
                 <select id="statut" name="statut" class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1" required>
                     <option value="">-- Sélectionner un statut --</option>
                     @foreach ($statut as $statutOption)
-                        <option value="{{ $statutOption }}" {{ $statutOption === 'en stock' ? 'selected' : '' }}>
+                        <option value="{{ $statutOption }}" {{ old('statut', 'en stock') == $statutOption ? 'selected' : '' }}>
                             {{ ucfirst($statutOption) }}
                         </option>
                     @endforeach
@@ -58,7 +62,9 @@
                 <select id="stock_id" name="stock_id" class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1" required>
                     <option value="">-- Sélectionner un site --</option>
                     @foreach (\App\Models\Stock::all() as $stock)
-                        <option value="{{ $stock->id }}">{{ ucfirst($stock->lieux) }}</option>
+                        <option value="{{ $stock->id }}" {{ old('stock_id') == $stock->id ? 'selected' : '' }}>
+                            {{ ucfirst($stock->lieux) }}
+                        </option>
                     @endforeach
                 </select>
             </div>

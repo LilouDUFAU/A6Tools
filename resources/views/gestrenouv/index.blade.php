@@ -10,7 +10,7 @@
         @foreach(['Mont de Marsan', 'Aire sur Adour'] as $lieu)
         <div class="filter-btn {{ $lieu === 'Mont de Marsan' ? 'bg-green-600 hover:bg-green-700 ring-blue-500' : 'bg-red-600 hover:bg-red-700 ring-blue-500' }} text-white text-center py-4 sm:py-6 rounded-lg shadow-md cursor-pointer" data-filter="{{ strtolower($lieu) }}" data-type="lieu">
             <div class="text-3xl sm:text-3xl font-bold count-display">
-                {{ $pcrenouvs->filter(fn($r) => optional($r->stocks->first())->lieux === $lieu && strtolower($r->statut) === 'en stock')->sum('quantite') }}
+                {{ $pcrenouvs->filter(fn($r) => optional($r->stocks->first())->lieux === $lieu && strtolower($r->statut) === 'en stock')->sum(function($r) { return $r->stocks->first()?->pivot->quantite ?? 0; }) }}
             </div>
             <div class="text-lg">{{ $lieu }}</div>
         </div>
@@ -23,7 +23,7 @@
         @foreach(App\Models\PCRenouv::TYPES as $type)
         <div class="filter-btn {{ $loop->index % 2 === 0 ? 'bg-green-600 hover:bg-green-700 ring-blue-500' : 'bg-red-600 hover:bg-red-700 ring-blue-500' }} text-white text-center py-4 sm:py-6 rounded-lg shadow-md cursor-pointer" data-filter="{{ strtolower($type) }}" data-type="type">
             <div class="text-3xl sm:text-3xl font-bold count-display">
-                {{ $pcrenouvs->filter(fn($r) => strtolower($r->type) === strtolower($type) && in_array(strtolower($type), ['portable', 'fixe']) && $r->quantite > 0)->sum('quantite') }}
+                {{ $pcrenouvs->filter(fn($r) => strtolower($r->type) === strtolower($type) && strtolower($r->statut) === 'en stock')->sum(function($r) { return $r->stocks->first()?->pivot->quantite ?? 0; }) }}
             </div>
             <div class="text-lg">{{ $type }}</div>
         </div>
@@ -42,7 +42,7 @@
             text-white text-center py-4 sm:py-6 rounded-lg shadow-md cursor-pointer" 
             data-filter="{{ strtolower($statut) }}" data-type="statut">
             <div class="text-3xl sm:text-3xl font-bold count-display">
-                {{ $pcrenouvs->filter(fn($r) => strtolower($r->statut) === strtolower($statut) && $r->quantite > 0)->sum('quantite') }}
+                {{ $pcrenouvs->filter(fn($r) => strtolower($r->statut) === strtolower($statut))->sum(function($r) { return $r->stocks->first()?->pivot->quantite ?? 0; }) }}
             </div>
             <div class="text-lg">{{ $statut }}</div>
         </div>
@@ -74,22 +74,20 @@
         </div>
     </div>
 
+    {{-- Affichage par référence --}}
+    <div class="mb-6 px-4">
+        <label for="groupByReference" class="flex items-center cursor-pointer">
+            <input type="checkbox" id="groupByReference" class="form-checkbox h-5 w-5 text-green-600" checked>
+            <span class="ml-2 text-gray-700">Regrouper par référence</span>
+        </label>
+    </div>
+
     <div class="bg-white shadow rounded-lg p-4 sm:p-6">
         <h2 id="table-title" class="text-xl sm:text-2xl font-semibold text-gray-800 mb-4">Liste des PCRenouv</h2>
         <div class="overflow-x-auto">
             <table class="min-w-full border-collapse border border-gray-200">
-                <thead>
-                    <tr class="bg-gray-100 text-left font-semibold text-gray-700">
-                        <th class="py-3 px-4 border border-gray-200">Référence</th>
-                        <th class="py-3 px-4 border border-gray-200">N° série</th>
-                        <th class="py-3 px-4 border border-gray-200">Client</th>
-                        <th class="py-3 px-4 border border-gray-200">Site</th>
-                        <th class="py-3 px-4 border border-gray-200">Type</th>
-                        <th class="py-3 px-4 border border-gray-200">Statut</th>
-                        <th class="py-3 px-4 border border-gray-200">Quantité</th>
-                        <th class="py-3 px-4 border border-gray-200">Options</th>
-                        <th class="py-3 px-4 border border-gray-200">Actions</th>
-                    </tr>
+                <thead id="table-header">
+                    <!-- Le contenu de l'en-tête sera généré dynamiquement par JavaScript -->
                 </thead>
                 <tbody id="pcrenouv-body">
                     {{-- Rempli par JS --}}
@@ -124,56 +122,17 @@
     $csrf = csrf_token();
     $renouvellements = $pcrenouvs->map(function($r) use($csrf) {
         $site = optional($r->stocks->first())->lieux ?? 'Non défini';
-        $louerUrl = route('gestrenouv.louer', ['id' => $r->id]);
-        $preterUrl = route('gestrenouv.preter', ['id' => $r->id]);
+        $quantity = $r->stocks->first()?->pivot->quantite ?? 0;
 
-        $isDisabled = in_array(strtolower($r->statut), ['loué', 'prêté']);
-
-        $option = "
-        <div class='inline-flex flex-wrap space-x-2'>
-            <button onclick=\"window.location.href='{$louerUrl}'\" 
-                class='" . ($isDisabled ? "text-gray-400 cursor-not-allowed" : "text-blue-600 font-semibold hover:underline") . "' 
-                " . ($isDisabled ? "disabled" : "") . ">
-                Louer
-            </button>
-
-            <button onclick=\"window.location.href='{$preterUrl}'\" 
-                class='" . ($isDisabled ? "text-gray-400 cursor-not-allowed" : "text-purple-600 font-semibold hover:underline") . "' 
-                " . ($isDisabled ? "disabled" : "") . ">
-                Prêter
-            </button>
-
-            <form action='".route('gestrenouv.retour', ['id' => $r->id])."' method='POST' id='retour-form'>
-                ".csrf_field()."
-                ".method_field('PUT')."
-                <button type='submit'
-                    ".(strtolower($r->statut) === 'en stock' ? 'disabled' : '')."
-                    class='".(strtolower($r->statut) === 'en stock'
-                        ? 'text-gray-400 cursor-not-allowed'
-                        : 'text-orange-600 font-semibold hover:underline')."'>
-                    Retour
-                </button>
-            </form>
-        </div>";
-
-        $actions = "
-    <form action='".route('gestrenouv.destroy',$r->id)."' method='POST' class='inline-flex flex-wrap space-x-2'>
-        <input type='hidden' name='_token' value='{$csrf}'>
-        <input type='hidden' name='_method' value='DELETE'>
-        <button type='button' class='text-green-600 hover:text-green-700 font-semibold mr-2' onclick=\"window.location.href='".route('gestrenouv.show',$r->id)."'\">Détails</button>
-        <button type='button' class='text-yellow-600 hover:text-yellow-700 font-semibold mr-2' onclick=\"window.location.href='".route('gestrenouv.edit',$r->id)."'\">Modifier</button>
-        <button type='button' class='text-red-600 hover:text-red-600 font-semibold' onclick='openDeleteModal({$r->id})'>Supprimer</button>
-    </form>";
         return [
+            'id' => $r->id,
             'reference' => $r->reference,
             'numero_serie' => $r->numero_serie ?? '<span class="block text-center font-bold">-</span>',
             'code_client' => $r->clients->isNotEmpty() ? $r->clients->pluck('code_client')->join(', ') : '<span class="block text-center font-bold">-</span>',
             'lieux' => strtolower($site),
             'type' => strtolower($r->type),
             'statut' => strtolower($r->statut),
-            'quantite' => $r->quantite,
-            'option' => $option,
-            'actions' => $actions
+            'quantite' => $quantity,
         ];
     });
 @endphp
@@ -182,8 +141,11 @@
     const données = @json($renouvellements);
     let activeFilters = { lieu: new Set(), type: new Set(), statut: new Set() };
     let searchTerm = '';
+    let groupByReference = true;
     const body = document.getElementById('pcrenouv-body');
+    const header = document.getElementById('table-header');
     const searchInput = document.getElementById('searchInput');
+    const groupByReferenceCheckbox = document.getElementById('groupByReference');
 
     const modal = document.getElementById('delete-modal');
     const closeModal = document.getElementById('closeModal');
@@ -244,35 +206,215 @@
             (!activeFilters.statut.size || activeFilters.statut.has(r.statut));
     };
 
-    const rowHTML = r => `        
-        <tr class="border-t hover:bg-gray-50">
-            <td class="py-3 px-4 border border-gray-200">${r.reference}</td>
-            <td class="py-3 px-4 border border-gray-200">${r.numero_serie ?? '<span class="block text-center font-bold">-</span>'}</td>
-            <td class="py-3 px-4 border border-gray-200">${r.code_client}</td>
-            <td class="py-3 px-4 border border-gray-200">${r.lieux}</td>
-            <td class="py-3 px-4 border border-gray-200">${r.type}</td>
-            <td class="py-3 px-4 border border-gray-200">${r.statut}</td>
-            <td class="py-3 px-4 border border-gray-200">${r.quantite}</td>
-            <td class="py-3 px-4 border border-gray-200">${r.option}</td>
-            <td class="py-3 px-4 border border-gray-200">${r.actions}</td>
-        </tr>
-    `;
+    // Create appropriate table header based on grouping mode
+    const createTableHeader = () => {
+        if (groupByReference) {
+            return `
+                <tr class="bg-gray-100 text-left font-semibold text-gray-700">
+                    <th class="py-3 px-4 border border-gray-200">Référence</th>
+                    <th class="py-3 px-4 border border-gray-200">Site</th>
+                    <th class="py-3 px-4 border border-gray-200">Type</th>
+                    <th class="py-3 px-4 border border-gray-200">Statut</th>
+                    <th class="py-3 px-4 border border-gray-200">Quantité</th>
+                    <th class="py-3 px-4 border border-gray-200">Options</th>
+                    <th class="py-3 px-4 border border-gray-200">Actions</th>
+                </tr>
+            `;
+        } else {
+            return `
+                <tr class="bg-gray-100 text-left font-semibold text-gray-700">
+                    <th class="py-3 px-4 border border-gray-200">Référence</th>
+                    <th class="py-3 px-4 border border-gray-200">N° série</th>
+                    <th class="py-3 px-4 border border-gray-200">Client</th>
+                    <th class="py-3 px-4 border border-gray-200">Site</th>
+                    <th class="py-3 px-4 border border-gray-200">Type</th>
+                    <th class="py-3 px-4 border border-gray-200">Statut</th>
+                    <th class="py-3 px-4 border border-gray-200">Quantité</th>
+                    <th class="py-3 px-4 border border-gray-200">Options</th>
+                    <th class="py-3 px-4 border border-gray-200">Actions</th>
+                </tr>
+            `;
+        }
+    };
+
+    // Generate an individual row for a PCRenouv
+    const generateItemRow = (r) => {
+        const louerUrl = "{{ route('gestrenouv.louer', ':id') }}".replace(':id', r.id);
+        const preterUrl = "{{ route('gestrenouv.preter', ':id') }}".replace(':id', r.id);
+        const isDisabled = r.statut !== 'en stock';
+        const canLoan = !isDisabled && r.quantite > 0;
+        
+        const option = `
+            <div class='inline-flex flex-wrap space-x-2'>
+                <button onclick="window.location.href='${louerUrl}'" 
+                    class='${canLoan ? "text-blue-600 font-semibold hover:underline" : "text-gray-400 cursor-not-allowed"}' 
+                    ${canLoan ? "" : "disabled"}>
+                    Louer
+                </button>
+                <button onclick="window.location.href='${preterUrl}'" 
+                    class='${canLoan ? "text-purple-600 font-semibold hover:underline" : "text-gray-400 cursor-not-allowed"}' 
+                    ${canLoan ? "" : "disabled"}>
+                    Prêter
+                </button>
+                <form action='{{ route("gestrenouv.retour", ":id") }}'.replace(':id', r.id) method='POST'>
+                    @csrf
+                    @method('PUT')
+                    <button type='submit'
+                        ${r.statut === 'en stock' ? 'disabled' : ''}
+                        class='${r.statut === 'en stock' ? 'text-gray-400 cursor-not-allowed' : 'text-orange-600 font-semibold hover:underline'}'>
+                        Retour
+                    </button>
+                </form>
+            </div>
+        `;
+        
+        const actions = `
+            <form action='{{ route("gestrenouv.destroy", ":id") }}'.replace(':id', r.id) method='POST' class='inline-flex flex-wrap space-x-2'>
+                @csrf
+                @method('DELETE')
+                <button type='button' class='text-green-600 hover:text-green-700 font-semibold mr-2' onclick="window.location.href='{{ route("gestrenouv.show", ":id") }}'.replace(':id', r.id)">Détails</button>
+                <button type='button' class='text-yellow-600 hover:text-yellow-700 font-semibold mr-2' onclick="window.location.href='{{ route("gestrenouv.edit", ":id") }}'.replace(':id', r.id)">Modifier</button>
+                <button type='button' class='text-red-600 hover:text-red-600 font-semibold' onclick='openDeleteModal(${r.id})'>Supprimer</button>
+            </form>
+        `;
+        
+        if (!groupByReference) {
+            return `
+                <tr class="border-t hover:bg-gray-50">
+                    <td class="py-3 px-4 border border-gray-200">${r.reference}</td>
+                    <td class="py-3 px-4 border border-gray-200">${r.numero_serie}</td>
+                    <td class="py-3 px-4 border border-gray-200">${r.code_client}</td>
+                    <td class="py-3 px-4 border border-gray-200">${r.lieux}</td>
+                    <td class="py-3 px-4 border border-gray-200">${r.type}</td>
+                    <td class="py-3 px-4 border border-gray-200">
+                        <span class="${
+                            r.statut === 'en stock' ? 'bg-green-100 text-green-800' : 
+                            r.statut === 'prêté' ? 'bg-amber-100 text-amber-800' : 
+                            'bg-red-100 text-red-800'
+                        } px-2 py-1 rounded-full text-xs font-semibold">${r.statut}</span>
+                    </td>
+                    <td class="py-3 px-4 border border-gray-200">${r.quantite}</td>
+                    <td class="py-3 px-4 border border-gray-200">${option}</td>
+                    <td class="py-3 px-4 border border-gray-200">${actions}</td>
+                </tr>
+            `;
+        }
+    };
+
+    // Generate a row for a group of PCRenouvs with the same reference
+    const generateGroupRow = (reference, items) => {
+        // Calculate total quantity and filter only in-stock items
+        const inStockItems = items.filter(r => r.statut === 'en stock');
+        const totalQuantity = inStockItems.reduce((sum, r) => sum + r.quantite, 0);
+        
+        if (totalQuantity <= 0) {
+            return ''; // Don't show groups with no in-stock items
+        }
+        
+        // Get unique sites
+        const sites = [...new Set(inStockItems.map(r => r.lieux))].join(', ');
+        
+        // Get the type (should be the same for all items in the group)
+        const type = inStockItems[0]?.type || '';
+        
+        // Only one item in the group? Use the individual row display instead
+        if (inStockItems.length === 1 && !groupByReference) {
+            return generateItemRow(inStockItems[0]);
+        }
+        
+        // Get the ID of the first item for loaning/lending actions
+        const firstItemId = inStockItems[0]?.id;
+        
+        // Build URLs with isGroup=true and reference parameters
+        const louerUrl = `{{ route('gestrenouv.louer', ':id') }}?isGroup=true&reference=${encodeURIComponent(reference)}`.replace(':id', firstItemId);
+        const preterUrl = `{{ route('gestrenouv.preter', ':id') }}?isGroup=true&reference=${encodeURIComponent(reference)}`.replace(':id', firstItemId);
+        
+        const option = `
+            <div class='inline-flex flex-wrap space-x-2'>
+                <button onclick="window.location.href='${louerUrl}'" 
+                    class='text-blue-600 font-semibold hover:underline'>
+                    Louer
+                </button>
+                <button onclick="window.location.href='${preterUrl}'" 
+                    class='text-purple-600 font-semibold hover:underline'>
+                    Prêter
+                </button>
+            </div>
+        `;
+        
+        const actions = `
+            <div class="text-center">
+                <span class="text-gray-500 text-sm">Actions sur les items individuels</span>
+            </div>
+        `;
+        
+        return `        
+            <tr class="border-t hover:bg-gray-50 bg-gray-50">
+                <td class="py-3 px-4 border border-gray-200 font-semibold">${reference}</td>
+                <td class="py-3 px-4 border border-gray-200">${sites}</td>
+                <td class="py-3 px-4 border border-gray-200">${type}</td>
+                <td class="py-3 px-4 border border-gray-200 text-center">
+                    <span class="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs font-semibold">en stock</span>
+                </td>
+                <td class="py-3 px-4 border border-gray-200 font-bold">${totalQuantity}</td>
+                <td class="py-3 px-4 border border-gray-200">${option}</td>
+                <td class="py-3 px-4 border border-gray-200">${actions}</td>
+            </tr>
+        `;
+    };
 
     function renderTable() {
-        const filteredData = données.filter(filtreOK);
-        body.innerHTML = filteredData.length > 0 
-            ? filteredData.map(rowHTML).join('')
-            : `<tr><td colspan="9" class="py-4 text-center text-gray-500">Aucun résultat trouvé. Veuillez modifier votre recherche ou réinitialiser les filtres.</td></tr>`;
+        // Create the appropriate header
+        header.innerHTML = createTableHeader();
+        
+        let filteredData = données.filter(filtreOK);
+        let tableRows = '';
+        
+        if (groupByReference) {
+            // Group by reference
+            const referenceGroups = {};
+            
+            filteredData.forEach(item => {
+                if (!referenceGroups[item.reference]) {
+                    referenceGroups[item.reference] = [];
+                }
+                referenceGroups[item.reference].push(item);
+            });
+            
+            // Convert groups to HTML rows
+            tableRows = Object.entries(referenceGroups)
+                .map(([reference, items]) => generateGroupRow(reference, items))
+                .filter(row => row) // Remove empty rows (groups with no in-stock items)
+                .join('');
+        } else {
+            // Individual items view
+            tableRows = filteredData.map(generateItemRow).join('');
+        }
+        
+        body.innerHTML = tableRows.length > 0 
+            ? tableRows
+            : `<tr><td colspan="${groupByReference ? 7 : 9}" class="py-4 text-center text-gray-500">Aucun résultat trouvé. Veuillez modifier votre recherche ou réinitialiser les filtres.</td></tr>`;
+        
         updateFilterCounts();
         
         // Mise à jour du titre avec le nombre de résultats
         const tableTitle = document.getElementById('table-title');
-        tableTitle.textContent = `Liste des PCRenouvs ${filteredData.length > 0 ? `(${filteredData.length})` : ''}`;
+        if (groupByReference) {
+            const groupCount = tableRows.split('<tr').length - 1;
+            tableTitle.textContent = `PCRenouv groupés par référence ${groupCount > 0 ? `(${groupCount} groupes)` : ''}`;
+        } else {
+            tableTitle.textContent = `Liste des PCRenouvs ${filteredData.length > 0 ? `(${filteredData.length})` : ''}`;
+        }
     }
 
     // Écouteurs d'événements
     searchInput.addEventListener('input', (e) => {
         searchTerm = e.target.value;
+        renderTable();
+    });
+
+    groupByReferenceCheckbox.addEventListener('change', (e) => {
+        groupByReference = e.target.checked;
         renderTable();
     });
 
