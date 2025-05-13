@@ -401,9 +401,9 @@
         const tableTitle = document.getElementById('table-title');
         if (groupByReference) {
             const groupCount = tableRows.split('<tr').length - 1;
-            tableTitle.textContent = `PCRenouv groupés par référence ${groupCount > 0 ? `(${groupCount} groupes)` : ''}`;
+            tableTitle.textContent = `PCRenouv groupés par référence`;
         } else {
-            tableTitle.textContent = `Liste des PCRenouvs ${filteredData.length > 0 ? `(${filteredData.length})` : ''}`;
+            tableTitle.textContent = `Liste des PCRenouvs`;
         }
     }
 
