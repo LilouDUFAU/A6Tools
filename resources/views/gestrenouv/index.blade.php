@@ -146,28 +146,31 @@
     const header = document.getElementById('table-header');
     const searchInput = document.getElementById('searchInput');
     const groupByReferenceCheckbox = document.getElementById('groupByReference');
+        const storedGroupBy = localStorage.getItem('groupByReference');
+    if (storedGroupBy !== null) {
+        groupByReference = storedGroupBy === 'true';
+        groupByReferenceCheckbox.checked = groupByReference;
+    }
 
     const modal = document.getElementById('delete-modal');
     const closeModal = document.getElementById('closeModal');
     const cancelModal = document.getElementById('cancelModal');
     const deleteForm = document.getElementById('deleteForm');
-    const deleteRouteTemplate = "{{ route('gestrenouv.destroy', ':id') }}";
+    const deleteRouteTemplate = "{{ route('gestrenouv.destroy', ['id' => 'REPLACE_ID']) }}";
 
-    // Fonction pour ouvrir la modale de confirmation de suppression
     function openDeleteModal(id) {
-        deleteForm.action = deleteRouteTemplate.replace(':id', id);
+        deleteForm.action = deleteRouteTemplate.replace('REPLACE_ID', id);
         modal.classList.remove('hidden');
     }
 
-    // Fonction pour fermer la modale
     function closeDeleteModal() {
         modal.classList.add('hidden');
     }
 
     const calculateCount = (type, value) => {
         const filteredData = données.filter(r => {
-            const searchMatch = 
-                searchTerm === '' || 
+            const searchMatch =
+                searchTerm === '' ||
                 r.reference.toLowerCase().includes(searchTerm.toLowerCase()) ||
                 (r.numero_serie && r.numero_serie.toLowerCase().includes(searchTerm.toLowerCase()));
 
@@ -194,8 +197,8 @@
     };
 
     const filtreOK = r => {
-        const searchMatch = 
-            searchTerm === '' || 
+        const searchMatch =
+            searchTerm === '' ||
             r.reference.toLowerCase().includes(searchTerm.toLowerCase()) ||
             (r.numero_serie && r.numero_serie.toLowerCase().includes(searchTerm.toLowerCase()));
 
@@ -206,7 +209,6 @@
             (!activeFilters.statut.size || activeFilters.statut.has(r.statut));
     };
 
-    // Create appropriate table header based on grouping mode
     const createTableHeader = () => {
         if (groupByReference) {
             return `
@@ -237,29 +239,31 @@
         }
     };
 
-    // Generate an individual row for a PCRenouv
     const generateItemRow = (r) => {
-        const louerUrl = "{{ route('gestrenouv.louer', ':id') }}".replace(':id', r.id);
-        const preterUrl = "{{ route('gestrenouv.preter', ':id') }}".replace(':id', r.id);
+        const louerUrl = `{{ route('gestrenouv.louer', ['id' => 'REPLACE_ID']) }}`.replace('REPLACE_ID', r.id);
+        const preterUrl = `{{ route('gestrenouv.preter', ['id' => 'REPLACE_ID']) }}`.replace('REPLACE_ID', r.id);
+        const retourUrl = `{{ route('gestrenouv.retour', ['id' => 'REPLACE_ID']) }}`.replace('REPLACE_ID', r.id);
+        const showUrl = `{{ route('gestrenouv.show', ['id' => 'REPLACE_ID']) }}`.replace('REPLACE_ID', r.id);
+        const editUrl = `{{ route('gestrenouv.edit', ['id' => 'REPLACE_ID']) }}`.replace('REPLACE_ID', r.id);
         const isDisabled = r.statut !== 'en stock';
         const canLoan = !isDisabled && r.quantite > 0;
-        
+
         const option = `
             <div class='inline-flex flex-wrap space-x-2'>
-                <button onclick="window.location.href='${louerUrl}'" 
-                    class='${canLoan ? "text-blue-600 font-semibold hover:underline" : "text-gray-400 cursor-not-allowed"}' 
+                <button onclick="window.location.href='${louerUrl}'"
+                    class='${canLoan ? "text-blue-600 font-semibold hover:underline" : "text-gray-400 cursor-not-allowed"}'
                     ${canLoan ? "" : "disabled"}>
                     Louer
                 </button>
-                <button onclick="window.location.href='${preterUrl}'" 
-                    class='${canLoan ? "text-purple-600 font-semibold hover:underline" : "text-gray-400 cursor-not-allowed"}' 
+                <button onclick="window.location.href='${preterUrl}'"
+                    class='${canLoan ? "text-purple-600 font-semibold hover:underline" : "text-gray-400 cursor-not-allowed"}'
                     ${canLoan ? "" : "disabled"}>
                     Prêter
                 </button>
-                <form action='{{ route("gestrenouv.retour", ":id") }}'.replace(':id', r.id) method='POST'>
+                <form action="${retourUrl}" method="POST">
                     @csrf
                     @method('PUT')
-                    <button type='submit'
+                    <button type="submit"
                         ${r.statut === 'en stock' ? 'disabled' : ''}
                         class='${r.statut === 'en stock' ? 'text-gray-400 cursor-not-allowed' : 'text-orange-600 font-semibold hover:underline'}'>
                         Retour
@@ -267,17 +271,17 @@
                 </form>
             </div>
         `;
-        
+
         const actions = `
-            <form action='{{ route("gestrenouv.destroy", ":id") }}'.replace(':id', r.id) method='POST' class='inline-flex flex-wrap space-x-2'>
+            <form method='POST' class='inline-flex flex-wrap space-x-2'>
                 @csrf
                 @method('DELETE')
-                <button type='button' class='text-green-600 hover:text-green-700 font-semibold mr-2' onclick="window.location.href='{{ route("gestrenouv.show", ":id") }}'.replace(':id', r.id)">Détails</button>
-                <button type='button' class='text-yellow-600 hover:text-yellow-700 font-semibold mr-2' onclick="window.location.href='{{ route("gestrenouv.edit", ":id") }}'.replace(':id', r.id)">Modifier</button>
+                <button type='button' class='text-green-600 hover:text-green-700 font-semibold mr-2' onclick="window.location.href='${showUrl}'">Détails</button>
+                <button type='button' class='text-yellow-600 hover:text-yellow-700 font-semibold mr-2' onclick="window.location.href='${editUrl}'">Modifier</button>
                 <button type='button' class='text-red-600 hover:text-red-600 font-semibold' onclick='openDeleteModal(${r.id})'>Supprimer</button>
             </form>
         `;
-        
+
         if (!groupByReference) {
             return `
                 <tr class="border-t hover:bg-gray-50">
@@ -288,8 +292,8 @@
                     <td class="py-3 px-4 border border-gray-200">${r.type}</td>
                     <td class="py-3 px-4 border border-gray-200">
                         <span class="${
-                            r.statut === 'en stock' ? 'bg-green-100 text-green-800' : 
-                            r.statut === 'prêté' ? 'bg-amber-100 text-amber-800' : 
+                            r.statut === 'en stock' ? 'bg-green-100 text-green-800' :
+                            r.statut === 'prêté' ? 'bg-amber-100 text-amber-800' :
                             'bg-red-100 text-red-800'
                         } px-2 py-1 rounded-full text-xs font-semibold">${r.statut}</span>
                     </td>
@@ -301,113 +305,78 @@
         }
     };
 
-    // Generate a row for a group of PCRenouvs with the same reference
-    const generateGroupRow = (reference, items) => {
-        // Calculate total quantity and filter only in-stock items
-        const inStockItems = items.filter(r => r.statut === 'en stock');
-        const totalQuantity = inStockItems.reduce((sum, r) => sum + r.quantite, 0);
-        
-        if (totalQuantity <= 0) {
-            return ''; // Don't show groups with no in-stock items
-        }
-        
-        // Get unique sites
-        const sites = [...new Set(inStockItems.map(r => r.lieux))].join(', ');
-        
-        // Get the type (should be the same for all items in the group)
-        const type = inStockItems[0]?.type || '';
-        
-        // Only one item in the group? Use the individual row display instead
-        if (inStockItems.length === 1 && !groupByReference) {
-            return generateItemRow(inStockItems[0]);
-        }
-        
-        // Get the ID of the first item for loaning/lending actions
-        const firstItemId = inStockItems[0]?.id;
-        
-        // Build URLs with isGroup=true and reference parameters
-        const louerUrl = `{{ route('gestrenouv.louer', ':id') }}?isGroup=true&reference=${encodeURIComponent(reference)}`.replace(':id', firstItemId);
-        const preterUrl = `{{ route('gestrenouv.preter', ':id') }}?isGroup=true&reference=${encodeURIComponent(reference)}`.replace(':id', firstItemId);
-        
-        const option = `
-            <div class='inline-flex flex-wrap space-x-2'>
-                <button onclick="window.location.href='${louerUrl}'" 
-                    class='text-blue-600 font-semibold hover:underline'>
-                    Louer
-                </button>
-                <button onclick="window.location.href='${preterUrl}'" 
-                    class='text-purple-600 font-semibold hover:underline'>
-                    Prêter
-                </button>
-            </div>
-        `;
-        
-        const actions = `
-            <div class="text-center">
-                <span class="text-gray-500 text-sm">Actions sur les items individuels</span>
-            </div>
-        `;
-        
-        return `        
-            <tr class="border-t hover:bg-gray-50 bg-gray-50">
-                <td class="py-3 px-4 border border-gray-200 font-semibold">${reference}</td>
-                <td class="py-3 px-4 border border-gray-200">${sites}</td>
-                <td class="py-3 px-4 border border-gray-200">${type}</td>
-                <td class="py-3 px-4 border border-gray-200 text-center">
-                    <span class="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs font-semibold">en stock</span>
-                </td>
-                <td class="py-3 px-4 border border-gray-200 font-bold">${totalQuantity}</td>
-                <td class="py-3 px-4 border border-gray-200">${option}</td>
-                <td class="py-3 px-4 border border-gray-200">${actions}</td>
-            </tr>
-        `;
-    };
+const generateGroupRow = (reference, items) => {
+    const totalQuantity = items.reduce((sum, r) => sum + r.quantite, 0);
+    if (totalQuantity <= 0) return '';
+
+    const sites = [...new Set(items.map(r => r.lieux))].join(', ');
+    const types = [...new Set(items.map(r => r.type))].join(', ');
+    const statuts = [...new Set(items.map(r => r.statut))];
+
+    const statutBadges = statuts.map(s => {
+        const base = "px-2 py-1 rounded-full text-xs font-semibold mr-1 ";
+        if (s === 'en stock') return `<span class="${base}bg-green-100 text-green-800">${s}</span>`;
+        if (s === 'prêté') return `<span class="${base}bg-amber-100 text-amber-800">${s}</span>`;
+        return `<span class="${base}bg-red-100 text-red-800">${s}</span>`;
+    }).join('');
+
+    const firstItemId = items[0]?.id;
+    const louerUrl = `{{ route('gestrenouv.louer', ['id' => 'REPLACE_ID']) }}?isGroup=true&reference=${encodeURIComponent(reference)}`.replace('REPLACE_ID', firstItemId);
+    const preterUrl = `{{ route('gestrenouv.preter', ['id' => 'REPLACE_ID']) }}?isGroup=true&reference=${encodeURIComponent(reference)}`.replace('REPLACE_ID', firstItemId);
+
+    const option = `
+        <div class='inline-flex flex-wrap space-x-2'>
+            <button onclick="window.location.href='${louerUrl}'" class='text-blue-600 font-semibold hover:underline'>Louer</button>
+            <button onclick="window.location.href='${preterUrl}'" class='text-purple-600 font-semibold hover:underline'>Prêter</button>
+        </div>
+    `;
+
+    const actions = `<div class="text-center"><span class="text-gray-500 text-sm">Actions sur les items individuels</span></div>`;
+
+    return `
+        <tr class="border-t hover:bg-gray-50 bg-gray-50">
+            <td class="py-3 px-4 border border-gray-200 font-semibold">${reference}</td>
+            <td class="py-3 px-4 border border-gray-200">${sites}</td>
+            <td class="py-3 px-4 border border-gray-200">${types}</td>
+            <td class="py-3 px-4 border border-gray-200">${statutBadges}</td>
+            <td class="py-3 px-4 border border-gray-200 font-bold">${totalQuantity}</td>
+            <td class="py-3 px-4 border border-gray-200">${option}</td>
+            <td class="py-3 px-4 border border-gray-200">${actions}</td>
+        </tr>
+    `;
+};
+
 
     function renderTable() {
-        // Create the appropriate header
         header.innerHTML = createTableHeader();
-        
         let filteredData = données.filter(filtreOK);
         let tableRows = '';
-        
+
         if (groupByReference) {
-            // Group by reference
             const referenceGroups = {};
-            
             filteredData.forEach(item => {
-                if (!referenceGroups[item.reference]) {
-                    referenceGroups[item.reference] = [];
-                }
+                if (!referenceGroups[item.reference]) referenceGroups[item.reference] = [];
                 referenceGroups[item.reference].push(item);
             });
-            
-            // Convert groups to HTML rows
+
             tableRows = Object.entries(referenceGroups)
                 .map(([reference, items]) => generateGroupRow(reference, items))
-                .filter(row => row) // Remove empty rows (groups with no in-stock items)
+                .filter(row => row)
                 .join('');
         } else {
-            // Individual items view
             tableRows = filteredData.map(generateItemRow).join('');
         }
-        
-        body.innerHTML = tableRows.length > 0 
+
+        body.innerHTML = tableRows.length > 0
             ? tableRows
             : `<tr><td colspan="${groupByReference ? 7 : 9}" class="py-4 text-center text-gray-500">Aucun résultat trouvé. Veuillez modifier votre recherche ou réinitialiser les filtres.</td></tr>`;
-        
+
         updateFilterCounts();
-        
-        // Mise à jour du titre avec le nombre de résultats
+
         const tableTitle = document.getElementById('table-title');
-        if (groupByReference) {
-            const groupCount = tableRows.split('<tr').length - 1;
-            tableTitle.textContent = `PCRenouv groupés par référence`;
-        } else {
-            tableTitle.textContent = `Liste des PCRenouvs`;
-        }
+        tableTitle.textContent = groupByReference ? `PCRenouv groupés par référence` : `Liste des PCRenouvs`;
     }
 
-    // Écouteurs d'événements
     searchInput.addEventListener('input', (e) => {
         searchTerm = e.target.value;
         renderTable();
@@ -415,8 +384,10 @@
 
     groupByReferenceCheckbox.addEventListener('change', (e) => {
         groupByReference = e.target.checked;
+        localStorage.setItem('groupByReference', groupByReference); // sauvegarde
         renderTable();
     });
+
 
     document.querySelectorAll('.filter-btn').forEach(btn =>
         btn.addEventListener('click', () => {
@@ -438,14 +409,12 @@
         renderTable();
     });
 
-    // Écouteurs pour la modale
     closeModal.addEventListener('click', closeDeleteModal);
     cancelModal.addEventListener('click', closeDeleteModal);
     window.addEventListener('click', (e) => {
         if (e.target === modal) closeDeleteModal();
     });
 
-    // Initialisation
     renderTable();
 </script>
 
