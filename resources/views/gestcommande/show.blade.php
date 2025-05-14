@@ -10,6 +10,7 @@
         <div class="border-l-4 border-green-600 pl-4 mb-8">
             <h2 class="text-2xl font-bold text-gray-800 mb-4">Commande</h2>
             <p><strong>Numéro de commande fournisseur :</strong> {{ $commande->numero_commande_fournisseur ?? '/' }}</p>
+            <p><strong>N° de devis/commande ou BL client :</strong> {{ $commande->doc_client ?? '/' }}</p>
             <p><strong>État :</strong> {{ $commande->etat ?? '/' }}</p>
             <p><strong>Remarque :</strong> {{ $commande->remarque ?? '/' }}</p>
             <p><strong>Délai d'installation prévu (en jours) :</strong> {{ $commande->delai_installation ?? '/' }}</p>

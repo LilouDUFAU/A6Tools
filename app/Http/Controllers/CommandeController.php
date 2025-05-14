@@ -127,6 +127,7 @@ class CommandeController extends Controller
             'reference_devis' => 'nullable|string|max:255',
             'urgence' => 'required|string|max:255',
             'stock_id' => 'required|exists:stocks,id',
+            'doc_client' => 'required|string|max:255',
         ]);
 
         $validated['employe_id'] = auth()->id();
@@ -279,6 +280,7 @@ class CommandeController extends Controller
             'reference_devis' => 'nullable|string|max:255',
             'urgence' => 'required|string|max:255',
             'stock_id' => 'required|exists:stocks,id',
+            'doc_client' => 'required|string|max:255',
         ]);
 
         $commande = Commande::findOrFail($id);

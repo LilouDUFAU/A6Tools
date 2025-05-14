@@ -18,6 +18,11 @@
                 </div>
 
                 <div class="mb-4">
+                    <label for="doc_client" class="block text-sm font-semibold text-gray-700">N° de devis/commande ou BL client</label>
+                    <input type="text" id="doc_client" name="doc_client" class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1">
+                </div>                
+
+                <div class="mb-4">
                     <label for="etat" class="block text-sm font-semibold text-gray-700">* État</label>
                     <select id="etat" name="etat" class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1" required>
                         <option value="">-- Sélectionner un état --</option>

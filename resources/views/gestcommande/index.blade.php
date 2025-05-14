@@ -89,6 +89,7 @@
                 <thead>
                     <tr id="table-headers" class="bg-gray-100 text-left text-sm font-semibold text-gray-700">
                         <th class="py-3 px-4 border border-gray-200">N° cmde fournisseur</th>
+                        <th class="py-3 px-4 border border-gray-200">Doc client</th>
                         <th class="py-3 px-4 border border-gray-200">Client</th>
                         <th class="py-3 px-4 border border-gray-200">Fournisseur</th>
                         <th class="py-3 px-4 border border-gray-200">Produit</th>
@@ -113,44 +114,45 @@
 
 @php
     $csrf = csrf_token();
-     $commandesData = $commandes->map(function($c) use($csrf) {
-        $lieux = DB::table('produit_stock')
-            ->join('stocks','produit_stock.stock_id','=','stocks.id')
-            ->where('produit_stock.commande_id',$c->id)
-            ->distinct()->pluck('stocks.lieux')->implode(', ');
-        $produits = DB::table('commande_produit')
-            ->join('produits','commande_produit.produit_id','=','produits.id')
-            ->where('commande_produit.commande_id',$c->id)
-            ->select('produits.nom as nom', 'produits.lien_produit_fournisseur as lien', 'commande_produit.quantite_totale as quantite')
-            ->get()->map(fn($p)=>['nom'=>$p->nom, 'lien'=>$p->lien, 'quantite'=>$p->quantite]);
-        $fourn = $produits->isNotEmpty()
-            ? DB::table('fournisseur_produit')
-                ->join('fournisseurs','fournisseur_produit.fournisseur_id','=','fournisseurs.id')
-                ->where('produit_id',DB::table('produits')->where('nom',$produits[0]['nom'])->value('id'))
-                ->where('commande_id',$c->id)->value('fournisseurs.nom')
-            : '/';
-        $actions = 
-            "<form action='".route('gestcommande.destroy',$c->id)."' method='POST' class='inline'>".
-            "<input type='hidden' name='_token' value='{$csrf}'>".
-            "<input type='hidden' name='_method' value='DELETE'>".
-            "<button type='button' class='text-green-600 hover:text-green-700 font-semibold mr-2' onclick=\"window.location.href='".route('gestcommande.show',$c->id)."'\">Détails</button>".
-            "<button type='button' class='text-yellow-600 hover:text-yellow-700 font-semibold mr-2' onclick=\"window.location.href='".route('gestcommande.edit',$c->id)."'\">Modifier</button>".
-            "<button type='button' onclick=\"openModal({$c->id})\" class='text-red-600 hover:text-red-700 font-semibold'>Supprimer</button>".
-            "</form>";
-        // Check if this command has an alert
-        $hasAlert = isset($alerteCommandes[$c->id]);
-        return [
-            'id'=>$c->id,
-            'numero_commande_fournisseur'=>$c->numero_commande_fournisseur ?? 'Non défini',
-            'client'=>$c->client?->code_client?:'<p class="text-red-500">Pas de client</p>',
-            'fournisseur'=>$fourn,
-            'lieux'=>$lieux?:'Non défini',
-            'produits'=>$produits,
-            'etat'=>strtolower($c->etat),
-            'urgence'=>strtolower($c->urgence),
-            'hasAlert'=>$hasAlert,
-            'actions'=>$actions];
-    });
+$commandesData = $commandes->map(function($c) use($csrf) {
+    $lieux = DB::table('produit_stock')
+        ->join('stocks','produit_stock.stock_id','=','stocks.id')
+        ->where('produit_stock.commande_id',$c->id)
+        ->distinct()->pluck('stocks.lieux')->implode(', ');
+    $produits = DB::table('commande_produit')
+        ->join('produits','commande_produit.produit_id','=','produits.id')
+        ->where('commande_produit.commande_id',$c->id)
+        ->select('produits.nom as nom', 'produits.lien_produit_fournisseur as lien', 'commande_produit.quantite_totale as quantite')
+        ->get()->map(fn($p)=>['nom'=>$p->nom, 'lien'=>$p->lien, 'quantite'=>$p->quantite]);
+    $fourn = $produits->isNotEmpty()
+        ? DB::table('fournisseur_produit')
+            ->join('fournisseurs','fournisseur_produit.fournisseur_id','=','fournisseurs.id')
+            ->where('produit_id',DB::table('produits')->where('nom',$produits[0]['nom'])->value('id'))
+            ->where('commande_id',$c->id)->value('fournisseurs.nom')
+        : '/';
+    $actions = 
+        "<form action='".route('gestcommande.destroy',$c->id)."' method='POST' class='inline'>".
+        "<input type='hidden' name='_token' value='{$csrf}'>".
+        "<input type='hidden' name='_method' value='DELETE'>".
+        "<button type='button' class='text-green-600 hover:text-green-700 font-semibold mr-2' onclick=\"window.location.href='".route('gestcommande.show',$c->id)."'\">Détails</button>".
+        "<button type='button' class='text-yellow-600 hover:text-yellow-700 font-semibold mr-2' onclick=\"window.location.href='".route('gestcommande.edit',$c->id)."'\">Modifier</button>".
+        "<button type='button' onclick=\"openModal({$c->id})\" class='text-red-600 hover:text-red-700 font-semibold'>Supprimer</button>".
+        "</form>";
+    // Check if this command has an alert
+    $hasAlert = isset($alerteCommandes[$c->id]);
+    return [
+        'id'=>$c->id,
+        'numero_commande_fournisseur'=>$c->numero_commande_fournisseur ?? 'Non défini',
+        'doc_client'=>$c->doc_client ?? 'Non défini', // Ajout de cette ligne
+        'client'=>$c->client?->code_client?:'<p class="text-red-500">Pas de client</p>',
+        'fournisseur'=>$fourn,
+        'lieux'=>$lieux?:'Non défini',
+        'produits'=>$produits,
+        'etat'=>strtolower($c->etat),
+        'urgence'=>strtolower($c->urgence),
+        'hasAlert'=>$hasAlert,
+        'actions'=>$actions];
+});
 @endphp
 
 <div id="modal" class="fixed inset-0 z-50 hidden bg-gray-800/40 flex items-center justify-center">
@@ -230,6 +232,7 @@
 
     const defaultHeaders = `
         <th class="py-3 px-4 border border-gray-200">N° cmde fournisseur</th>
+        <th class="py-3 px-4 border border-gray-200">Doc client</th>
         <th class="py-3 px-4 border border-gray-200">Client</th>
         <th class="py-3 px-4 border border-gray-200">Fournisseur</th>
         <th class="py-3 px-4 border border-gray-200">Produit</th>
@@ -248,6 +251,9 @@ const rowHTML = cmd => `
     <tr class="border-t hover:bg-gray-50">
         <td class="py-3 px-4 border border-gray-200">
             ${cmd.numero_commande_fournisseur}
+        </td>
+        <td class="py-3 px-4 border border-gray-200">
+            ${cmd.doc_client ?? 'N/A'}
         </td>
         <td class="py-3 px-4 border border-gray-200">${cmd.client}</td>
         <td class="py-3 px-4 border border-gray-200">${cmd.fournisseur}</td>

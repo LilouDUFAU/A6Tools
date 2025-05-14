@@ -23,6 +23,7 @@ class Commande extends Model
         'reference_devis',
         'client_id',
         'employe_id',
+        'doc_client',
     ];
 
     /////////////////////////
