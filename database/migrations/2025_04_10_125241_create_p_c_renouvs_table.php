@@ -20,10 +20,13 @@ return new class extends Migration
             $table->enum('type', ['portable', 'fixe']); // Type du PCRenouv
             $table->enum('statut', ['en stock', 'prêté', 'loué']); // Statut du PCRenouv
             $table->unsignedBigInteger('employe_id'); // Clé étrangère vers la table users (employé)
+            $table->unsignedBigInteger('locPret_id'); // Clé étrangère vers la table loc_prets (prêt)
             $table->timestamps(); // created_at, updated_at
 
             // Clé étrangère vers la table users (employe_id)
             $table->foreign('employe_id')->references('id')->on('users')->onDelete('cascade');
+            // Clé étrangère vers la table loc_prets (locPret_id)
+            $table->foreign('locPret_id')->references('id')->on('loc_prets')->onDelete('cascade');
         });
     }
 

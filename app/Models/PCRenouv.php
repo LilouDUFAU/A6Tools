@@ -21,6 +21,7 @@ class PCRenouv extends Model
         'type',
         'statut',
         'employe_id',
+        'locPret_id',
     ];
     
     /////////////////////////
@@ -56,5 +57,10 @@ class PCRenouv extends Model
     public function clients()
     {
         return $this->belongsToMany(Client::class, 'client_pcrenouv', 'pcrenouv_id', 'client_id')->withPivot('date_pret', 'date_retour');
+    }
+
+        public function locPret()
+    {
+        return $this->belongsTo(LocPret::class, 'locPret_id', 'id');
     }
 }
