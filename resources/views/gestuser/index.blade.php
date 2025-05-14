@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="min-h-screen py-10" x-data="{ 
+<div class="py-10" x-data="{ 
     view: '{{ request('view', 'grid') }}',
     selectedRole: '{{ request('role', '') }}',
     selectedService: '{{ request('service', '') }}',

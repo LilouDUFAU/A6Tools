@@ -2,7 +2,6 @@
 
 @section('content')
 
-<div class="min-h-screen">
 <div class="max-w-6xl mx-auto my-4 py-8 px-6 bg-white shadow-md rounded-lg">
     <h1 class="text-3xl font-extrabold text-gray-800 mb-8">Modifier la Panne</h1>
 
@@ -108,7 +107,4 @@
         <a href="{{ route('gestsav.index') }}" class="text-gray-500 hover:underline">Retour</a>
     </div>
 </div>
-</div>
-
-
 @endsection

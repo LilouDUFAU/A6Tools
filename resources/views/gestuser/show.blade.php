@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="min-h-screen py-10 flex items-center justify-center bg-gray-100">
+<div class="py-10 flex items-center justify-center bg-gray-100">
     <div class="max-w-4xl mx-auto">
         <div class="bg-white shadow rounded-2xl py-8 px-16">
             @if(auth()->user()->id === $user->id)

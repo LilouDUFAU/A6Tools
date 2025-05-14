@@ -13,7 +13,7 @@
     
 </head>
 <body class="font-[Poppins]">
-    <main class="grid grid-cols-12">
+    <main class="grid grid-cols-12 min-h-screen">
         <!-- Burger Menu -->
         <div class="md:hidden col-span-12 bg-green-600 text-white p-4">
             <button id="burger-menu" class="text-white">
@@ -38,12 +38,11 @@
             <!-- contenu -->
             @yield('content')
         </section>
-
-        <!-- footer -->
-        <footer class="bg-green-600 text-white text-center py-4 col-span-12 w-full">
-            @include('layouts.partials.footer')
-        </footer>
     </main>
+    <!-- footer -->
+    <footer class="bg-green-600 text-white text-center py-4 col-span-12 w-full">
+        @include('layouts.partials.footer')
+    </footer>
 
     <script>
         document.getElementById('burger-menu').addEventListener('click', function () {

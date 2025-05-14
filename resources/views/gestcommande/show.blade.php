@@ -2,7 +2,6 @@
 
 @section('content')
 
-<div class="min-h-screen">
     <div class="max-w-6xl mx-auto my-4 py-8 px-6 bg-white shadow-md rounded-lg">
         <h1 class="text-3xl font-extrabold text-gray-800 mb-8 text-center">Récapitulatif de la commande</h1>
 
@@ -135,5 +134,4 @@
             <a href="{{ route('gestcommande.index') }}" class="text-gray-600 hover:underline">Retour à la liste</a>
         </div>
     </div>
-</div>
 @endsection
