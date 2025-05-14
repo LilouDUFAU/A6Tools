@@ -88,38 +88,56 @@ class UserController extends Controller
         return view('gestuser.edit', compact('user', 'roles', 'services', 'stocks'));
     }
 
-    public function update(Request $request, string $id)
-    {
-        $user = User::findOrFail($id);
+public function update(Request $request, string $id)
+{
+    $user = User::findOrFail($id);
 
-        $validatedData = $request->validate([
-            'nom' => 'sometimes|required|string|max:255',
-            'prenom' => 'sometimes|required|string|max:255',
-            'telephone' => 'sometimes|required|string|max:20',
-            'email' => 'sometimes|required|email|unique:users,email,' . $user->id,
-            'password' => 'nullable|string|min:8',
-            'photo' => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif,svg', 'max:2048'],
-            'service_id' => 'sometimes|required|exists:services,id',
-            'role_id' => 'sometimes|required|exists:roles,id',
-            'stock_id' => 'nullable|exists:stocks,id', // ✅ Ajout
+    $validatedData = $request->validate([
+        'nom' => 'sometimes|required|string|max:255',
+        'prenom' => 'sometimes|required|string|max:255',
+        'telephone' => 'sometimes|required|string|max:20',
+        'email' => 'sometimes|required|email|unique:users,email,' . $user->id,
+        'password' => 'nullable|string|min:8',
+        'photo' => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif,svg', 'max:2048'],
+        'service_id' => 'sometimes|required|exists:services,id',
+        'role_id' => 'sometimes|required|exists:roles,id',
+        'stock_id' => 'nullable|exists:stocks,id',
+    ]);
+
+    $plainPassword = null;
+
+    // Gérer le mot de passe
+    if (!empty($validatedData['password'])) {
+        $plainPassword = $validatedData['password'];
+        $validatedData['password'] = bcrypt($validatedData['password']);
+    } else {
+        unset($validatedData['password']);
+    }
+
+    // Gérer la photo
+    if (isset($validatedData['photo'])) {
+        $validatedData['photo'] = $validatedData['photo']->store('photos', 'public');
+    } else {
+        unset($validatedData['photo']);
+    }
+
+    $user->update($validatedData);
+
+    // Générer le PDF uniquement si le mot de passe a été modifié
+    if ($plainPassword !== null) {
+        $pdf = PDF::loadView('pdf.user_credentials', [
+            'user' => $user,
+            'password' => $plainPassword
         ]);
 
-        if (!empty($validatedData['password'])) {
-            $validatedData['password'] = bcrypt($validatedData['password']);
-        } else {
-            unset($validatedData['password']);
-        }
-
-        if (isset($validatedData['photo'])) {
-            $validatedData['photo'] = $validatedData['photo']->store('photos', 'public');
-        } else {
-            unset($validatedData['photo']);
-        }
-
-        $user->update($validatedData);
-
-        return redirect()->route('gestuser.index')->with('success', 'Utilisateur mis à jour avec succès.');
+        return redirect()->route('gestuser.index')->with('success', 'Utilisateur mis à jour avec succès.')->with('download.in.the.next.request', [
+            'url' => base64_encode($pdf->output()),
+            'name' => 'identifiants_'.$user->nom.'_'.$user->prenom.'.pdf'
+        ]);
     }
+
+    return redirect()->route('gestuser.index')->with('success', 'Utilisateur mis à jour avec succès.');
+}
 
     public function destroy(string $id)
     {
