@@ -409,12 +409,37 @@ const generateGroupRow = (reference, items) => {
     );
 
     document.getElementById('resetFilters').addEventListener('click', () => {
-        activeFilters = { lieu: new Set(), type: new Set(), statut: new Set() };
-        searchTerm = '';
-        searchInput.value = '';
-        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('ring-4', 'ring-blue-600'));
-        renderTable();
-    });
+    activeFilters = { lieu: new Set(), type: new Set(), statut: new Set() };
+    searchTerm = '';
+    searchInput.value = '';
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('ring-4', 'ring-blue-600'));
+
+    // Réapplique le filtre de lieu par défaut après réinitialisation
+    if (userDefaultStock) {
+        activeFilters.lieu.add(userDefaultStock);
+        document.querySelectorAll('.filter-btn[data-type="lieu"]').forEach(btn => {
+            if (btn.dataset.filter.toLowerCase() === userDefaultStock) {
+                btn.classList.add('ring-4', 'ring-blue-600');
+            }
+        });
+    }
+
+    renderTable();
+});
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Appliquer le filtre de lieu de l'utilisateur dès le chargement
+    if (userDefaultStock) {
+        activeFilters.lieu.add(userDefaultStock);
+        document.querySelectorAll('.filter-btn[data-type="lieu"]').forEach(btn => {
+            if (btn.dataset.filter.toLowerCase() === userDefaultStock) {
+                btn.classList.add('ring-4', 'ring-blue-600');
+            }
+        });
+    }
+
+    renderTable();
+});
 
     closeModal.addEventListener('click', closeDeleteModal);
     cancelModal.addEventListener('click', closeDeleteModal);
@@ -422,18 +447,7 @@ const generateGroupRow = (reference, items) => {
         if (e.target === modal) closeDeleteModal();
     });
 
-    document.addEventListener('DOMContentLoaded', function() {
-        // Appliquer l'activation visuelle pour le filtre de lieu par défaut
-        if (userDefaultStock) {
-            document.querySelectorAll('.filter-btn[data-type="lieu"]').forEach(btn => {
-                if (btn.dataset.filter.toLowerCase() === userDefaultStock) {
-                    btn.classList.add('ring-4', 'ring-blue-600');
-                }
-            });
-        }
-        
-        renderTable();
-    });
+
 </script>
 
 @endsection
