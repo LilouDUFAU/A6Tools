@@ -100,7 +100,8 @@
         </div>
 
         <!-- Préparation Atelier -->
-        <!-- <div class="border-l-4 border-green-600 pl-4 mb-8">
+        @if (auth()->check() && auth()->user()->stock_id === 1)
+        <div class="border-l-4 border-green-600 pl-4 mb-8">
             <h2 class="text-2xl font-bold text-gray-800 mb-4">Préparation Atelier</h2>
             @php
                 $preparation = \App\Models\PrepAtelier::where('commande_id', $commande->id)->first();
@@ -125,7 +126,8 @@
                     <a href="{{ route('gestatelier.create', ['commande_id' => $commande->id]) }}" class="text-blue-600 font-medium hover:underline">Créer une Préparation</a>
                 @endif
             @endif
-        </div> -->
+        </div>
+        @endif
 
         <!-- Boutons -->
         <div class="flex flex-col sm:flex-row justify-between mt-8 space-y-4 sm:space-y-0">
