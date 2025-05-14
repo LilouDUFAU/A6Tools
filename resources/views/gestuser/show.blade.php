@@ -91,24 +91,12 @@
                     <a href="{{ route('gestuser.index') }}" class="text-red-500 hover:underline transition">
                         Retour à la liste des employés
                     </a>
-                    <button class="ml-4 bg-red-600 text-white py-2 px-4 rounded hover:bg-red-700 transition" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-                        Déconnexion
-                    </button>
-                    <form id="logout-form" action="{{ route('logout') }}" method="POST" class="hidden">
-                        @csrf
-                    </form>
                 @endif
                 @if(auth()->check() && auth()->user()->role->nom === 'user')
                     <div class="ml-auto">
                         <a href="{{ route('home') }}" class="text-gray-500 hover:underline transition">
                             Retour à l'accueil
                         </a>
-                        <button class="ml-4 bg-red-600 text-white py-2 px-4 rounded hover:bg-red-700 transition" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-                            Déconnexion
-                        </button>
-                        <form id="logout-form" action="{{ route('logout') }}" method="POST" class="hidden">
-                            @csrf
-                        </form>
                     </div>
                 @endif
             </div>
