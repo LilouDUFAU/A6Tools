@@ -198,54 +198,76 @@ $commandesData = $commandes->map(function($c) use($csrf) {
         if (e.target === modal) closeModalHandler();
     });
 </script>
-
 <script>
-    const données = @json($commandesData);
-    let activeFilters = {lieu:new Set(),etat:new Set(),urgence:new Set()};
-    const body = document.getElementById('commandes-body');
-    const titre = document.getElementById('table-title');
-    const headers = document.getElementById('table-headers');
+// Ajout d'une variable pour stocker le stock de l'utilisateur connecté
+// Cette donnée devra être fournie par le backend
+const données = @json($commandesData);
+let activeFilters = {lieu:new Set(),etat:new Set(),urgence:new Set()};
+const body = document.getElementById('commandes-body');
+const titre = document.getElementById('table-title');
+const headers = document.getElementById('table-headers');
 
-    const calculateCount = (type, value) => {
-        const filteredData = données.filter(cmd => {
-            const lieuMatch = !activeFilters.lieu.size || [...activeFilters.lieu].some(f => cmd.lieux.toLowerCase().includes(f));
-            const etatMatch = !activeFilters.etat.size || activeFilters.etat.has(cmd.etat);
-            const urgenceMatch = !activeFilters.urgence.size || activeFilters.urgence.has(cmd.urgence);
-            return lieuMatch && etatMatch && urgenceMatch;
+// Récupérer le stock lié à l'utilisateur connecté depuis une variable PHP
+// Ajoutez cette ligne dans votre backend juste avant ce script:
+// $userStock = Auth::user()->stock ? Auth::user()->stock->lieux : null;
+const userStock = "{{ $userStock ?? '' }}".toLowerCase();
+
+// Appliquer automatiquement le filtre basé sur le stock de l'utilisateur
+function applyUserStockFilter() {
+    if (userStock) {
+        // Trouver le bouton de filtre correspondant au stock de l'utilisateur
+        const stockButtons = document.querySelectorAll('.filter-btn[data-type="lieu"]');
+        stockButtons.forEach(btn => {
+            const stockName = btn.dataset.filter.toLowerCase();
+            if (stockName === userStock) {
+                // Appliquer le filtre
+                activeFilters.lieu.add(stockName);
+                btn.classList.add('ring-4', 'ring-blue-500');
+            }
         });
+    }
+}
 
-        return filteredData.filter(cmd => {
-            if (type === 'lieu') return cmd.lieux.toLowerCase().includes(value.toLowerCase());
-            if (type === 'etat') return cmd.etat === value.toLowerCase();
-            return cmd.urgence === value.toLowerCase();
-        }).length;
-    };
+const calculateCount = (type, value) => {
+    const filteredData = données.filter(cmd => {
+        const lieuMatch = !activeFilters.lieu.size || [...activeFilters.lieu].some(f => cmd.lieux.toLowerCase().includes(f));
+        const etatMatch = !activeFilters.etat.size || activeFilters.etat.has(cmd.etat);
+        const urgenceMatch = !activeFilters.urgence.size || activeFilters.urgence.has(cmd.urgence);
+        return lieuMatch && etatMatch && urgenceMatch;
+    });
 
-    const updateFilterCounts = () => {
-        document.querySelectorAll('.filter-btn').forEach(btn => {
-            const type = btn.dataset.type;
-            const value = btn.dataset.filter;
-            const count = calculateCount(type, value);
-            btn.querySelector('.count-display').textContent = count;
-        });
-    };
+    return filteredData.filter(cmd => {
+        if (type === 'lieu') return cmd.lieux.toLowerCase().includes(value.toLowerCase());
+        if (type === 'etat') return cmd.etat === value.toLowerCase();
+        return cmd.urgence === value.toLowerCase();
+    }).length;
+};
 
-    const defaultHeaders = `
-        <th class="py-3 px-4 border border-gray-200">N° cmde fournisseur</th>
-        <th class="py-3 px-4 border border-gray-200">Doc client</th>
-        <th class="py-3 px-4 border border-gray-200">Client</th>
-        <th class="py-3 px-4 border border-gray-200">Fournisseur</th>
-        <th class="py-3 px-4 border border-gray-200">Produit</th>
-        <th class="py-3 px-4 border border-gray-200">Site</th>
-        <th class="py-3 px-4 border border-gray-200">État</th>
-        <th class="py-3 px-4 border border-gray-200">Urgence</th>
-        <th class="py-3 px-4 border border-gray-200">Actions</th>
-    `;
+const updateFilterCounts = () => {
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+        const type = btn.dataset.type;
+        const value = btn.dataset.filter;
+        const count = calculateCount(type, value);
+        btn.querySelector('.count-display').textContent = count;
+    });
+};
 
-    const filtreOK = cmd =>
-        (!activeFilters.lieu.size || [...activeFilters.lieu].some(f => cmd.lieux.toLowerCase().includes(f))) &&
-        (!activeFilters.etat.size || activeFilters.etat.has(cmd.etat)) &&
-        (!activeFilters.urgence.size || activeFilters.urgence.has(cmd.urgence));
+const defaultHeaders = `
+    <th class="py-3 px-4 border border-gray-200">N° cmde fournisseur</th>
+    <th class="py-3 px-4 border border-gray-200">Doc client</th>
+    <th class="py-3 px-4 border border-gray-200">Client</th>
+    <th class="py-3 px-4 border border-gray-200">Fournisseur</th>
+    <th class="py-3 px-4 border border-gray-200">Produit</th>
+    <th class="py-3 px-4 border border-gray-200">Site</th>
+    <th class="py-3 px-4 border border-gray-200">État</th>
+    <th class="py-3 px-4 border border-gray-200">Urgence</th>
+    <th class="py-3 px-4 border border-gray-200">Actions</th>
+`;
+
+const filtreOK = cmd =>
+    (!activeFilters.lieu.size || [...activeFilters.lieu].some(f => cmd.lieux.toLowerCase().includes(f))) &&
+    (!activeFilters.etat.size || activeFilters.etat.has(cmd.etat)) &&
+    (!activeFilters.urgence.size || activeFilters.urgence.has(cmd.urgence));
 
 const rowHTML = cmd => `
     <tr class="border-t hover:bg-gray-50">
@@ -309,94 +331,100 @@ const rowHTML = cmd => `
     </tr>
 `;
 
-    function renderDefault() {
-        titre.textContent = 'Liste des Commandes';
-        headers.innerHTML = defaultHeaders;
-        body.innerHTML = données.filter(filtreOK).map(rowHTML).join('');
-        updateFilterCounts();
-    }
+function renderDefault() {
+    titre.textContent = 'Liste des Commandes';
+    headers.innerHTML = defaultHeaders;
+    body.innerHTML = données.filter(filtreOK).map(cmd => {
+        const rowHtml = rowHTML(cmd);
+        // Modifier le HTML pour ajouter la classe et le data attribute
+        return rowHtml.replace(
+            `<td class="py-3 px-4 border border-gray-200">${cmd.fournisseur}</td>`, 
+            `<td class="py-3 px-4 border border-gray-200 supplier-cell cursor-pointer hover:bg-gray-200" data-commande-id="${cmd.id}">${cmd.fournisseur}</td>`
+        );
+    }).join('');
+    updateFilterCounts();
+    makeSupplierEditable();
+    reactivateStateSelectors();
+}
 
-    function renderByArticle() {
-        titre.textContent = 'Grouper par Article';
-        headers.innerHTML = `
-            <th class="py-3 px-4 border border-gray-200">Produit</th>
-            <th class="py-3 px-4 border border-gray-200">Quantité</th>
-        `;
-        const agg = {};
-        données.forEach(cmd => {
-            if (filtreOK(cmd)) {
-                cmd.produits.forEach(p => {
-                    agg[p.nom] = (agg[p.nom] || 0) + p.quantite;
-                });
-            }
-        });
-        const rows = Object.entries(agg).map(([nom, total]) => `
-            <tr class="border-t hover:bg-gray-50">
-                <td class="py-3 px-4 border border-gray-200">${nom}</td>
-                <td class="py-3 px-4 border border-gray-200">${total}</td>
-            </tr>
-        `);
-        body.innerHTML = rows.join('');
-        updateFilterCounts();
-    }
-
-    function renderByFournisseur() {
-        titre.textContent = 'Grouper par Fournisseur';
-        headers.innerHTML = `
-            <th class="py-3 px-4 border border-gray-200">Fournisseur</th>
-            <th class="py-3 px-4 border border-gray-200">Produit</th>
-            <th class="py-3 px-4 border border-gray-200">Quantité</th>
-        `;
-        const agg = {};
-        données.forEach(cmd => {
-            if (filtreOK(cmd)) {
-                cmd.produits.forEach(p => {
-                    const fournisseur = cmd.fournisseur || 'Non défini';
-                    const key = fournisseur + '|' + p.nom;
-                    if (!agg[key]) agg[key] = {fournisseur: fournisseur, produit: p.nom, quantite: 0};
-                    agg[key].quantite += p.quantite;
-                });
-            }
-        });
-        const rows = Object.values(agg)
-            .sort((a, b) => a.fournisseur.localeCompare(b.fournisseur) || a.produit.localeCompare(b.produit))
-            .map(item => `
-            <tr class="border-t hover:bg-gray-50">
-                <td class="py-3 px-4 border border-gray-200">${item.fournisseur}</td>
-                <td class="py-3 px-4 border border-gray-200">${item.produit}</td>
-                <td class="py-3 px-4 border border-gray-200">${item.quantite}</td>
-            </tr>
-        `);
-        body.innerHTML = rows.join('');
-        updateFilterCounts();
-    }
-
-    document.querySelectorAll('.filter-btn').forEach(b => b.addEventListener('click', () => {
-        const t = b.dataset.type, v = b.dataset.filter.toLowerCase();
-        if (activeFilters[t].has(v)) activeFilters[t].delete(v);
-        else activeFilters[t].add(v);
-        b.classList.toggle('ring-4'); b.classList.toggle('ring-blue-500');
-        const view = titre.textContent;
-        if (view.includes('Article')) renderByArticle();
-        else if (view.includes('Fournisseur')) renderByFournisseur();
-        else renderDefault();
-    }));
-
-    document.getElementById('resetFilters').addEventListener('click', () => {
-        activeFilters = {lieu:new Set(), etat:new Set(), urgence:new Set()};
-        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('ring-4','ring-blue-500'));
-        renderDefault();
+function renderByArticle() {
+    titre.textContent = 'Grouper par Article';
+    headers.innerHTML = `
+        <th class="py-3 px-4 border border-gray-200">Produit</th>
+        <th class="py-3 px-4 border border-gray-200">Quantité</th>
+    `;
+    const agg = {};
+    données.forEach(cmd => {
+        if (filtreOK(cmd)) {
+            cmd.produits.forEach(p => {
+                agg[p.nom] = (agg[p.nom] || 0) + p.quantite;
+            });
+        }
     });
-    document.getElementById('groupDefault').addEventListener('click', renderDefault);
-    document.getElementById('groupByArticle').addEventListener('click', renderByArticle);
-    document.getElementById('groupByFournisseur').addEventListener('click', renderByFournisseur);
+    const rows = Object.entries(agg).map(([nom, total]) => `
+        <tr class="border-t hover:bg-gray-50">
+            <td class="py-3 px-4 border border-gray-200">${nom}</td>
+            <td class="py-3 px-4 border border-gray-200">${total}</td>
+        </tr>
+    `);
+    body.innerHTML = rows.join('');
+    updateFilterCounts();
+}
 
+function renderByFournisseur() {
+    titre.textContent = 'Grouper par Fournisseur';
+    headers.innerHTML = `
+        <th class="py-3 px-4 border border-gray-200">Fournisseur</th>
+        <th class="py-3 px-4 border border-gray-200">Produit</th>
+        <th class="py-3 px-4 border border-gray-200">Quantité</th>
+    `;
+    const agg = {};
+    données.forEach(cmd => {
+        if (filtreOK(cmd)) {
+            cmd.produits.forEach(p => {
+                const fournisseur = cmd.fournisseur || 'Non défini';
+                const key = fournisseur + '|' + p.nom;
+                if (!agg[key]) agg[key] = {fournisseur: fournisseur, produit: p.nom, quantite: 0};
+                agg[key].quantite += p.quantite;
+            });
+        }
+    });
+    const rows = Object.values(agg)
+        .sort((a, b) => a.fournisseur.localeCompare(b.fournisseur) || a.produit.localeCompare(b.produit))
+        .map(item => `
+        <tr class="border-t hover:bg-gray-50">
+            <td class="py-3 px-4 border border-gray-200">${item.fournisseur}</td>
+            <td class="py-3 px-4 border border-gray-200">${item.produit}</td>
+            <td class="py-3 px-4 border border-gray-200">${item.quantite}</td>
+        </tr>
+    `);
+    body.innerHTML = rows.join('');
+    updateFilterCounts();
+}
+
+document.querySelectorAll('.filter-btn').forEach(b => b.addEventListener('click', () => {
+    const t = b.dataset.type, v = b.dataset.filter.toLowerCase();
+    if (activeFilters[t].has(v)) activeFilters[t].delete(v);
+    else activeFilters[t].add(v);
+    b.classList.toggle('ring-4'); b.classList.toggle('ring-blue-500');
+    const view = titre.textContent;
+    if (view.includes('Article')) renderByArticle();
+    else if (view.includes('Fournisseur')) renderByFournisseur();
+    else renderDefault();
+}));
+
+document.getElementById('resetFilters').addEventListener('click', () => {
+    activeFilters = {lieu:new Set(), etat:new Set(), urgence:new Set()};
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('ring-4','ring-blue-500'));
+    // Si l'utilisateur est associé à un stock, le réappliquer après la réinitialisation
+    applyUserStockFilter();
     renderDefault();
+});
+document.getElementById('groupDefault').addEventListener('click', renderDefault);
+document.getElementById('groupByArticle').addEventListener('click', renderByArticle);
+document.getElementById('groupByFournisseur').addEventListener('click', renderByFournisseur);
 
-
-
-
-    // Toast notification handling
+// Toast notification handling
 const toast = document.getElementById('toast');
 const toastContent = toast.querySelector('.message');
 
@@ -409,59 +437,65 @@ function showToast(message, type) {
 }
 
 // State change handling
-document.querySelectorAll('.state-select').forEach(select => {
-    select.addEventListener('change', async function() {
-        const commandeId = this.dataset.commandeId;
-        const newState = this.value;
-        const loadingIndicator = this.parentElement.querySelector('.loading-indicator');
-        
-        // Show loading indicator
-        loadingIndicator.classList.remove('hidden');
-        
-        try {
-            const response = await fetch(`/commandes/${commandeId}/etat`, {
-                method: 'PATCH',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                },
-                body: JSON.stringify({ etat: newState })
-            });
+function reactivateStateSelectors() {
+    document.querySelectorAll('.state-select').forEach(select => {
+        select.addEventListener('change', async function() {
+            const commandeId = this.dataset.commandeId;
+            const newState = this.value;
+            const loadingIndicator = this.parentElement.querySelector('.loading-indicator');
             
-            const data = await response.json();
+            // Show loading indicator
+            loadingIndicator.classList.remove('hidden');
             
-            if (response.ok) {
-                // Update border color based on new state
-                const borderColors = {
-                    'a faire': 'border-green-600',
-                    'commandé': 'border-yellow-600',
-                    'reçu': 'border-amber-600',
-                    'prévenu': 'border-orange-600',
-                    'délais': 'border-red-600'
-                };
+            try {
+                const response = await fetch(`/commandes/${commandeId}/etat`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    },
+                    body: JSON.stringify({ etat: newState })
+                });
                 
-                // Remove all border colors and add new one
-                Object.values(borderColors).forEach(color => this.classList.remove(color));
-                this.classList.add(borderColors[newState]);
+                const data = await response.json();
                 
-                showToast('État mis à jour avec succès', 'success');
-                
-                // Update the count in state filters
-                updateFilterCounts();
-            } else {
-                throw new Error(data.message || 'Une erreur est survenue');
+                if (response.ok) {
+                    // Update border color based on new state
+                    const borderColors = {
+                        'a faire': 'border-green-600',
+                        'commandé': 'border-yellow-600',
+                        'reçu': 'border-amber-600',
+                        'prévenu': 'border-orange-600',
+                        'délais': 'border-red-600'
+                    };
+                    
+                    // Remove all border colors and add new one
+                    Object.values(borderColors).forEach(color => this.classList.remove(color));
+                    this.classList.add(borderColors[newState]);
+                    
+                    // Mettre à jour les données du client
+                    const cmdIndex = données.findIndex(cmd => cmd.id == commandeId);
+                    if (cmdIndex !== -1) {
+                        données[cmdIndex].etat = newState;
+                    }
+                    
+                    showToast('État mis à jour avec succès', 'success');
+                    
+                    // Update the count in state filters
+                    updateFilterCounts();
+                } else {
+                    throw new Error(data.message || 'Une erreur est survenue');
+                }
+            } catch (error) {
+                showToast(error.message, 'error');
+                // Revert select to previous value
+                this.value = this.querySelector('[selected]').value;
+            } finally {
+                loadingIndicator.classList.add('hidden');
             }
-        } catch (error) {
-            showToast(error.message, 'error');
-            // Revert select to previous value
-            this.value = this.querySelector('[selected]').value;
-        } finally {
-            loadingIndicator.classList.add('hidden');
-        }
+        });
     });
-});
-
-// Modifications du script précédent
+}
 
 // Fonction pour rendre les cellules de fournisseur modifiables
 function makeSupplierEditable() {
@@ -542,99 +576,10 @@ function makeSupplierEditable() {
     });
 }
 
-// Fonction pour réactiver les écouteurs d'événements sur les sélecteurs d'état
-function reactivateStateSelectors() {
-    document.querySelectorAll('.state-select').forEach(select => {
-        select.addEventListener('change', async function() {
-            const commandeId = this.dataset.commandeId;
-            const newState = this.value;
-            const loadingIndicator = this.parentElement.querySelector('.loading-indicator');
-            
-            // Show loading indicator
-            loadingIndicator.classList.remove('hidden');
-            
-            try {
-                const response = await fetch(`/commandes/${commandeId}/etat`, {
-                    method: 'PATCH',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                    },
-                    body: JSON.stringify({ etat: newState })
-                });
-                
-                const data = await response.json();
-                
-                if (response.ok) {
-                    // Update border color based on new state
-                    const borderColors = {
-                        'a faire': 'border-green-600',
-                        'commandé': 'border-yellow-600',
-                        'reçu': 'border-amber-600',
-                        'prévenu': 'border-orange-600',
-                        'délais': 'border-red-600'
-                    };
-                    
-                    // Remove all border colors and add new one
-                    Object.values(borderColors).forEach(color => this.classList.remove(color));
-                    this.classList.add(borderColors[newState]);
-                    
-                    // Mettre à jour les données du client
-                    const cmdIndex = données.findIndex(cmd => cmd.id == commandeId);
-                    if (cmdIndex !== -1) {
-                        données[cmdIndex].etat = newState;
-                    }
-                    
-                    showToast('État mis à jour avec succès', 'success');
-                    
-                    // Update the count in state filters
-                    updateFilterCounts();
-                } else {
-                    throw new Error(data.message || 'Une erreur est survenue');
-                }
-            } catch (error) {
-                showToast(error.message, 'error');
-                // Revert select to previous value
-                this.value = this.querySelector('[selected]').value;
-            } finally {
-                loadingIndicator.classList.add('hidden');
-            }
-        });
-    });
-}
+// Appliquer le filtre de stock utilisateur au chargement initial
+applyUserStockFilter();
 
-// Modification de la fonction renderDefault pour ajouter la classe supplier-cell
-function renderDefault() {
-    titre.textContent = 'Liste des Commandes';
-    headers.innerHTML = defaultHeaders;
-    body.innerHTML = données.filter(filtreOK).map(cmd => {
-        const rowHtml = rowHTML(cmd);
-        // Modifier le HTML pour ajouter la classe et le data attribute
-        return rowHtml.replace(
-            `<td class="py-3 px-4 border border-gray-200">${cmd.fournisseur}</td>`, 
-            `<td class="py-3 px-4 border border-gray-200 supplier-cell cursor-pointer hover:bg-gray-200" data-commande-id="${cmd.id}">${cmd.fournisseur}</td>`
-        );
-    }).join('');
-    updateFilterCounts();
-    makeSupplierEditable();
-    reactivateStateSelectors();
-}
-
-// Modification des autres fonctions de rendu pour préserver l'éditabilité et les sélecteurs
-const originalRenderByArticle = renderByArticle;
-renderByArticle = function() {
-    originalRenderByArticle();
-    // Ne pas ajouter l'éditabilité pour le groupement par article
-};
-
-const originalRenderByFournisseur = renderByFournisseur;
-renderByFournisseur = function() {
-    originalRenderByFournisseur();
-    // Ne pas ajouter l'éditabilité pour le groupement par fournisseur
-};
-
-// Appeler makeSupplierEditable et reactivateStateSelectors après le rendu initial
+// Initialiser l'affichage
 renderDefault();
 </script>
-
 @endsection

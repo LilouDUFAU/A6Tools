@@ -16,6 +16,7 @@ use App\Models\Produit;
 use App\Models\Fournisseur;
 use App\Models\PrepAtelier;
 use App\Models\Stock;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -39,6 +40,7 @@ class CommandeController extends Controller
     public function index()
     {
         $commandes = Commande::with(['client', 'employe'])->get();
+        $userStock = Auth::user()->stock ? Auth::user()->stock->lieux : null;
         $alerteCommandes = [];
         
         
@@ -85,7 +87,7 @@ class CommandeController extends Controller
                 }
             }
         }        
-        return view('gestcommande.index', compact('commandes', 'alerteCommandes'));
+        return view('gestcommande.index', compact('commandes', 'alerteCommandes', 'userStock'));
     }
     
     
@@ -127,7 +129,7 @@ class CommandeController extends Controller
             'reference_devis' => 'nullable|string|max:255',
             'urgence' => 'required|string|max:255',
             'stock_id' => 'required|exists:stocks,id',
-            'doc_client' => 'required|string|max:255',
+            'doc_client' => 'nullable|string|max:255',
         ]);
 
         $validated['employe_id'] = auth()->id();
@@ -280,7 +282,7 @@ class CommandeController extends Controller
             'reference_devis' => 'nullable|string|max:255',
             'urgence' => 'required|string|max:255',
             'stock_id' => 'required|exists:stocks,id',
-            'doc_client' => 'required|string|max:255',
+            'doc_client' => 'nullable|string|max:255',
         ]);
 
         $commande = Commande::findOrFail($id);

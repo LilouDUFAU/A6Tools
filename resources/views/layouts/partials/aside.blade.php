@@ -10,9 +10,11 @@
         <a href="{{ route('gestrenouv.index') }}" class="{{ Route::is('gestrenouv.index') ? 'bg-green-700 px-2 py-1 text-white font-semibold' : 'hover:bg-green-700 hover:px-2 hover:py-1 hover:text-white transition-all duration-300 hover:font-semibold' }} rounded-lg">
             <i class="fa-solid fa-desktop"></i> <span class="ml-2">GestRenouv</span>
         </a>
-        <!-- <a href="{{ route('gestatelier.index') }}" class="{{ Route::is('gestatelier.index') ? 'bg-green-700 px-2 py-1 text-white font-semibold' : 'hover:bg-green-700 hover:px-2 hover:py-1 hover:text-white transition-all duration-300 hover:font-semibold' }} rounded-lg">
+        @if (auth()->check() && auth()->user()->stock_id === 1)
+        <a href="{{ route('gestatelier.index') }}" class="{{ Route::is('gestatelier.index') ? 'bg-green-700 px-2 py-1 text-white font-semibold' : 'hover:bg-green-700 hover:px-2 hover:py-1 hover:text-white transition-all duration-300 hover:font-semibold' }} rounded-lg">
             <i class="fa-solid fa-wrench"></i> <span class="ml-2">GestAtelier</span>
-        </a> -->
+        </a>
+        @endif
         <a href="{{ route('gestsav.index') }}" class="{{ Route::is('gestsav.index') ? 'bg-green-700 px-2 py-1 text-white font-semibold' : 'hover:bg-green-700 hover:px-2 hover:py-1 hover:text-white transition-all duration-300 hover:font-semibold' }} rounded-lg">
             <i class="fa-solid fa-bolt"></i> <span class="ml-2">GestSAV</span>
         </a>

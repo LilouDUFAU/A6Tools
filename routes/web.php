@@ -51,6 +51,8 @@ Route::middleware(['auth'])->group(function () {
     Route::put('/gestatelier/{id}', [PrepAtelierController::class, 'update'])->name('gestatelier.update');
     Route::delete('/gestatelier/{id}', [PrepAtelierController::class, 'destroy'])->name('gestatelier.destroy');
 
+    Route::put('/etapes/{id}/update', [EtapeController::class, 'update'])->name('etapes.update');
+
     Route::get('/gestsav', [PanneController::class, 'index'])->name('gestsav.index');
     Route::get('/gestsav/create', [PanneController::class, 'create'])->name('gestsav.create');
     Route::post('/gestsav', [PanneController::class, 'store'])->name('gestsav.store');
@@ -72,4 +74,6 @@ Route::middleware(['auth'])->group(function () {
         Route::delete('/gestuser/{id}', [UserController::class, 'destroy'])->name('gestuser.destroy');
     });
     Route::get('/gestuser/{id}', [UserController::class, 'show'])->name('gestuser.show');
+
+
 });
