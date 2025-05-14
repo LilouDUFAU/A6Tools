@@ -10,14 +10,13 @@
     <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
-    
 </head>
-<body class="font-[Poppins]">
-    <main class="grid grid-cols-12 min-h-screen">
-        <!-- Burger Menu -->
+<body class="font-[Poppins] h-screen overflow-hidden">
+    <main class="grid grid-cols-12 h-full">
+        <!-- Burger Menu (mobile) -->
         <div class="md:hidden col-span-12 bg-green-600 text-white p-4">
             <button id="burger-menu" class="text-white">
-            <i class="fa-solid fa-bars"></i> <span class="ml-2">Menu</span>
+                <i class="fa-solid fa-bars"></i> <span class="ml-2">Menu</span>
             </button>
             <div id="mobile-menu" class="hidden">
                 @include('layouts.partials.aside')
@@ -25,24 +24,25 @@
         </div>
 
         <!-- Aside pour md et lg -->
-        <aside class="hidden md:block col-start-1 md:col-span-3 lg:col-span-2 border-r border-gray-300 bg-white">
+        <aside class="hidden md:block col-start-1 md:col-span-3 lg:col-span-2 bg-white h-full sticky top-0 overflow-y-auto border-r border-gray-300">
             @include('layouts.partials.aside')
         </aside>
 
-        <section class="col-span-12 md:col-start-4 md:col-span-9 lg:col-span-3 lg:col-span-10 bg-gray-100 bg-gray-100">
-            <!-- header -->
-            <header class="">
+        <!-- Section principale -->
+        <section class="col-span-12 md:col-span-9 lg:col-span-10 bg-gray-100 h-full overflow-y-auto flex flex-col min-h-screen">
+            <!-- Header -->
+            <header>
                 @include('layouts.partials.header')
             </header>
 
-            <!-- contenu -->
-            @yield('content')
+            <!-- Contenu principal -->
+            <div class="flex-1">
+                @yield('content')
+            </div>
+
+
         </section>
     </main>
-    <!-- footer -->
-    <footer class="bg-green-600 text-white text-center py-4 col-span-12 w-full">
-        @include('layouts.partials.footer')
-    </footer>
 
     <script>
         document.getElementById('burger-menu').addEventListener('click', function () {
@@ -50,6 +50,7 @@
             mobileMenu.classList.toggle('hidden');
         });
     </script>
+
     @if(Session::has('download.in.the.next.request'))
         <script>
             var link = document.createElement('a');
