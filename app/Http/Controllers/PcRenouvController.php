@@ -8,12 +8,14 @@ use App\Models\Client;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
 
 class PCRenouvController extends Controller
 {
     public function index()
     {
         $pcrenouvs = PCRenouv::with(['stocks', 'clients'])->get();
+        $userStock = Auth::user()->stock ? Auth::user()->stock->lieux : null;
         return view('gestrenouv.index', compact('pcrenouvs'));
     }
 

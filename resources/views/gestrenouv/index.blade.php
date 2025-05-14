@@ -120,6 +120,7 @@
 
 @php
     $csrf = csrf_token();
+    $userStock = Auth::user()->stock ? strtolower(Auth::user()->stock->lieux) : null;
     $renouvellements = $pcrenouvs->map(function($r) use($csrf) {
         $site = optional($r->stocks->first())->lieux ?? 'Non défini';
         $quantity = $r->stocks->first()?->pivot->quantite ?? 0;
@@ -139,6 +140,7 @@
 
 <script>
     const données = @json($renouvellements);
+    const userDefaultStock = @json($userStock);
     let activeFilters = { lieu: new Set(), type: new Set(), statut: new Set() };
     let searchTerm = '';
     let groupByReference = true;
@@ -150,6 +152,11 @@
     if (storedGroupBy !== null) {
         groupByReference = storedGroupBy === 'true';
         groupByReferenceCheckbox.checked = groupByReference;
+    }
+
+    // Initialiser le filtre par défaut basé sur le stock de l'utilisateur
+    if (userDefaultStock) {
+        activeFilters.lieu.add(userDefaultStock);
     }
 
     const modal = document.getElementById('delete-modal');
@@ -415,7 +422,18 @@ const generateGroupRow = (reference, items) => {
         if (e.target === modal) closeDeleteModal();
     });
 
-    renderTable();
+    document.addEventListener('DOMContentLoaded', function() {
+        // Appliquer l'activation visuelle pour le filtre de lieu par défaut
+        if (userDefaultStock) {
+            document.querySelectorAll('.filter-btn[data-type="lieu"]').forEach(btn => {
+                if (btn.dataset.filter.toLowerCase() === userDefaultStock) {
+                    btn.classList.add('ring-4', 'ring-blue-600');
+                }
+            });
+        }
+        
+        renderTable();
+    });
 </script>
 
 @endsection
