@@ -22,6 +22,7 @@ return new class extends Migration
             $table->string('photo')->nullable();
             $table->unsignedBigInteger('service_id')->default(1); 
             $table->unsignedBigInteger('role_id')->default(1);
+            $table->unsignedBigInteger('stock_id');
             $table->rememberToken();
             $table->timestamps();
 
@@ -29,6 +30,8 @@ return new class extends Migration
             $table->foreign('service_id')->references('id')->on('services')->onDelete('cascade');
             // Clé étrangère vers la table roles
             $table->foreign('role_id')->references('id')->on('roles')->onDelete('cascade');
+            // Clé étrangère vers la table stocks
+            $table->foreign('stock_id')->references('id')->on('stocks')->onDelete('cascade');
 
         });
 

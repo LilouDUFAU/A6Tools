@@ -5,14 +5,12 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use App\Models\Service;
 use App\Models\Role;
+use App\Models\Stock;
 use Illuminate\Http\Request;
 use Barryvdh\DomPDF\Facade\Pdf;
 
 class UserController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index(Request $request)
     {
         $query = User::query();
@@ -31,19 +29,15 @@ class UserController extends Controller
 
         return view('gestuser.index', compact('users', 'roles', 'services'));
     }
-    /**
-     * Show the form for creating a new resource.
-     */
+
     public function create()
     {
         $roles = Role::all();
         $services = Service::all();
-        return view('gestuser.create', compact('roles', 'services'));
+        $stocks = Stock::all(); // ✅ Utiliser les stocks de la base
+        return view('gestuser.create', compact('roles', 'services', 'stocks'));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
         $validatedData = $request->validate([
@@ -55,51 +49,45 @@ class UserController extends Controller
             'photo' => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif,svg', 'max:2048'],
             'service_id' => 'required|exists:services,id',
             'role_id' => 'required|exists:roles,id',
+            'stock_id' => 'nullable|exists:stocks,id', // ✅ Ajout
         ]);
-    
-        // Sauvegardez le mot de passe en clair pour le PDF
+
         $plainPassword = $validatedData['password'];
-        
-        // hasher le mot de passe pour la base de données
         $validatedData['password'] = bcrypt($validatedData['password']);
-    
-        // Créez l'utilisateur
-        $validatedData['photo'] = isset($validatedData['photo']) ? $validatedData['photo']->store('photos', 'public') : null;
+
+        $validatedData['photo'] = isset($validatedData['photo']) 
+            ? $validatedData['photo']->store('photos', 'public') 
+            : null;
+
         $user = User::create($validatedData);
-    
-        // Générez le PDF
+
         $pdf = PDF::loadView('pdf.user_credentials', [
             'user' => $user,
             'password' => $plainPassword
         ]);
-    
+
         return redirect()->route('gestuser.index')->with('success', 'Utilisateur créé avec succès.')->with('download.in.the.next.request', [
             'url' => base64_encode($pdf->output()),
             'name' => 'identifiants_'.$user->nom.'_'.$user->prenom.'.pdf'
         ]);
     }
 
-    /**
-     * Display the specified resource.
-     */
     public function show(string $id)
     {
         $user = User::findOrFail($id);
-        return view('gestuser.show', compact('user'));
+        $stock = $user->stock;
+        return view('gestuser.show', compact('user', 'stock'));
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
     public function edit(string $id)
     {
         $user = User::findOrFail($id);
-        return view('gestuser.edit', compact('user'));
+        $roles = Role::all();
+        $services = Service::all();
+        $stocks = Stock::all(); // ✅ Ajout
+        return view('gestuser.edit', compact('user', 'roles', 'services', 'stocks'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(Request $request, string $id)
     {
         $user = User::findOrFail($id);
@@ -113,6 +101,7 @@ class UserController extends Controller
             'photo' => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif,svg', 'max:2048'],
             'service_id' => 'sometimes|required|exists:services,id',
             'role_id' => 'sometimes|required|exists:roles,id',
+            'stock_id' => 'nullable|exists:stocks,id', // ✅ Ajout
         ]);
 
         if (!empty($validatedData['password'])) {
@@ -121,21 +110,17 @@ class UserController extends Controller
             unset($validatedData['password']);
         }
 
-        $user->update($validatedData);
-
         if (isset($validatedData['photo'])) {
             $validatedData['photo'] = $validatedData['photo']->store('photos', 'public');
         } else {
             unset($validatedData['photo']);
         }
+
         $user->update($validatedData);
 
         return redirect()->route('gestuser.index')->with('success', 'Utilisateur mis à jour avec succès.');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(string $id)
     {
         $user = User::findOrFail($id);

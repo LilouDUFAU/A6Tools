@@ -27,6 +27,7 @@ class UserSeeder extends Seeder
                 'password' => Hash::make(env('ADMIN_PASSWORD', 'password_par_defaut')),
                 'service_id' => 3,
                 'role_id' => 2,
+                'stock_id' => 2,
                 'updated_at' => $now,
                 'created_at' => $now, // utile seulement si la ligne est créée
             ]

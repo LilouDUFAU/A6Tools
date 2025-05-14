@@ -42,8 +42,8 @@
                 </div>
 
                 <div>
-                    <p class="text-sm text-gray-500">Date de création :</p>
-                    <p class="text-lg text-gray-900 font-semibold">{{ $user->created_at->format('d/m/Y H:i') }}</p>
+                    <p class="text-sm text-gray-500">Magasin associé :</p>
+                    <p class="text-lg text-gray-900 font-semibold">{{ $user->stock->lieux ?? 'N/A' }}</p>
                 </div>
 
                 <div>

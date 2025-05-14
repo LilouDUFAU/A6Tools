@@ -29,6 +29,7 @@ class User extends Authenticatable
         'photo',
         'service_id',
         'role_id',
+        'stock_id',
     ];
 
     //////////////////////////////
@@ -63,6 +64,11 @@ class User extends Authenticatable
     //un employe peut occuper un role
     public function role(){
         return $this->belongsTo(Role::class, 'role_id', 'id');
+    }
+
+    // un employe peut appartenir a un stock
+    public function stock(){
+        return $this->belongsTo(Stock::class, 'stock_id', 'id');
     }
 
     

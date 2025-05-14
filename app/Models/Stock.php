@@ -41,5 +41,11 @@ class Stock extends Model
     {
         return $this->belongsToMany(PCRenouv::class, 'pcrenouv_stock', 'stock_id', 'pcrenouv_id')->withPivot('quantite');    
     }
+
+    //un stock peut avoir plusieurs user
+    public function users()
+    {
+        return $this->hasMany(User::class, 'user_id', 'id');
+    }
     
 }

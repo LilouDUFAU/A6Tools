@@ -100,6 +100,21 @@
                     @enderror
                 </div>
 
+                                <div class="mb-4">
+                    <label for="stock_id" class="block text-gray-700 text-sm font-bold mb-2">{{ __('Magasin') }}</label>
+                    <select id="stock_id" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('stock_id') border-red-500 @enderror" name="stock_id">
+                        <option value="">{{ __('Sélectionnez un magasin') }}</option>
+                        @foreach ($stocks as $stock)
+                            <option value="{{ $stock->id }}" {{ old('stock_id', $user->stock_id ?? '') == $stock->id ? 'selected' : '' }}>
+                                {{ $stock->lieux }}
+                            </option>
+                        @endforeach
+                    </select>
+                    @error('stock_id')
+                        <p class="text-red-500 text-xs italic mt-2">{{ $message }}</p>
+                    @enderror
+                </div>
+
                 <div class="flex items-center justify-between">
                     <button type="submit" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
                         {{ __('Mettre à jour') }}
