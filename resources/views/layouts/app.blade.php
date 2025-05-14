@@ -29,14 +29,14 @@
         </aside>
 
         <!-- Section principale -->
-        <section class="col-span-12 md:col-span-9 lg:col-span-10 bg-gray-100 h-full overflow-y-auto flex flex-col min-h-screen">
+        <section class="col-span-12 md:col-span-9 lg:col-span-10 bg-gray-100 h-full overflow-y-auto flex flex-col min-h-screen pb-8">
             <!-- Header -->
             <header>
                 @include('layouts.partials.header')
             </header>
 
             <!-- Contenu principal -->
-            <div class="flex-1">
+            <div class="flex-1 pb-8">
                 @yield('content')
             </div>
 
