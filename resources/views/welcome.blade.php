@@ -33,10 +33,12 @@
                             <i class="nav-icon fa-solid fa-desktop text-6xl mb-4"></i>
                             <span class="text-lg md:text-xl">GestRenouv</span>
                         </a>
-                        <!-- <a href="{{ route('gestatelier.index') }}" class="flex flex-col items-center text-gray-800 hover:text-green-600 transition">
+                        @if (auth()->check() && auth()->user()->stock_id === 1)
+                        <a href="{{ route('gestatelier.index') }}" class="flex flex-col items-center text-gray-800 hover:text-green-600 transition">
                             <i class="nav-icon fa-solid fa-wrench text-6xl mb-4"></i>
                             <span class="text-lg md:text-xl">GestAtelier</span>
-                        </a> -->
+                        </a>
+                        @endif
                         <a href="{{ route('gestsav.index') }}" class="flex flex-col items-center text-gray-800 hover:text-green-600 transition">
                             <i class="nav-icon fa-solid fa-bolt text-6xl mb-4"></i>
                             <span class="text-lg md:text-xl">GestSAV</span>
