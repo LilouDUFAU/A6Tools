@@ -19,6 +19,6 @@ class LocPret extends Model
 
     public function pcRenouv()
     {
-        return $this->hasMany(PCRenouv::class, 'pcRenouv_id', 'id');
+        return $this->hasMany(PCRenouv::class, 'locPret_id', 'id');
     }
 }

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\PCRenouv;
 use App\Models\Stock;
 use App\Models\Client;
+use App\Models\LocPret;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -14,7 +15,7 @@ class PCRenouvController extends Controller
 {
     public function index()
     {
-        $pcrenouvs = PCRenouv::with(['stocks', 'clients'])->get();
+        $pcrenouvs = PCRenouv::with(['stocks', 'clients', 'locPret'])->get();
         $userStock = Auth::user()->stock ? Auth::user()->stock->lieux : null;
         return view('gestrenouv.index', compact('pcrenouvs'));
     }
@@ -26,7 +27,7 @@ class PCRenouvController extends Controller
         return view('gestrenouv.create', compact('type', 'statut'));
     }
 
-public function store(Request $request)
+    public function store(Request $request)
     {
         $validated = $request->validate([
             'reference' => 'required|string|max:255',
@@ -49,7 +50,8 @@ public function store(Request $request)
                 'type' => $validated['type'],
                 'statut' => $validated['statut'],
                 'employe_id' => auth()->id(),
-                'quantite' => $validated['quantite'], // Add this line
+                'quantite' => $validated['quantite'],
+                'locPret_id' => null,
             ]);
 
             Log::info('PCRenouv created successfully', ['id' => $pcrenouv->id]);
@@ -79,7 +81,7 @@ public function store(Request $request)
         try {
             Log::info('Fetching PCRenouv details', ['id' => $id]);
             
-            $pcrenouv = PCRenouv::with(['stocks', 'clients'])->findOrFail($id);
+            $pcrenouv = PCRenouv::with(['stocks', 'clients', 'locPret'])->findOrFail($id);
             
             Log::info('PCRenouv details fetched successfully', [
                 'id' => $id,
@@ -101,7 +103,7 @@ public function store(Request $request)
         try {
             Log::info('Fetching PCRenouv for editing', ['id' => $id]);
             
-            $pcrenouv = PCRenouv::with(['stocks', 'clients'])->findOrFail($id);
+            $pcrenouv = PCRenouv::with(['stocks', 'clients', 'locPret'])->findOrFail($id);
             Log::info('PCRenouv fetched successfully', ['id' => $id, 'reference' => $pcrenouv->reference]);
             
             $type = PCRenouv::TYPES;
@@ -317,202 +319,227 @@ public function store(Request $request)
         }
     }
 
-public function addLocPret(Request $request, $id)
-{
-    $validated = $request->validate([
-        'reference' => 'required|string|max:255',
-        'numero_serie' => 'required|string|max:255',
-        'caracteristiques' => 'nullable|string|max:255',
-        'type' => 'required|string|in:' . implode(',', PCRenouv::TYPES),
-        'statut' => 'required|string|in:' . implode(',', PCRenouv::STATUTS),
-        'stock_id' => 'required|exists:stocks,id',
-        'quantite' => 'required|integer|min:1',
-        'client_id' => 'nullable|exists:clients,id',
-        'new_client' => 'nullable|array',
-        'date_pret' => 'nullable|date',
-        'date_retour' => 'nullable|date',
-        'is_group' => 'nullable|boolean',
-    ]);
-
-    DB::beginTransaction();
-    try {
-        Log::info('Starting addLocPret process', [
-            'id' => $id,
-            'is_group' => $request->input('is_group'),
-            'data' => $validated
+    public function addLocPret(Request $request, $id)
+    {
+        $validated = $request->validate([
+            'reference' => 'required|string|max:255',
+            'numero_serie' => 'required|string|max:255',
+            'caracteristiques' => 'nullable|string|max:255',
+            'type' => 'required|string|in:' . implode(',', PCRenouv::TYPES),
+            'statut' => 'required|string|in:' . implode(',', PCRenouv::STATUTS),
+            'stock_id' => 'required|exists:stocks,id',
+            'quantite' => 'required|integer|min:1',
+            'client_id' => 'nullable|exists:clients,id',
+            'new_client' => 'nullable|array',
+            'date_pret' => 'nullable|date',
+            'date_retour' => 'nullable|date',
+            'is_group' => 'nullable|boolean',
         ]);
 
-        $isGroup = $request->has('is_group') && $request->input('is_group');
-        
-        if ($isGroup) {
-            $originalReference = preg_replace('/^(prêt-|location-)/', '', $validated['reference']);
-            $originalReference = preg_replace('/-\d+$/', '', $originalReference);
-            
-            Log::info('Processing group operation', [
-                'original_reference' => $originalReference
-            ]);
-            
-            $pcrenouvs = PCRenouv::where('reference', $originalReference)
-                              ->where('statut', 'en stock')
-                              ->with('stocks')
-                              ->get();
-            
-            $totalAvailableQuantity = $pcrenouvs->sum(function($r) {
-                return $r->stocks->first()?->pivot->quantite ?? 0;
-            });
-            
-            Log::info('Group availability check', [
-                'requested_quantity' => $validated['quantite'],
-                'available_quantity' => $totalAvailableQuantity
-            ]);
-            
-            if ($validated['quantite'] > $totalAvailableQuantity) {
-                throw new \Exception("Quantité demandée ($validated[quantite]) supérieure à la quantité disponible ($totalAvailableQuantity)");
-            }
-            
-            $loanedPcrenouv = PCRenouv::create([
-                'reference' => $validated['reference'],
-                'numero_serie' => $validated['numero_serie'],
-                'caracteristiques' => $validated['caracteristiques'],
-                'type' => $validated['type'],
-                'statut' => $validated['statut'],
-                'employe_id' => auth()->id(),
-                'quantite' => $validated['quantite'], // Add the quantite field here
-            ]);
-            
-            Log::info('Created group loan/lend record', [
-                'id' => $loanedPcrenouv->id,
-                'reference' => $loanedPcrenouv->reference
-            ]);
-            
-            $loanedPcrenouv->stocks()->attach($validated['stock_id'], ['quantite' => $validated['quantite']]);
-            
-            $remainingToReduce = $validated['quantite'];
-            
-            foreach ($pcrenouvs as $pcrenouv) {
-                $currentQty = $pcrenouv->stocks->first()?->pivot->quantite ?? 0;
-                
-                if ($currentQty <= 0) continue;
-                
-                $toReduce = min($remainingToReduce, $currentQty);
-                $newQty = $currentQty - $toReduce;
-                
-                Log::info('Updating stock quantities', [
-                    'pcrenouv_id' => $pcrenouv->id,
-                    'current_quantity' => $currentQty,
-                    'to_reduce' => $toReduce,
-                    'new_quantity' => $newQty
-                ]);
-                
-                if ($newQty <= 0) {
-                    $pcrenouv->stocks()->detach();
-                    $pcrenouv->delete();
-                    Log::info('Removed empty stock record', ['pcrenouv_id' => $pcrenouv->id]);
-                } else {
-                    $pcrenouv->stocks()->updateExistingPivot(
-                        $pcrenouv->stocks->first()->id,
-                        ['quantite' => $newQty]
-                    );
-                    Log::info('Updated stock quantity', [
-                        'pcrenouv_id' => $pcrenouv->id,
-                        'new_quantity' => $newQty
-                    ]);
-                }
-                
-                $remainingToReduce -= $toReduce;
-                if ($remainingToReduce <= 0) break;
-            }
-        } else {
-            $originalPcrenouv = PCRenouv::with('stocks')->findOrFail($id);
-            
-            $totalQuantity = $originalPcrenouv->stocks->first()?->pivot->quantite ?? 0;
-            
-            Log::info('Single item availability check', [
+        DB::beginTransaction();
+        try {
+            Log::info('Starting addLocPret process', [
                 'id' => $id,
-                'requested_quantity' => $validated['quantite'],
-                'available_quantity' => $totalQuantity
+                'is_group' => $request->input('is_group'),
+                'data' => $validated
             ]);
+
+            $isGroup = $request->has('is_group') && $request->input('is_group');
             
-            if ($validated['quantite'] > $totalQuantity) {
-                throw new \Exception("Quantité demandée ($validated[quantite]) supérieure à la quantité disponible ($totalQuantity)");
-            }
+            // Process client
+            $clientId = null;
             
-            $loanedPcrenouv = PCRenouv::create([
-                'reference' => $validated['reference'],
-                'numero_serie' => $validated['numero_serie'],
-                'caracteristiques' => $validated['caracteristiques'],
-                'type' => $validated['type'],
-                'statut' => $validated['statut'],
-                'employe_id' => auth()->id(),
-                'quantite' => $validated['quantite'], // Add the quantite field here
-            ]);
-            
-            Log::info('Created single loan/lend record', [
-                'id' => $loanedPcrenouv->id,
-                'reference' => $loanedPcrenouv->reference
-            ]);
-            
-            $loanedPcrenouv->stocks()->attach($validated['stock_id'], ['quantite' => $validated['quantite']]);
-            
-            $remainingQuantity = $totalQuantity - $validated['quantite'];
-            
-            if ($remainingQuantity <= 0) {
-                $originalPcrenouv->stocks()->detach();
-                $originalPcrenouv->delete();
-                Log::info('Removed original record (no remaining quantity)', ['id' => $id]);
-            } else {
-                $originalPcrenouv->stocks()->updateExistingPivot(
-                    $originalPcrenouv->stocks->first()->id,
-                    ['quantite' => $remainingQuantity]
-                );
-                Log::info('Updated original record quantity', [
-                    'id' => $id,
-                    'new_quantity' => $remainingQuantity
+            if (isset($validated['new_client']) && !empty($validated['new_client']['nom'])) {
+                $client = Client::create([
+                    'nom' => $validated['new_client']['nom'],
+                    'code_client' => $validated['new_client']['code_client'] ?? null,
                 ]);
+                $clientId = $client->id;
+                Log::info('Created new client', [
+                    'client_id' => $clientId,
+                    'nom' => $client->nom
+                ]);
+            } elseif (!empty($validated['client_id'])) {
+                $clientId = $validated['client_id'];
+                Log::info('Using existing client', ['client_id' => $clientId]);
             }
-        }
-        
-        // Process client
-        $clientId = null;
-        
-        if (isset($validated['new_client']) && !empty($validated['new_client']['nom'])) {
-            $client = Client::create([
-                'nom' => $validated['new_client']['nom'],
-                'code_client' => $validated['new_client']['code_client'] ?? null,
-            ]);
-            $clientId = $client->id;
-            Log::info('Created new client', [
-                'client_id' => $clientId,
-                'nom' => $client->nom
-            ]);
-        } elseif (!empty($validated['client_id'])) {
-            $clientId = $validated['client_id'];
-            Log::info('Using existing client', ['client_id' => $clientId]);
-        }
-        
-        if ($clientId) {
-            $loanedPcrenouv->clients()->attach($clientId, [
+            
+            // Create LocPret record
+            $locPret = LocPret::create([
                 'date_pret' => $validated['date_pret'] ?? now(),
-                'date_retour' => $validated['date_retour'],
+                'date_retour' => $validated['date_retour'] ?? null,
+                'client_id' => $clientId,
             ]);
-            Log::info('Attached client to PCRenouv', [
-                'pcrenouv_id' => $loanedPcrenouv->id,
+            
+            Log::info('Created LocPret record', [
+                'id' => $locPret->id,
                 'client_id' => $clientId
             ]);
+            
+            if ($isGroup) {
+                $this->processGroupRental($validated, $locPret);
+            } else {
+                $this->processSingleRental($id, $validated, $locPret);
+            }
+            
+            DB::commit();
+            Log::info('Transaction completed successfully');
+            return redirect()->route('gestrenouv.index')->with('success', 'PCRenouv ' . $validated['statut'] . ' avec succès!');
+        } catch (\Exception $e) {
+            DB::rollback();
+            Log::error('Error in addLocPret process', [
+                'error' => $e->getMessage(),
+                'data' => $validated
+            ]);
+            return redirect()->back()->with('error', 'Erreur: ' . $e->getMessage())->withInput();
+        }
+    }
+    
+    /**
+     * Process a group rental operation
+     */
+    private function processGroupRental($validated, $locPret)
+    {
+        $originalReference = preg_replace('/^(prêt-|location-)/', '', $validated['reference']);
+        $originalReference = preg_replace('/-\d+$/', '', $originalReference);
+        
+        Log::info('Processing group operation', [
+            'original_reference' => $originalReference
+        ]);
+        
+        $pcrenouvs = PCRenouv::where('reference', $originalReference)
+                         ->where('statut', 'en stock')
+                         ->with('stocks')
+                         ->get();
+        
+        $totalAvailableQuantity = $pcrenouvs->sum(function($r) {
+            return $r->stocks->first()?->pivot->quantite ?? 0;
+        });
+        
+        Log::info('Group availability check', [
+            'requested_quantity' => $validated['quantite'],
+            'available_quantity' => $totalAvailableQuantity
+        ]);
+        
+        if ($validated['quantite'] > $totalAvailableQuantity) {
+            throw new \Exception("Quantité demandée ($validated[quantite]) supérieure à la quantité disponible ($totalAvailableQuantity)");
         }
         
-        DB::commit();
-        Log::info('Transaction completed successfully');
-        return redirect()->route('gestrenouv.index')->with('success', 'PCRenouv ' . $validated['statut'] . ' avec succès!');
-    } catch (\Exception $e) {
-        DB::rollback();
-        Log::error('Error in addLocPret process', [
-            'error' => $e->getMessage(),
-            'data' => $validated
+        // Create a new PCRenouv for the rental
+        $loanedPcrenouv = PCRenouv::create([
+            'reference' => $validated['reference'],
+            'numero_serie' => $validated['numero_serie'],
+            'caracteristiques' => $validated['caracteristiques'],
+            'type' => $validated['type'],
+            'statut' => $validated['statut'],
+            'employe_id' => auth()->id(),
+            'quantite' => $validated['quantite'],
+            'locPret_id' => $locPret->id,
         ]);
-        return redirect()->back()->with('error', 'Erreur: ' . $e->getMessage())->withInput();
+        
+        Log::info('Created group loan/lend record', [
+            'id' => $loanedPcrenouv->id,
+            'reference' => $loanedPcrenouv->reference,
+            'locpret_id' => $locPret->id
+        ]);
+        
+        $loanedPcrenouv->stocks()->attach($validated['stock_id'], ['quantite' => $validated['quantite']]);
+        
+        // Reduce quantities from original PCRenouv records
+        $remainingToReduce = $validated['quantite'];
+        
+        foreach ($pcrenouvs as $pcrenouv) {
+            $currentQty = $pcrenouv->stocks->first()?->pivot->quantite ?? 0;
+            
+            if ($currentQty <= 0) continue;
+            
+            $toReduce = min($remainingToReduce, $currentQty);
+            $newQty = $currentQty - $toReduce;
+            
+            Log::info('Updating stock quantities', [
+                'pcrenouv_id' => $pcrenouv->id,
+                'current_quantity' => $currentQty,
+                'to_reduce' => $toReduce,
+                'new_quantity' => $newQty
+            ]);
+            
+            if ($newQty <= 0) {
+                $pcrenouv->stocks()->detach();
+                $pcrenouv->delete();
+                Log::info('Removed empty stock record', ['pcrenouv_id' => $pcrenouv->id]);
+            } else {
+                $pcrenouv->stocks()->updateExistingPivot(
+                    $pcrenouv->stocks->first()->id,
+                    ['quantite' => $newQty]
+                );
+                Log::info('Updated stock quantity', [
+                    'pcrenouv_id' => $pcrenouv->id,
+                    'new_quantity' => $newQty
+                ]);
+            }
+            
+            $remainingToReduce -= $toReduce;
+            if ($remainingToReduce <= 0) break;
+        }
     }
-}
+    
+    /**
+     * Process a single rental operation
+     */
+    private function processSingleRental($id, $validated, $locPret)
+    {
+        $originalPcrenouv = PCRenouv::with('stocks')->findOrFail($id);
+        
+        $totalQuantity = $originalPcrenouv->stocks->first()?->pivot->quantite ?? 0;
+        
+        Log::info('Single item availability check', [
+            'id' => $id,
+            'requested_quantity' => $validated['quantite'],
+            'available_quantity' => $totalQuantity
+        ]);
+        
+        if ($validated['quantite'] > $totalQuantity) {
+            throw new \Exception("Quantité demandée ($validated[quantite]) supérieure à la quantité disponible ($totalQuantity)");
+        }
+        
+        // Create a new PCRenouv for the rental
+        $loanedPcrenouv = PCRenouv::create([
+            'reference' => $validated['reference'],
+            'numero_serie' => $validated['numero_serie'],
+            'caracteristiques' => $validated['caracteristiques'],
+            'type' => $validated['type'],
+            'statut' => $validated['statut'],
+            'employe_id' => auth()->id(),
+            'quantite' => $validated['quantite'],
+            'locPret_id' => $locPret->id,
+        ]);
+        
+        Log::info('Created single loan/lend record', [
+            'id' => $loanedPcrenouv->id,
+            'reference' => $loanedPcrenouv->reference,
+            'locpret_id' => $locPret->id
+        ]);
+        
+        $loanedPcrenouv->stocks()->attach($validated['stock_id'], ['quantite' => $validated['quantite']]);
+        
+        // Update original PCRenouv quantity
+        $remainingQuantity = $totalQuantity - $validated['quantite'];
+        
+        if ($remainingQuantity <= 0) {
+            $originalPcrenouv->stocks()->detach();
+            $originalPcrenouv->delete();
+            Log::info('Removed original record (no remaining quantity)', ['id' => $id]);
+        } else {
+            $originalPcrenouv->stocks()->updateExistingPivot(
+                $originalPcrenouv->stocks->first()->id,
+                ['quantite' => $remainingQuantity]
+            );
+            Log::info('Updated original record quantity', [
+                'id' => $id,
+                'new_quantity' => $remainingQuantity
+            ]);
+        }
+    }
 
     public function retour(Request $request, $id)
     {
@@ -520,7 +547,7 @@ public function addLocPret(Request $request, $id)
         try {
             Log::info('Starting return process', ['id' => $id]);
 
-            $pcrenouv = PCRenouv::with(['stocks', 'clients'])->findOrFail($id);
+            $pcrenouv = PCRenouv::with(['stocks', 'clients', 'locPret'])->findOrFail($id);
             
             if (!in_array(strtolower($pcrenouv->statut), ['loué', 'prêté'])) {
                 throw new \Exception('Ce PCRenouv n\'est pas prêté ou loué.');
@@ -540,7 +567,7 @@ public function addLocPret(Request $request, $id)
                                         ->with('stocks')
                                         ->first();
             
-            $returnQuantity = $pcrenouv->stocks->first()->pivot->quantite ?? 0;
+            $returnQuantity = $pcrenouv->quantite ?? 0;
             
             Log::info('Return quantity', [
                 'quantity' => $returnQuantity,
@@ -548,27 +575,17 @@ public function addLocPret(Request $request, $id)
             ]);
             
             if ($originalPCRenouv) {
-                $originalStock = $originalPCRenouv->stocks->first();
-                if ($originalStock) {
-                    $currentQuantity = $originalStock->pivot->quantite ?? 0;
-                    $originalPCRenouv->stocks()->updateExistingPivot(
-                        $originalStock->id,
-                        ['quantite' => $currentQuantity + $returnQuantity]
-                    );
-                    Log::info('Updated original stock quantity', [
-                        'pcrenouv_id' => $originalPCRenouv->id,
-                        'new_quantity' => $currentQuantity + $returnQuantity
-                    ]);
-                } else {
-                    $originalPCRenouv->stocks()->attach($pcrenouv->stocks->first()->id, [
-                        'quantite' => $returnQuantity
-                    ]);
-                    Log::info('Attached new stock to original PCRenouv', [
-                        'pcrenouv_id' => $originalPCRenouv->id,
-                        'quantity' => $returnQuantity
-                    ]);
-                }
+                // Add returned quantity to existing PCRenouv
+                $originalPCRenouv->update([
+                    'quantite' => $originalPCRenouv->quantite + $returnQuantity
+                ]);
+                
+                Log::info('Updated original PCRenouv quantity', [
+                    'pcrenouv_id' => $originalPCRenouv->id,
+                    'new_quantity' => $originalPCRenouv->quantite
+                ]);
             } else {
+                // Create new PCRenouv with returned quantity
                 $newPCRenouv = PCRenouv::create([
                     'reference' => $baseReference,
                     'numero_serie' => preg_replace('/^(prêt-|location-)/', '', $pcrenouv->numero_serie),
@@ -576,11 +593,16 @@ public function addLocPret(Request $request, $id)
                     'type' => $pcrenouv->type,
                     'statut' => 'en stock',
                     'employe_id' => auth()->id(),
+                    'quantite' => $returnQuantity,
+                    'locPret_id' => null,
                 ]);
                 
-                $newPCRenouv->stocks()->attach($pcrenouv->stocks->first()->id, [
-                    'quantite' => $returnQuantity
-                ]);
+                // Attach to the same stock
+                if ($pcrenouv->stocks->isNotEmpty()) {
+                    $newPCRenouv->stocks()->attach($pcrenouv->stocks->first()->id, [
+                        'quantite' => $returnQuantity
+                    ]);
+                }
                 
                 Log::info('Created new PCRenouv for return', [
                     'id' => $newPCRenouv->id,
@@ -589,6 +611,29 @@ public function addLocPret(Request $request, $id)
                 ]);
             }
             
+            // Check if this is the last PCRenouv linked to the LocPret
+            $locPretId = $pcrenouv->locPret_id;
+            $locPret = null;
+            
+            if ($locPretId) {
+                $locPret = LocPret::findOrFail($locPretId);
+                $remainingPCs = PCRenouv::where('locPret_id', $locPretId)
+                                       ->where('id', '!=', $pcrenouv->id)
+                                       ->count();
+                
+                Log::info('Checking remaining PCs in LocPret', [
+                    'locpret_id' => $locPretId,
+                    'remaining_pcs' => $remainingPCs
+                ]);
+                
+                if ($remainingPCs == 0) {
+                    // This was the last PC, delete the LocPret record
+                    $locPret->delete();
+                    Log::info('Deleted LocPret record (all PCs returned)', ['locpret_id' => $locPretId]);
+                }
+            }
+            
+            // Delete the returned PCRenouv
             $pcrenouv->delete();
             Log::info('Deleted loan/lend record', ['id' => $id]);
             
