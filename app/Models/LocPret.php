@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class LocPret extends Model
 {
@@ -27,6 +28,7 @@ class LocPret extends Model
     // une location / pret peut concerner plusieurs pcrenouvs
     public function pcrenouvs()
     {
-        return $this->hasMany(Pcrenouv::class, 'loc_pret_id', 'id');
+        return $this->belongsToMany(PcRenouv::class, 'loc_pret_p_c_renouv');
     }
+
 }
