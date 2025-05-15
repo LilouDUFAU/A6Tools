@@ -75,24 +75,6 @@
                                         <i class="fas fa-edit"></i>
                                     </a>
                                     
-                                    @if($pcrenouv->statut == 'en stock')
-                                        <a href="{{ route('locpret.create', ['pcrenouv_id' => $pcrenouv->id]) }}" class="text-blue-600 hover:text-blue-900">
-                                            <i class="fas fa-handshake"></i>
-                                        </a>
-                                    @elseif($pcrenouv->statut == 'prêté' || $pcrenouv->statut == 'loué')
-                                        {{-- Formulaire invisible pour PUT retour via locpret.retourner --}}
-                                        @if($pcrenouv->locprets->isNotEmpty())
-                                            <form id="retourner-form-{{ $pcrenouv->id }}" action="{{ route('locpret.retourner', $pcrenouv->locprets->first()) }}" method="POST" style="display:none;">
-                                                @csrf
-                                                @method('PUT')
-                                            </form>
-                                            <a href="#" class="text-green-600 hover:text-green-900"
-                                               onclick="event.preventDefault(); if(confirm('Confirmer le retour de ce PC?')) document.getElementById('retourner-form-{{ $pcrenouv->id }}').submit();">
-                                                <i class="fas fa-undo"></i>
-                                            </a>
-                                        @endif
-                                    @endif
-                                    
                                     <form action="{{ route('gestrenouv.destroy', $pcrenouv) }}" method="POST" class="inline">
                                         @csrf
                                         @method('DELETE')
