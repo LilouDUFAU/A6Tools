@@ -1,7 +1,7 @@
 <div class="flex items-center justify-between p-4 gap-4">
-    <form action="/search" method="GET" class="w-full max-w-md">
+    <form onsubmit="event.preventDefault();" class="w-full max-w-md">
         <div class="relative">
-            <input type="text" name="query" placeholder="Rechercher..." class="w-full px-4 py-2 border border-gray-300 rounded-lg outline-none"/>
+            <input id="searchInput" type="text" name="query" placeholder="Rechercher..." class="w-full px-4 py-2 border border-gray-300 rounded-lg outline-none"/>
             <button type="submit" class="absolute top-0 right-0 px-4 py-2 text-white bg-green-600 rounded-r-lg hover:bg-green-700 font-semibold outline-none">
                 Rechercher
             </button>
@@ -29,3 +29,15 @@
         </div>
     @endif
 </div>
+<script>
+        // Filtre de recherche pour la table
+    document.getElementById('searchInput').addEventListener('keyup', function() {
+        const searchValue = this.value.toLowerCase();
+        const rows = document.querySelectorAll('tbody tr');
+        
+        rows.forEach(row => {
+            const text = row.textContent.toLowerCase();
+            row.style.display = text.includes(searchValue) ? '' : 'none';
+        });
+    });
+</script>
