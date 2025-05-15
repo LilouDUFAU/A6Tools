@@ -130,6 +130,8 @@
                         <th class="px-6 py-3">Nom & Prénom</th>
                         <th class="px-6 py-3">Service</th>
                         <th class="px-6 py-3">Rôle</th>
+                        <th class="px-6 py-3">Email</th>
+                        <th class="px-6 py-3">Magasin</th>
                         <th class="px-6 py-3">Actions</th>
                     </tr>
                 </thead>
@@ -141,6 +143,8 @@
                             </td>
                             <td class="px-6 py-4">{{ $user->service->nom ?? 'Service inconnu' }}</td>
                             <td class="px-6 py-4">{{ $user->role->nom ?? 'Rôle inconnu' }}</td>
+                            <td class="px-6 py-4">{{ $user->email }}</td>
+                            <td class="px-6 py-4">{{ $user->stock->lieux ?? 'Magasin non trouvé' }}</td>
                             <td class="px-6 py-4 flex space-x-2">
                                 <a href="{{ route('gestuser.edit', $user->id) }}" class="text-blue-600 hover:underline" onclick="event.stopPropagation();">Modifier</a>
                                 <form action="{{ route('gestuser.destroy', $user->id) }}" method="POST">
