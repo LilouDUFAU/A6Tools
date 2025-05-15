@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="h-screen flex items-center justify-center bg-gray-100">
+<div class="h-full flex items-center justify-center bg-gray-100">
     <div class="w-full max-w-md">
         <div class="bg-white shadow-md rounded px-8 py-6">
             <div class="text-lg font-semibold text-gray-700 mb-4">{{ __('Réinitialiser le mot de passe') }}</div>
