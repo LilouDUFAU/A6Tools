@@ -17,7 +17,7 @@ class PCRenouvController extends Controller
      */
     public function index()
     {
-        $pcrenouvs = PCRenouv::with('locPrets.clients')->get();
+        $pcrenouvs = PCRenouv::with('locprets.clients')->get();
         return view('gestrenouv.index', compact('pcrenouvs'));
     }
 

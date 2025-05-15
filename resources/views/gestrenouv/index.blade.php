@@ -31,8 +31,8 @@
                 <table class="min-w-full divide-y divide-gray-200">
                     <thead class="bg-gray-50">
                         <tr>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">N° Série</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Référence</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">N° Série</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Statut</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Client</th>
@@ -41,9 +41,13 @@
                     </thead>
                     <tbody class="bg-white divide-y divide-gray-200">
                         @forelse($pcrenouvs as $pcrenouv)
+                            @php
+                                $locpret = $pcrenouv->locprets->first();
+                                $client = $locpret ? $locpret->clients : null;
+                            @endphp
                             <tr class="hover:bg-gray-50">
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $pcrenouv->numero_serie }}</td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $pcrenouv->reference }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $pcrenouv->numero_serie }}</td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $pcrenouv->type }}</td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm">
                                     @if($pcrenouv->statut == 'en stock')
@@ -61,12 +65,13 @@
                                     @endif
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                    @if($pcrenouv->locprets->isNotEmpty() && $pcrenouv->locprets->first()->client)
-                                        {{ $pcrenouv->locprets->first()->client->nom }}
+                                    @if($client)
+                                        {{ $client->code_client }} ({{ $client->nom }})
                                     @else
                                         -
                                     @endif
                                 </td>
+
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 space-x-2">
                                     <a href="{{ route('gestrenouv.show', $pcrenouv) }}" class="text-blue-600 hover:text-blue-900">
                                         <i class="fas fa-eye"></i>
@@ -156,7 +161,6 @@
 @section('scripts')
 <script>
     function openPretModal(pcrenouvId) {
-        // Correction du chemin ici, pour coller à ta route
         document.getElementById('pretForm').action = `/gestrenouv/${pcrenouvId}/preter-louer`;
         document.getElementById('pretModal').classList.remove('hidden');
     }
