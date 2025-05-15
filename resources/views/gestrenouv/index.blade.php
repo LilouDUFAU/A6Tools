@@ -17,16 +17,7 @@
             </a>
         </div>
 
-        <div class="p-6">
-            <div class="mb-4 flex justify-end">
-                <div class="relative">
-                    <input type="text" id="searchInput" 
-                           class="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                           placeholder="Rechercher...">
-                    <i class="fas fa-search absolute right-3 top-3 text-gray-400"></i>
-                </div>
-            </div>
-            
+        <div class="p-6">            
             <div class="overflow-x-auto">
                 <table class="min-w-full divide-y divide-gray-200">
                     <thead class="bg-gray-50">
@@ -156,25 +147,4 @@
             </form>
         </div>
     </div>
-<script>
-    function openPretModal(pcrenouvId) {
-        document.getElementById('pretForm').action = `/gestrenouv/${pcrenouvId}/preter-louer`;
-        document.getElementById('pretModal').classList.remove('hidden');
-    }
-    
-    function closeModal() {
-        document.getElementById('pretModal').classList.add('hidden');
-    }
-    
-    // Filtre de recherche pour la table
-    document.getElementById('searchInput').addEventListener('keyup', function() {
-        const searchValue = this.value.toLowerCase();
-        const rows = document.querySelectorAll('tbody tr');
-        
-        rows.forEach(row => {
-            const text = row.textContent.toLowerCase();
-            row.style.display = text.includes(searchValue) ? '' : 'none';
-        });
-    });
-</script>
 @endsection
