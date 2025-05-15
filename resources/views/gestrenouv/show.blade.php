@@ -65,12 +65,14 @@
                     </a>
                 </div>
 
-                <form action="{{ route('gestrenouv.retourner', $pcRenouv) }}" method="GET" class="mt-4">
-                    @csrf
-                    <button type="submit" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded">
-                        Marquer comme retourné
-                    </button>
-                </form>
+            <form action="{{ route('locpret.retourner', $locpret->id) }}" method="POST" class="mt-4">
+                @csrf
+                @method('PUT')
+                <button type="submit" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded">
+                    Marquer comme retourné
+                </button>
+            </form>
+
 
             @else
                 @if($pcRenouv->statut == 'en stock')
