@@ -20,7 +20,6 @@ class PCRenouv extends Model
         'caracteristiques',
         'type',
         'statut',
-        'locPret_id',
     ];
     
     /////////////////////////
@@ -47,9 +46,10 @@ class PCRenouv extends Model
         return $this->belongsToMany(Stock::class, 'pcrenouv_stock', 'pcrenouv_id', 'stock_id')->withPivot('quantite');
     }
 
-
-    public function locPret()
+    public function locPrets()
     {
-        return $this->belongsTo(LocPret::class, 'loc_pret_id', 'id');
+        return $this->belongsToMany(LocPret::class, 'loc_pret_p_c_renouv', 'p_c_renouv_id', 'loc_pret_id');
     }
+
+
 }
