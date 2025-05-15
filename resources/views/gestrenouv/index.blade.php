@@ -156,9 +156,6 @@
             </form>
         </div>
     </div>
-@endsection
-
-@section('scripts')
 <script>
     function openPretModal(pcrenouvId) {
         document.getElementById('pretForm').action = `/gestrenouv/${pcrenouvId}/preter-louer`;
