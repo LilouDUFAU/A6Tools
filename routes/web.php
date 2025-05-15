@@ -8,6 +8,7 @@ use App\Http\Controllers\PCRenouvController;
 use App\Http\Controllers\PrepAtelierController;
 use App\Http\Controllers\EtapeController;
 use App\Http\Controllers\PanneController;
+use App\Http\Controllers\LocPretController;
 use App\Http\Controllers\UserController;
 use App\Http\Middleware\IsAdmin;
 
@@ -38,10 +39,19 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/gestrenouv/{id}/edit', [PCRenouvController::class, 'edit'])->name('gestrenouv.edit');
     Route::put('/gestrenouv/{id}', [PCRenouvController::class, 'update'])->name('gestrenouv.update');
     Route::delete('/gestrenouv/{id}', [PCRenouvController::class, 'destroy'])->name('gestrenouv.destroy');
-    Route::get('/gestrenouv{id}/louer', [PCRenouvController::class, 'louer'])->name('gestrenouv.louer');
-    Route::get('/gestrenouv{id}/preter', [PCRenouvController::class, 'preter'])->name('gestrenouv.preter');
-    Route::put('/gestrenouv/{id}/addLocPret', [PCRenouvController::class, 'addLocPret'])->name('gestrenouv.addLocPret');
-    Route::put('/gestrenouv/{id}/retour', [PCRenouvController::class, 'retour'])->name('gestrenouv.retour');
+    Route::put('/gestrenouv/{id}/retourner', [PCRenouvController::class, 'retourner'])->name('gestrenouv.retourner');
+    Route::get('gestrenouv/{id}/preter-louer', [PCRenouvController::class, 'preterLouer'])->name('gestrenouv.preterLouer');
+
+
+    Route::get('/locpret', [LocPretController::class, 'index'])->name('locpret.index');
+    Route::get('/locpret/create', [LocPretController::class, 'create'])->name('locpret.create');
+    Route::post('/locpret', [LocPretController::class, 'store'])->name('locpret.store');
+    Route::get('/locpret/{id}', [LocPretController::class, 'show'])->name('locpret.show');
+    Route::get('/locpret/{id}/edit', [LocPretController::class, 'edit'])->name('locpret.edit');
+    Route::put('/locpret/{id}', [LocPretController::class, 'update'])->name('locpret.update');
+    Route::delete('/locpret/{id}', [LocPretController::class, 'destroy'])->name('locpret.destroy');
+    Route::put('/locpret/{id}/retourner', [LocPretController::class, 'retourner'])->name('locpret.retourner');
+
 
     Route::get('/gestatelier', [PrepAtelierController::class, 'index'])->name('gestatelier.index');
     Route::get('/gestatelier/create', [PrepAtelierController::class, 'create'])->name('gestatelier.create');
