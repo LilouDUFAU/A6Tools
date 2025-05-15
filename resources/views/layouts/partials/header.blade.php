@@ -30,14 +30,18 @@
     @endif
 </div>
 <script>
-        // Filtre de recherche pour la table
-    document.getElementById('searchInput').addEventListener('keyup', function() {
-        const searchValue = this.value.toLowerCase();
-        const rows = document.querySelectorAll('tbody tr');
-        
-        rows.forEach(row => {
-            const text = row.textContent.toLowerCase();
-            row.style.display = text.includes(searchValue) ? '' : 'none';
+        // Fonction pour supprimer les accents d'une chaîne
+        function removeAccents(str) {
+            return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+        }
+
+        document.getElementById('searchInput').addEventListener('keyup', function() {
+            const searchValue = removeAccents(this.value.toLowerCase());
+            const rows = document.querySelectorAll('tbody tr');
+            
+            rows.forEach(row => {
+                const text = removeAccents(row.textContent.toLowerCase());
+                row.style.display = text.includes(searchValue) ? '' : 'none';
+            });
         });
-    });
 </script>
