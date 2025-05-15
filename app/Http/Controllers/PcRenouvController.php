@@ -17,9 +17,10 @@ class PCRenouvController extends Controller
      */
     public function index()
     {
-        $pcrenouvs = PCRenouv::with('locprets.clients')->get();
+        $pcrenouvs = PCRenouv::with(['locprets.clients', 'stocks'])->get();
         return view('gestrenouv.index', compact('pcrenouvs'));
     }
+
 
     /**
      * Show the form for creating a new resource.

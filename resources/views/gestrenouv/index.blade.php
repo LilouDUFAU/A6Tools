@@ -26,7 +26,7 @@
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">N° Série</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Statut</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Client</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Client/Magasin</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                         </tr>
                     </thead>
@@ -56,13 +56,24 @@
                                     @endif
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                    @if($client)
-                                        <strong>{{ $client->code_client }}</strong> ({{ $client->nom }})
+                                    @if($pcrenouv->statut == 'loué' || $pcrenouv->statut == 'prêté')
+                                        @if($client)
+                                            <strong>{{ $client->code_client }}</strong> ({{ $client->nom }})
+                                        @else
+                                            Indéfini
+                                        @endif
                                     @else
-                                        -
+                                        @if($pcrenouv->stocks->isNotEmpty())
+                                            @foreach($pcrenouv->stocks as $stock)
+                                                <div>
+                                                    {{ $stock->lieux }}
+                                                </div>
+                                            @endforeach
+                                        @else
+                                            -
+                                        @endif
                                     @endif
                                 </td>
-
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 space-x-2">
                                     <a href="{{ route('gestrenouv.show', $pcrenouv) }}" class="text-blue-600 hover:text-blue-900">
                                         <i class="fas fa-eye"></i>
