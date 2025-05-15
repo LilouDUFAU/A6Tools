@@ -35,9 +35,9 @@ class Client extends Model
         return $this->belongsToMany(Panne::class, 'client_panne ');
     }
 
-    // un client peut avoir plusieurs pcrenouv
-    public function pcrenouv()
+    // un client peut avoir plusieurs locations / prets de pcrenouv
+    public function locPrets()
     {
-        return $this->belongsToMany(PCRenouv::class, 'client_pcrenouv', 'client_id', 'pcrenouv_id')->withPivot('date_pret', 'date_retour');
+        return $this->hasMany(LocPret ::class, 'client_id', 'id');
     }
 }

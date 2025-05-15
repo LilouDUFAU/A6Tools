@@ -20,7 +20,6 @@ class PCRenouv extends Model
         'caracteristiques',
         'type',
         'statut',
-        'employe_id',
         'locPret_id',
     ];
     
@@ -41,11 +40,6 @@ class PCRenouv extends Model
     //relations entre les tables//
     //////////////////////////////
 
-    //un pcrenouv peut etre enregistre par un employe
-    public function employe()
-    {
-        return $this->belongsTo(User::class, 'employe_id', 'id');
-    }
 
     // un pcrenouv peut etre stocke dans un magasin
     public function stocks()
@@ -53,14 +47,9 @@ class PCRenouv extends Model
         return $this->belongsToMany(Stock::class, 'pcrenouv_stock', 'pcrenouv_id', 'stock_id')->withPivot('quantite');
     }
 
-    // un pcrenouv peut etre prete a plusieurs clients
-    public function clients()
-    {
-        return $this->belongsToMany(Client::class, 'client_pcrenouv', 'pcrenouv_id', 'client_id')->withPivot('date_pret', 'date_retour');
-    }
 
-        public function locPret()
+    public function locPret()
     {
-        return $this->belongsTo(LocPret::class, 'locPret_id', 'id');
+        return $this->belongsTo(LocPret::class, 'loc_pret_id', 'id');
     }
 }

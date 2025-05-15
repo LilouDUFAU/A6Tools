@@ -6,19 +6,27 @@ use Illuminate\Database\Eloquent\Model;
 
 class LocPret extends Model
 {
-    protected $fillable = [
-        'date_pret',
+    use hasFactory;
+
+        protected $fillable = [
+        'date_debut',
         'date_retour',
         'client_id',
     ];
 
-    public function client()
+    //////////////////////////////
+    //relations entre les tables//
+    //////////////////////////////
+
+    // une location / pret peut concerner plusieurs clients
+    public function clients()
     {
         return $this->belongsTo(Client::class, 'client_id', 'id');
     }
 
-    public function pcRenouv()
+    // une location / pret peut concerner plusieurs pcrenouvs
+    public function pcrenouvs()
     {
-        return $this->hasMany(PCRenouv::class, 'locPret_id', 'id');
+        return $this->hasMany(Pcrenouv::class, 'loc_pret_id', 'id');
     }
 }

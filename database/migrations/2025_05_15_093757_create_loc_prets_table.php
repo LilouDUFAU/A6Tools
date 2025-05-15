@@ -13,13 +13,13 @@ return new class extends Migration
     {
         Schema::create('loc_prets', function (Blueprint $table) {
             $table->id();
-            $table->date('date_pret'); // Date de prêt
-            $table->date('date_retour')->nullable(); // Date de retour
+            $table->date('date_debut'); // Date de début de la location / prêt
+            $table->date('date_retour'); // Date de retour de la location / prêt
             $table->unsignedBigInteger('client_id'); // Clé étrangère vers la table clients
-            $table->timestamps();
 
             // Clé étrangère vers la table clients
             $table->foreign('client_id')->references('id')->on('clients')->onDelete('cascade');
+            $table->timestamps();
         });
     }
 
