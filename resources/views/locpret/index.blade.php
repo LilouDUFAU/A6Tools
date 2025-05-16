@@ -202,40 +202,41 @@
 
 <!-- Modales déplacées en dehors des vues liste/grille pour éviter les doublons et erreurs d'accessibilité -->
 @foreach($locPrets as $locPret)
-<div id="returnModal{{ $locPret->id }}" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-    <div class="bg-white rounded-lg shadow-lg max-w-md w-full p-6">
+<div id="returnModal{{ $locPret->id }}" class="hidden fixed inset-0 bg-gray-800/40 flex items-center justify-center z-50 modal-overlay">
+    <div class="bg-white rounded-lg shadow-lg max-w-md w-full p-6 modal-content" onclick="event.stopPropagation();">
         <div class="flex justify-between items-center mb-4">
             <h5 class="text-lg font-semibold">Confirmation de retour</h5>
-            <button onclick="toggleModal('returnModal{{ $locPret->id }}')" class="text-gray-500 hover:text-gray-700">&times;</button>
+            <button onclick="closeModal('returnModal{{ $locPret->id }}')" class="text-gray-500 hover:text-gray-700">&times;</button>
         </div>
         <p class="mb-6">Êtes-vous sûr de vouloir marquer tous les PC de cette opération comme retournés ?</p>
         <div class="flex justify-end space-x-2">
-            <button onclick="toggleModal('returnModal{{ $locPret->id }}')" class="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400">Annuler</button>
+            <button onclick="closeModal('returnModal{{ $locPret->id }}')" class="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400">Annuler</button>
             <form action="{{ route('locpret.retourner', $locPret) }}" method="POST">
                 @csrf
-                @method('PUT') <!-- ✅ Corrigé ici -->
+                @method('PUT')
                 <button type="submit" class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700">Confirmer le retour</button>
             </form>
         </div>
     </div>
 </div>
 
-<div id="deleteModal{{ $locPret->id }}" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-    <div class="bg-white rounded-lg shadow-lg max-w-md w-full p-6">
+<div id="deleteModal{{ $locPret->id }}" class="hidden fixed inset-0 bg-gray-800/40 flex items-center justify-center z-50 modal-overlay">
+    <div class="bg-white rounded-lg shadow-lg max-w-md w-full p-6 modal-content" onclick="event.stopPropagation();">
         <div class="flex justify-between items-center mb-4">
             <h5 class="text-lg font-semibold">Confirmation de suppression</h5>
-            <button onclick="toggleModal('deleteModal{{ $locPret->id }}')" class="text-gray-500 hover:text-gray-700">&times;</button>
+            <button onclick="closeModal('deleteModal{{ $locPret->id }}')" class="text-gray-500 hover:text-gray-700">&times;</button>
         </div>
         <p class="mb-6">Êtes-vous sûr de vouloir supprimer cette opération de prêt/location ? Les PC associés seront remis en stock.</p>
         <div class="flex justify-end space-x-2">
-            <button onclick="toggleModal('deleteModal{{ $locPret->id }}')" class="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400">Annuler</button>
+            <button onclick="closeModal('deleteModal{{ $locPret->id }}')" class="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400">Annuler</button>
             <form action="{{ route('locpret.destroy', $locPret) }}" method="POST">
                 @csrf
                 @method('DELETE')
                 <button type="submit" class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700">Supprimer</button>
             </form>
         </div>
-    </div></div>
+    </div>
+</div>
 @endforeach
 
 <script>
@@ -247,6 +248,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const listViewContent = document.getElementById('listViewContent');
     const gridViewContent = document.getElementById('gridViewContent');
     const tableTitle = document.getElementById('table-title');
+    const modalOverlays = document.querySelectorAll('.modal-overlay');
 
     let activeFilters = new Set();
     let currentView = localStorage.getItem('locpretViewMode') || 'list';
@@ -348,6 +350,25 @@ document.addEventListener('DOMContentLoaded', () => {
     listViewBtn.addEventListener('click', () => setView('list'));
     gridViewBtn.addEventListener('click', () => setView('grid'));
 
+    // Fermeture des modales en cliquant sur l'overlay
+    modalOverlays.forEach(overlay => {
+        overlay.addEventListener('click', function(e) {
+            // Si le clic est directement sur l'overlay (pas sur son contenu)
+            if (e.target === overlay) {
+                closeModal(overlay.id);
+            }
+        });
+    });
+
+    // Ajout de gestionnaires d'événements pour la touche Échap
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+            document.querySelectorAll('.modal-overlay:not(.hidden)').forEach(modal => {
+                closeModal(modal.id);
+            });
+        }
+    });
+
     // Initialisation
     // On applique le style ring sur filtres actifs au chargement (aucun par défaut)
     filterButtons.forEach(btn => {
@@ -358,35 +379,15 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     setView(currentView);
-    
-    // Ajout de gestionnaires d'événements pour fermer les modales lors d'un clic à l'extérieur
-    document.addEventListener('click', (e) => {
-        if (e.target.classList.contains('modal-container')) {
-            closeModal(e.target.id);
-        }
-    });
-    
-    // Ajout de gestionnaires d'événements pour la touche Échap
-    document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape') {
-            document.querySelectorAll('.modal-container:not(.hidden)').forEach(modal => {
-                closeModal(modal.id);
-            });
-        }
-    });
 });
 
-// Amélioration des fonctions de gestion de modales
+// Fonctions de gestion de modales
 function openModal(modalId) {
     const modal = document.getElementById(modalId);
     if (modal) {
         modal.classList.remove('hidden');
         // Empêcher le défilement de la page en arrière-plan
         document.body.style.overflow = 'hidden';
-        // Utiliser flex pour centrer la modale
-        modal.style.display = 'flex';
-    } else {
-        console.warn(`Modal avec l'ID "${modalId}" introuvable.`);
     }
 }
 
@@ -396,10 +397,6 @@ function closeModal(modalId) {
         modal.classList.add('hidden');
         // Restaurer le défilement de la page
         document.body.style.overflow = '';
-        // Réinitialiser le style d'affichage
-        modal.style.display = 'none';
-    } else {
-        console.warn(`Modal avec l'ID "${modalId}" introuvable.`);
     }
 }
 </script>
