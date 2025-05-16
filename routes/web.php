@@ -43,6 +43,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('gestrenouv/{id}/preter-louer', [PCRenouvController::class, 'preterLouer'])->name('gestrenouv.preterLouer');
 
 
+
     Route::get('/locpret', [LocPretController::class, 'index'])->name('locpret.index');
     Route::get('/locpret/create', [LocPretController::class, 'create'])->name('locpret.create');
     Route::post('/locpret', [LocPretController::class, 'store'])->name('locpret.store');
