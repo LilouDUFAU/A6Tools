@@ -84,7 +84,19 @@
                     Sélectionnez au moins un PC à prêter ou louer.
                 </div>
 
-                @if($pcrenouvs->count() > 0)
+                @php
+                    // IDs des PC déjà associés à la commande
+                    $pcAssocies = $locPret->pcrenouvs->pluck('id')->toArray();
+                @endphp
+
+                @php
+                    // On affiche seulement les PC en stock ou déjà associés à la commande
+                    $pcsAffiches = $pcrenouvs->filter(function($pc) use ($pcAssocies) {
+                        return $pc->statut === 'en stock' || in_array($pc->id, $pcAssocies);
+                    });
+                @endphp
+
+                @if($pcsAffiches->count() > 0)
                     <div class="overflow-x-auto rounded-lg shadow">
                         <table class="min-w-full divide-y divide-gray-200 text-sm">
                             <thead class="bg-gray-50">
@@ -98,12 +110,12 @@
                                 </tr>
                             </thead>
                             <tbody class="bg-white divide-y divide-gray-100">
-                                @foreach($pcrenouvs as $pcrenouv)
+                                @foreach($pcsAffiches as $pcrenouv)
                                     <tr class="hover:bg-gray-50">
                                         <td class="px-3 py-3">
-                                            <input class="h-4 w-4 text-green-600 border-gray-300 focus:ring-green-500" type="checkbox" name="pcrenouv_ids[]" value="{{ $pcrenouv->id }}" id="pc{{ $pcrenouv->id }}" 
-                                                {{ (is_array(old('pcrenouv_ids')) && in_array($pcrenouv->id, old('pcrenouv_ids'))) || 
-                                                (!old('pcrenouv_ids') && $pcrenouv->locPret_id == $locPret->id) ? 'checked' : '' }}>
+                                            <input class="h-4 w-4 text-green-600 border-gray-300 focus:ring-green-500" type="checkbox" name="pcrenouv_ids[]" value="{{ $pcrenouv->id }}" id="pc{{ $pcrenouv->id }}"
+                                                {{ (is_array(old('pcrenouv_ids')) && in_array($pcrenouv->id, old('pcrenouv_ids')))
+                                                    || (!old('pcrenouv_ids') && in_array($pcrenouv->id, $pcAssocies)) ? 'checked' : '' }}>
                                         </td>
                                         <td class="px-3 py-3">{{ $pcrenouv->numero_serie }}</td>
                                         <td class="px-3 py-3">{{ $pcrenouv->reference }}</td>
