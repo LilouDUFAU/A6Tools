@@ -1,3 +1,4 @@
+
 @extends('layouts.app')
 @section('content')
 <div class="container mx-auto py-8 px-4 sm:px-6 lg:px-8">
@@ -11,10 +12,17 @@
             'loué' => 'bg-red-600 hover:bg-red-700'
         ];
 
-        // Calculate total PCs for each status
-        $totalPCs = [
-            'prêté' => $locPrets->flatMap->pcrenouvs->where('statut', 'prêté')->count(),
-            'loué' => $locPrets->flatMap->pcrenouvs->where('statut', 'loué')->count()
+        // Compte le nombre de "locPret" qui ont UNIQUEMENT ce statut
+        // (pas le nombre total de PC, mais le nombre de contrats pour chaque statut)
+        $totalLocPretsByStatus = [
+            'prêté' => $locPrets->filter(function($locPret) {
+                // Vérifie si AU MOINS UN des PC de ce locPret a le statut 'prêté'
+                return $locPret->pcrenouvs->where('statut', 'prêté')->count() > 0;
+            })->count(),
+            'loué' => $locPrets->filter(function($locPret) {
+                // Vérifie si AU MOINS UN des PC de ce locPret a le statut 'loué'
+                return $locPret->pcrenouvs->where('statut', 'loué')->count() > 0;
+            })->count()
         ];
 
         // Labels personnalisés
@@ -25,7 +33,7 @@
     @endphp
     @foreach($statutCouleurs as $statut => $classes)
         <div class="filter-btn {{ $classes }} text-white text-center py-6 rounded-lg shadow-md cursor-pointer" data-filter="{{ $statut }}" data-type="statut">
-            <div class="text-3xl font-bold count-display" id="count-{{ $statut }}">{{ $totalPCs[$statut] }}</div>
+            <div class="text-3xl font-bold count-display" id="count-{{ $statut }}">{{ $totalLocPretsByStatus[$statut] }}</div>
             <div class="text-lg">{{ $statutLabels[$statut] }}</div>
         </div>
     @endforeach
@@ -299,6 +307,7 @@ document.addEventListener('DOMContentLoaded', () => {
             let count = 0;
             const items = document.querySelectorAll(`.item-row[data-statut="${statut}"], .item-card[data-statut="${statut}"]`);
             
+            // Pour chaque statut, nous comptons combien d'éléments sont visibles
             items.forEach(item => {
                 if (item.style.display !== 'none') {
                     count++;
