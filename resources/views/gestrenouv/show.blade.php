@@ -27,7 +27,7 @@
         <div class="border-l-4 border-green-600 pl-4 mb-8">
             <h2 class="text-2xl font-bold text-gray-800 mb-4">Caractéristiques Techniques</h2>
            
-            <p><strong>Caractéristiques :</strong> {{ $pcRenouv->caracteristiques }}</p>
+            <p><strong>Caractéristiques :</strong> {{ $pcRenouv->caracteristiques ? $pcRenouv->caracteristiques : '/' }}</p>
         </div>
 
         <!-- Partie Prêt / Location -->
