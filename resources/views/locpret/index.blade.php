@@ -231,133 +231,137 @@
 @endforeach
 
 <script>
-// View toggle functionality
-const listViewBtn = document.getElementById('listView');
-const gridViewBtn = document.getElementById('gridView');
-const listViewContent = document.getElementById('listViewContent');
-const gridViewContent = document.getElementById('gridViewContent');
+document.addEventListener('DOMContentLoaded', () => {
+    // Vue : Liste ou Grille
+    const listViewBtn = document.getElementById('listView');
+    const gridViewBtn = document.getElementById('gridView');
+    const listViewContent = document.getElementById('listViewContent');
+    const gridViewContent = document.getElementById('gridViewContent');
 
-// Get saved view preference
-let currentView = localStorage.getItem('locpretViewMode') || 'list';
+    let currentView = localStorage.getItem('locpretViewMode') || 'list';
 
-function setView(view) {
-    currentView = view;
-    localStorage.setItem('locpretViewMode', view);
-    
-    if (view === 'list') {
-        listViewContent.classList.remove('hidden');
-        gridViewContent.classList.add('hidden');
-        listViewBtn.classList.replace('bg-gray-200', 'bg-blue-600');
-        listViewBtn.classList.replace('text-gray-700', 'text-white');
-        gridViewBtn.classList.replace('bg-blue-600', 'bg-gray-200');
-        gridViewBtn.classList.replace('text-white', 'text-gray-700');
-    } else {
-        listViewContent.classList.add('hidden');
-        gridViewContent.classList.remove('hidden');
-        gridViewBtn.classList.replace('bg-gray-200', 'bg-blue-600');
-        gridViewBtn.classList.replace('text-gray-700', 'text-white');
-        listViewBtn.classList.replace('bg-blue-600', 'bg-gray-200');
-        listViewBtn.classList.replace('text-white', 'text-gray-700');
+    function setView(view) {
+        currentView = view;
+        localStorage.setItem('locpretViewMode', view);
+
+        const isList = view === 'list';
+
+        listViewContent.classList.toggle('hidden', !isList);
+        gridViewContent.classList.toggle('hidden', isList);
+
+        listViewBtn.classList.toggle('bg-blue-600', isList);
+        listViewBtn.classList.toggle('text-white', isList);
+        listViewBtn.classList.toggle('bg-gray-200', !isList);
+        listViewBtn.classList.toggle('text-gray-700', !isList);
+
+        gridViewBtn.classList.toggle('bg-blue-600', !isList);
+        gridViewBtn.classList.toggle('text-white', !isList);
+        gridViewBtn.classList.toggle('bg-gray-200', isList);
+        gridViewBtn.classList.toggle('text-gray-700', isList);
+
+        updateVisibility();
     }
-}
 
-// Set initial view
-setView(currentView);
+    listViewBtn.addEventListener('click', () => setView('list'));
+    gridViewBtn.addEventListener('click', () => setView('grid'));
 
-// Add click event listeners
-listViewBtn.addEventListener('click', () => setView('list'));
-gridViewBtn.addEventListener('click', () => setView('grid'));
+    setView(currentView);
 
-// Filter functionality
-let activeFilters = { statut: new Set() };
-const filterButtons = document.querySelectorAll('.filter-btn');
-const resetFiltersBtn = document.getElementById('resetFilters');
+    // Filtres
+    const filterButtons = document.querySelectorAll('.filter-btn');
+    const resetFiltersBtn = document.getElementById('resetFilters');
+    let activeFilters = { statut: new Set() };
 
-function updateCounts() {
-    const statuts = ['prêté', 'loué'];
-    statuts.forEach(statut => {
-        let count = 0;
-        const rows = document.querySelectorAll('tr:not(:first-child)');
-        rows.forEach(row => {
-            const statusCell = row.querySelector('td:nth-child(5) .rounded-full');
-            if (statusCell && statusCell.textContent.trim().toLowerCase() === statut) {
-                if (row.style.display !== 'none') {
-                    count++;
-                }
-            }
-        });
-        document.getElementById(`count-${statut}`).textContent = count;
-    });
-}
+    function getStatutFromElement(el) {
+        if (!el) return null;
 
-function updateVisibility() {
-    const rows = document.querySelectorAll('tr:not(:first-child)');
-    const cards = document.querySelectorAll('#gridViewContent > div');
-    
-    if (activeFilters.statut.size === 0) {
-        rows.forEach(row => row.style.display = '');
-        cards.forEach(card => card.style.display = '');
-    } else {
-        rows.forEach(row => {
-            const statusCell = row.querySelector('td:nth-child(5) .rounded-full');
-            if (statusCell) {
-                const status = statusCell.textContent.trim().toLowerCase();
-                row.style.display = activeFilters.statut.has(status) ? '' : 'none';
-            }
-        });
-
-        cards.forEach(card => {
-            const statusBadge = card.querySelector('.rounded-full');
-            if (statusBadge) {
-                const status = statusBadge.textContent.trim().toLowerCase();
-                card.style.display = activeFilters.statut.has(status) ? '' : 'none';
-            }
-        });
-    }
-    
-    // Update counts after visibility changes
-    updateCounts();
-}
-
-// Initial count update
-updateCounts();
-
-filterButtons.forEach(btn => {
-    btn.addEventListener('click', () => {
-        const filter = btn.dataset.filter.toLowerCase();
-        if (activeFilters.statut.has(filter)) {
-            activeFilters.statut.delete(filter);
-            btn.classList.remove('ring-4', 'ring-blue-500');
-        } else {
-            activeFilters.statut.add(filter);
-            btn.classList.add('ring-4', 'ring-blue-500');
+        // Vue LISTE : tr avec td 5
+        if (el.tagName === 'TR') {
+            const td = el.querySelector('td:nth-child(5) .rounded-full');
+            return td ? td.textContent.trim().toLowerCase() : null;
         }
+
+        // Vue GRILLE : carte
+        const badge = el.querySelector('.rounded-full');
+        return badge ? badge.textContent.trim().toLowerCase() : null;
+    }
+
+    function updateVisibility() {
+        const listRows = document.querySelectorAll('#listViewContent tbody tr');
+        const cards = document.querySelectorAll('#gridViewContent > div');
+
+        const applyFilter = (elements) => {
+            elements.forEach(el => {
+                const statut = getStatutFromElement(el);
+                const match = activeFilters.statut.size === 0 || activeFilters.statut.has(statut);
+                el.style.display = match ? '' : 'none';
+            });
+        };
+
+        applyFilter(listRows);
+        applyFilter(cards);
+        updateCounts();
+    }
+
+    function updateCounts() {
+        const statuts = ['prêté', 'loué'];
+
+        statuts.forEach(statut => {
+            let count = 0;
+            const elements = currentView === 'list'
+                ? document.querySelectorAll('#listViewContent tbody tr')
+                : document.querySelectorAll('#gridViewContent > div');
+
+            elements.forEach(el => {
+                if (el.style.display !== 'none') {
+                    const s = getStatutFromElement(el);
+                    if (s === statut) count++;
+                }
+            });
+
+            const countEl = document.getElementById(`count-${statut}`);
+            if (countEl) countEl.textContent = count;
+        });
+    }
+
+    filterButtons.forEach(btn => {
+        btn.addEventListener('click', () => {
+            const statut = btn.dataset.filter.toLowerCase();
+            const active = activeFilters.statut.has(statut);
+
+            if (active) {
+                activeFilters.statut.delete(statut);
+                btn.classList.remove('ring-4', 'ring-blue-500');
+            } else {
+                activeFilters.statut.add(statut);
+                btn.classList.add('ring-4', 'ring-blue-500');
+            }
+
+            updateVisibility();
+        });
+    });
+
+    resetFiltersBtn.addEventListener('click', () => {
+        activeFilters.statut.clear();
+        filterButtons.forEach(btn => btn.classList.remove('ring-4', 'ring-blue-500'));
         updateVisibility();
     });
-});
 
-resetFiltersBtn.addEventListener('click', () => {
-    activeFilters.statut.clear();
-    filterButtons.forEach(btn => btn.classList.remove('ring-4', 'ring-blue-500'));
     updateVisibility();
-});
 
-// Modal functionality
-function toggleModal(modalId) {
-    const modal = document.getElementById(modalId);
-    if (modal.classList.contains('hidden')) {
-        modal.classList.remove('hidden');
-    } else {
-        modal.classList.add('hidden');
-    }
-}
+    // Modals
+    window.toggleModal = function (modalId) {
+        const modal = document.getElementById(modalId);
+        if (modal) modal.classList.toggle('hidden');
+    };
 
-// Close modals when clicking outside
-window.addEventListener('click', (e) => {
-    if (e.target.classList.contains('fixed')) {
-        e.target.classList.add('hidden');
-    }
+    window.addEventListener('click', e => {
+        if (e.target.classList.contains('fixed')) {
+            e.target.classList.add('hidden');
+        }
+    });
 });
 </script>
+
 
 @endsection
