@@ -1,126 +1,363 @@
 @extends('layouts.app')
-@section('content')
-<div class="flex justify-between items-center mb-6">
-    <h1 class="text-2xl font-semibold">Gestion des Locations et Prêts</h1>
-    <a href="{{ route('locpret.create') }}" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition">Nouveau Prêt/Location</a>
-</div>
 
-<div class="bg-white shadow rounded-lg">
-    <div class="overflow-x-auto">
-        <table class="min-w-full divide-y divide-gray-200">
-            <thead class="bg-gray-50">
-                <tr>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Client</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date de début</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date de retour</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">PC</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Statut</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-                </tr>
-            </thead>
-            <tbody class="bg-white divide-y divide-gray-200">
-                @forelse($locPrets as $locPret)
-                <tr>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        @if(isset($locPret->clients))
-                            {{ $locPret->clients->nom }} {{ $locPret->clients->prenom }}
-                        @else
-                            Client non défini
-                        @endif
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $locPret->date_debut }}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $locPret->date_retour }}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        @if($locPret->pcrenouvs->count() > 0)
+@section('content')
+<div class="container mx-auto py-8 px-4 sm:px-6 lg:px-8">
+    <h1 class="text-3xl font-bold mb-8 px-4 pt-10 text-gray-800">Gestion des Locations et Prêts</h1>
+
+    {{-- Filtres par Statut --}}
+    <h2 class="text-2xl font-semibold px-4 py-2 text-gray-700">Filtrer par statut</h2>
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-8 px-4">
+        @php
+            $statutCouleurs = [
+                'prêté' => 'bg-green-600 hover:bg-green-700',
+                'loué' => 'bg-red-600 hover:bg-red-700'
+            ];
+        @endphp
+        @foreach($statutCouleurs as $statut => $classes)
+            <div class="filter-btn {{ $classes }} text-white text-center py-6 rounded-lg shadow-md cursor-pointer" data-filter="{{ $statut }}" data-type="statut">
+                <div class="text-3xl font-bold count-display" id="count-{{ $statut }}">0</div>
+                <div class="text-lg">{{ ucfirst($statut) }}</div>
+            </div>
+        @endforeach
+    </div>
+
+    <div class="flex flex-wrap justify-between items-center mb-6 px-4 gap-4">
+        <div class="flex flex-wrap gap-4 w-full sm:w-auto">
+            <button id="resetFilters" class="bg-gray-600 text-white px-6 py-3 rounded-lg shadow-md hover:bg-gray-700 w-full sm:w-auto flex items-center justify-center">
+                Réinitialiser les filtres
+            </button>
+            <a href="{{ route('gestrenouv.index') }}" class="bg-purple-600 text-white px-6 py-3 rounded-lg shadow-md hover:bg-purple-700 w-full sm:w-auto text-center">
+                Liste des PC RenouvO
+            </a>
+            <a href="{{ route('locpret.create') }}" class="bg-blue-600 text-white px-6 py-3 rounded-lg shadow-md hover:bg-blue-700 w-full sm:w-auto text-center">
+                Nouveau Loc/Prêt
+            </a>
+        </div>
+        
+        <div class="flex items-center gap-2">
+            <span class="text-gray-700">Vue:</span>
+            <button id="listView" class="p-2 rounded-lg transition-colors bg-blue-600 text-white" aria-label="Vue liste">
+                <i class="fas fa-list"></i>
+            </button>
+            <button id="gridView" class="p-2 rounded-lg transition-colors bg-gray-200 text-gray-700" aria-label="Vue mosaïque">
+                <i class="fas fa-th"></i>
+            </button>
+        </div>
+    </div>
+
+    <div class="bg-white shadow rounded-lg p-4 sm:p-6">
+        <h2 id="table-title" class="text-xl sm:text-2xl font-semibold text-gray-800 mb-4">
+            Liste des Locations et Prêts
+        </h2>
+
+        <div id="listViewContent" class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Client</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date de début</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date de retour</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">PC</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Statut</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    @forelse($locPrets as $locPret)
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                            @if(isset($locPret->clients))
+                                {{ $locPret->clients->nom }} {{ $locPret->clients->prenom }}
+                                <span class="text-gray-500">({{ $locPret->clients->code_client }})</span>
+                            @else
+                                Client non défini
+                            @endif
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $locPret->date_debut }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $locPret->date_retour }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                             {{ $locPret->pcrenouvs->count() }} PC(s)
-                        @else
-                            Aucun PC
-                        @endif
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm">
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm">
+                            @php
+                                $statut = $locPret->pcrenouvs->first() ? $locPret->pcrenouvs->first()->statut : 'inconnu';
+                                $badgeColor = match($statut) {
+                                    'prêté' => 'bg-green-100 text-green-800',
+                                    'loué' => 'bg-red-100 text-red-800',
+                                };
+                            @endphp
+                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {{ $badgeColor }}">
+                                {{ ucfirst($statut) }}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-1">
+                            <a href="{{ route('locpret.show', $locPret) }}" class="px-2 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 transition text-xs">
+                                Détails
+                            </a>
+                            <a href="{{ route('locpret.edit', $locPret) }}" class="px-2 py-1 bg-yellow-400 text-yellow-900 rounded hover:bg-yellow-500 transition text-xs">
+                                Modifier
+                            </a>
+                            <button onclick="toggleModal('returnModal{{ $locPret->id }}')" class="px-2 py-1 bg-green-500 text-white rounded hover:bg-green-600 transition text-xs">
+                                Retourner
+                            </button>
+                            <button onclick="toggleModal('deleteModal{{ $locPret->id }}')" class="px-2 py-1 bg-red-500 text-white rounded hover:bg-red-600 transition text-xs">
+                                Supprimer
+                            </button>
+                        </td>
+                    </tr>
+                    @empty
+                    <tr>
+                        <td colspan="6" class="px-6 py-4 whitespace-nowrap text-center text-gray-500">
+                            Aucune location ou prêt trouvé
+                        </td>
+                    </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+
+        <div id="gridViewContent" class="hidden grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            @forelse($locPrets as $locPret)
+            <div class="bg-white rounded-lg shadow-md overflow-hidden border border-gray-200 hover:shadow-lg transition-shadow">
+                <div class="p-4 border-b border-gray-200">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <h3 class="text-lg font-semibold text-gray-800">
+                                @if(isset($locPret->clients))
+                                    {{ $locPret->clients->nom }} {{ $locPret->clients->prenom }}
+                                @else
+                                    Client non défini
+                                @endif
+                            </h3>
+                            @if(isset($locPret->clients))
+                                <p class="text-sm text-gray-500">{{ $locPret->clients->code_client }}</p>
+                            @endif
+                        </div>
                         @php
                             $statut = $locPret->pcrenouvs->first() ? $locPret->pcrenouvs->first()->statut : 'inconnu';
                             $badgeColor = match($statut) {
-                                'prêté' => 'bg-yellow-400 text-yellow-900',
-                                'loué' => 'bg-blue-400 text-blue-900',
-                                default => 'bg-gray-300 text-gray-700',
+                                'prêté' => 'bg-green-100 text-green-800',
+                                'loué' => 'bg-red-100 text-red-800',
                             };
                         @endphp
                         <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {{ $badgeColor }}">
-                            {{ $statut }}
+                            {{ ucfirst($statut) }}
                         </span>
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-1">
-                        <a href="{{ route('locpret.show', $locPret) }}" class="px-2 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 transition text-xs">Détails</a>
-                        <a href="{{ route('locpret.edit', $locPret) }}" class="px-2 py-1 bg-yellow-400 text-yellow-900 rounded hover:bg-yellow-500 transition text-xs">Modifier</a>
-                        <button type="button" data-modal-target="returnModal{{ $locPret->id }}" class="px-2 py-1 bg-green-500 text-white rounded hover:bg-green-600 transition text-xs" onclick="toggleModal('returnModal{{ $locPret->id }}')">
-                            Retourner
-                        </button>
-                        <button type="button" data-modal-target="deleteModal{{ $locPret->id }}" class="px-2 py-1 bg-red-500 text-white rounded hover:bg-red-600 transition text-xs" onclick="toggleModal('deleteModal{{ $locPret->id }}')">
-                            Supprimer
-                        </button>
-                    </td>
-                </tr>
-                @empty
-                <tr>
-                    <td colspan="6" class="px-6 py-4 whitespace-nowrap text-center text-gray-500">Aucune location ou prêt enregistré</td>
-                </tr>
-                @endforelse
-            </tbody>
-        </table>
+                    </div>
+                </div>
+                
+                <div class="p-4 space-y-3">
+                    <div class="flex items-center text-sm">
+                        <i class="fas fa-calendar mr-2 text-gray-500"></i>
+                        <span class="text-gray-700">Début: {{ $locPret->date_debut }}</span>
+                    </div>
+                    
+                    <div class="flex items-center text-sm">
+                        <i class="fas fa-clock mr-2 text-gray-500"></i>
+                        <span class="text-gray-700">Retour: {{ $locPret->date_retour }}</span>
+                    </div>
+                    
+                    <div class="flex items-center text-sm">
+                        <i class="fas fa-desktop mr-2 text-gray-500"></i>
+                        <span class="text-gray-700">{{ $locPret->pcrenouvs->count() }} PC(s)</span>
+                    </div>
+                </div>
+                
+                <div class="px-4 py-3 bg-gray-50 border-t border-gray-200 flex justify-end space-x-1">
+                    <a href="{{ route('locpret.show', $locPret) }}" class="px-2 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 transition text-xs">
+                        Détails
+                    </a>
+                    <button onclick="toggleModal('returnModal{{ $locPret->id }}')" class="px-2 py-1 bg-green-500 text-white rounded hover:bg-green-600 transition text-xs">
+                        Retourner
+                    </button>
+                </div>
+            </div>
+            @empty
+            <div class="col-span-full text-center py-12 text-gray-500">
+                Aucune location ou prêt trouvé
+            </div>
+            @endforelse
+        </div>
     </div>
 </div>
-<a href=" {{route('gestrenouv.index') }}" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition">Retour vers les PC RenouvO</a>
 
-<!-- Modals -->
+{{-- Modals --}}
 @foreach($locPrets as $locPret)
-<!-- Retour Modal -->
-<div id="returnModal{{ $locPret->id }}" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-    <div class="bg-white rounded-lg shadow-lg max-w-md w-full p-6">
-        <div class="flex justify-between items-center mb-4">
-            <h5 class="text-lg font-semibold">Confirmation de retour</h5>
-            <button onclick="toggleModal('returnModal{{ $locPret->id }}')" class="text-gray-500 hover:text-gray-700">&times;</button>
-        </div>
-        <p class="mb-6">Êtes-vous sûr de vouloir marquer tous les PC de cette opération comme retournés ?</p>
-        <div class="flex justify-end space-x-2">
-            <button onclick="toggleModal('returnModal{{ $locPret->id }}')" class="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400">Annuler</button>
-            <form action="{{ route('locpret.retourner', $locPret) }}" method="POST">
-                @csrf
-                @method('PUT') <!-- ✅ Corrigé ici -->
-                <button type="submit" class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700">Confirmer le retour</button>
-            </form>
+    {{-- Return Modal --}}
+    <div id="returnModal{{ $locPret->id }}" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-white rounded-lg shadow-lg max-w-md w-full p-6">
+            <div class="flex justify-between items-center mb-4">
+                <h5 class="text-lg font-semibold">Confirmation de retour</h5>
+                <button onclick="toggleModal('returnModal{{ $locPret->id }}')" class="text-gray-500 hover:text-gray-700">&times;</button>
+            </div>
+            <p class="mb-6">Êtes-vous sûr de vouloir marquer tous les PC de cette opération comme retournés ?</p>
+            <div class="flex justify-end space-x-2">
+                <button onclick="toggleModal('returnModal{{ $locPret->id }}')" class="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400">
+                    Annuler
+                </button>
+                <form action="{{ route('locpret.retourner', $locPret) }}" method="POST">
+                    @csrf
+                    @method('PUT')
+                    <button type="submit" class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700">
+                        Confirmer le retour
+                    </button>
+                </form>
+            </div>
         </div>
     </div>
-</div>
 
-
-<!-- Delete Modal -->
-<div id="deleteModal{{ $locPret->id }}" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-    <div class="bg-white rounded-lg shadow-lg max-w-md w-full p-6">
-        <div class="flex justify-between items-center mb-4">
-            <h5 class="text-lg font-semibold">Confirmation de suppression</h5>
-            <button onclick="toggleModal('deleteModal{{ $locPret->id }}')" class="text-gray-500 hover:text-gray-700">&times;</button>
+    {{-- Delete Modal --}}
+    <div id="deleteModal{{ $locPret->id }}" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-white rounded-lg shadow-lg max-w-md w-full p-6">
+            <div class="flex justify-between items-center mb-4">
+                <h5 class="text-lg font-semibold">Confirmation de suppression</h5>
+                <button onclick="toggleModal('deleteModal{{ $locPret->id }}')" class="text-gray-500 hover:text-gray-700">&times;</button>
+            </div>
+            <p class="mb-6">Êtes-vous sûr de vouloir supprimer cette opération de prêt/location ? Les PC associés seront remis en stock.</p>
+            <div class="flex justify-end space-x-2">
+                <button onclick="toggleModal('deleteModal{{ $locPret->id }}')" class="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400">
+                    Annuler
+                </button>
+                <form action="{{ route('locpret.destroy', $locPret) }}" method="POST">
+                    @csrf
+                    @method('DELETE')
+                    <button type="submit" class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700">
+                        Supprimer
+                    </button>
+                </form>
+            </div>
         </div>
-        <p class="mb-6">Êtes-vous sûr de vouloir supprimer cette opération de prêt/location ? Les PC associés seront remis en stock.</p>
-        <div class="flex justify-end space-x-2">
-            <button onclick="toggleModal('deleteModal{{ $locPret->id }}')" class="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400">Annuler</button>
-            <form action="{{ route('locpret.destroy', $locPret) }}" method="POST">
-                @csrf
-                @method('DELETE')
-                <button type="submit" class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700">Supprimer</button>
-            </form>
-        </div>
-    </div></div>
+    </div>
 @endforeach
 
 <script>
-    function toggleModal(id) {
-        const modal = document.getElementById(id);
-        if(modal.classList.contains('hidden')) {
-            modal.classList.remove('hidden');
-        } else {
-            modal.classList.add('hidden');
-        }
+// View toggle functionality
+const listViewBtn = document.getElementById('listView');
+const gridViewBtn = document.getElementById('gridView');
+const listViewContent = document.getElementById('listViewContent');
+const gridViewContent = document.getElementById('gridViewContent');
+
+// Get saved view preference
+let currentView = localStorage.getItem('locpretViewMode') || 'list';
+
+function setView(view) {
+    currentView = view;
+    localStorage.setItem('locpretViewMode', view);
+    
+    if (view === 'list') {
+        listViewContent.classList.remove('hidden');
+        gridViewContent.classList.add('hidden');
+        listViewBtn.classList.replace('bg-gray-200', 'bg-blue-600');
+        listViewBtn.classList.replace('text-gray-700', 'text-white');
+        gridViewBtn.classList.replace('bg-blue-600', 'bg-gray-200');
+        gridViewBtn.classList.replace('text-white', 'text-gray-700');
+    } else {
+        listViewContent.classList.add('hidden');
+        gridViewContent.classList.remove('hidden');
+        gridViewBtn.classList.replace('bg-gray-200', 'bg-blue-600');
+        gridViewBtn.classList.replace('text-gray-700', 'text-white');
+        listViewBtn.classList.replace('bg-blue-600', 'bg-gray-200');
+        listViewBtn.classList.replace('text-white', 'text-gray-700');
     }
+}
+
+// Set initial view
+setView(currentView);
+
+// Add click event listeners
+listViewBtn.addEventListener('click', () => setView('list'));
+gridViewBtn.addEventListener('click', () => setView('grid'));
+
+// Filter functionality
+let activeFilters = { statut: new Set() };
+const filterButtons = document.querySelectorAll('.filter-btn');
+const resetFiltersBtn = document.getElementById('resetFilters');
+
+function updateCounts() {
+    const statuts = ['prêté', 'loué'];
+    statuts.forEach(statut => {
+        let count = 0;
+        const rows = document.querySelectorAll('tr:not(:first-child)');
+        rows.forEach(row => {
+            const statusCell = row.querySelector('td:nth-child(5) .rounded-full');
+            if (statusCell && statusCell.textContent.trim().toLowerCase() === statut) {
+                if (row.style.display !== 'none') {
+                    count++;
+                }
+            }
+        });
+        document.getElementById(`count-${statut}`).textContent = count;
+    });
+}
+
+function updateVisibility() {
+    const rows = document.querySelectorAll('tr:not(:first-child)');
+    const cards = document.querySelectorAll('#gridViewContent > div');
+    
+    if (activeFilters.statut.size === 0) {
+        rows.forEach(row => row.style.display = '');
+        cards.forEach(card => card.style.display = '');
+    } else {
+        rows.forEach(row => {
+            const statusCell = row.querySelector('td:nth-child(5) .rounded-full');
+            if (statusCell) {
+                const status = statusCell.textContent.trim().toLowerCase();
+                row.style.display = activeFilters.statut.has(status) ? '' : 'none';
+            }
+        });
+
+        cards.forEach(card => {
+            const statusBadge = card.querySelector('.rounded-full');
+            if (statusBadge) {
+                const status = statusBadge.textContent.trim().toLowerCase();
+                card.style.display = activeFilters.statut.has(status) ? '' : 'none';
+            }
+        });
+    }
+    
+    // Update counts after visibility changes
+    updateCounts();
+}
+
+// Initial count update
+updateCounts();
+
+filterButtons.forEach(btn => {
+    btn.addEventListener('click', () => {
+        const filter = btn.dataset.filter.toLowerCase();
+        if (activeFilters.statut.has(filter)) {
+            activeFilters.statut.delete(filter);
+            btn.classList.remove('ring-4', 'ring-blue-500');
+        } else {
+            activeFilters.statut.add(filter);
+            btn.classList.add('ring-4', 'ring-blue-500');
+        }
+        updateVisibility();
+    });
+});
+
+resetFiltersBtn.addEventListener('click', () => {
+    activeFilters.statut.clear();
+    filterButtons.forEach(btn => btn.classList.remove('ring-4', 'ring-blue-500'));
+    updateVisibility();
+});
+
+// Modal functionality
+function toggleModal(modalId) {
+    const modal = document.getElementById(modalId);
+    if (modal.classList.contains('hidden')) {
+        modal.classList.remove('hidden');
+    } else {
+        modal.classList.add('hidden');
+    }
+}
+
+// Close modals when clicking outside
+window.addEventListener('click', (e) => {
+    if (e.target.classList.contains('fixed')) {
+        e.target.classList.add('hidden');
+    }
+});
 </script>
+
 @endsection
