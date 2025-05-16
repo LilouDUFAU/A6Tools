@@ -24,40 +24,71 @@ class LocPretController extends Controller
         return view('locpret.create', compact('clients', 'pcrenouvs'));
     }
 
-    public function store(Request $request)
-    {
-        $validated = $request->validate([
-            'client_id' => 'required|exists:clients,id',
-            'date_debut' => 'required|date',
-            'date_retour' => 'required|date|after_or_equal:date_debut',
-            'pcrenouv_ids' => 'required|array',
-            'pcrenouv_ids.*' => 'exists:p_c_renouvs,id',
-            'type_operation' => 'required|in:prêt,location',
+
+public function store(Request $request)
+{
+    // Validation initiale pour récupérer le type d'opération (pour la création des PC)
+    $typeOperation = $request->validate([
+        'type_operation' => 'required|in:prêt,location',
+    ])['type_operation'];
+
+    // Gestion du client (création ou utilisation existant)
+    if ($request->has('new_client') && !$request->filled('client_id')) {
+        // Validation pour le nouveau client
+        $validatedClient = $request->validate([
+            'new_client.nom' => 'required|string|max:255',
+            'new_client.code_client' => 'required|string|max:255|unique:clients,code_client',
+            'new_client.numero_telephone' => 'nullable|string|max:20',
         ]);
 
-        DB::beginTransaction();
-        try {
-            $locPret = LocPret::create([
-                'client_id' => $validated['client_id'],
-                'date_debut' => $validated['date_debut'],
-                'date_retour' => $validated['date_retour'],
-            ]);
+        // Création du client
+        $client = Client::create([
+            'nom' => $validatedClient['new_client']['nom'],
+            'code_client' => $validatedClient['new_client']['code_client'],
+            'numero_telephone' => $validatedClient['new_client']['numero_telephone'] ?? null,
+        ]);
 
-            $locPret->pcrenouvs()->attach($validated['pcrenouv_ids']);
-
-            PCRenouv::whereIn('id', $validated['pcrenouv_ids'])->update([
-                'statut' => $validated['type_operation'] === 'prêt' ? 'prêté' : 'loué'
-            ]);
-
-            DB::commit();
-            return redirect()->route('locpret.index')->with('success', 'Location/Prêt créé avec succès.');
-        } catch (\Exception $e) {
-            DB::rollBack();
-            Log::error('Erreur lors de la création: ' . $e->getMessage());
-            return back()->withInput()->with('error', 'Erreur: ' . $e->getMessage());
-        }
+        // Utilisation de l'ID du nouveau client
+        $clientId = $client->id;
+    } else {
+        // Validation pour un client existant
+        $validatedClient = $request->validate([
+            'client_id' => 'required|exists:clients,id',
+        ]);
+        
+        $clientId = $validatedClient['client_id'];
     }
 
+    // Validation des autres champs
+    $validated = $request->validate([
+        'date_debut' => 'required|date',
+        'date_retour' => 'required|date|after_or_equal:date_debut',
+        'pcrenouv_ids' => 'required|array',
+        'pcrenouv_ids.*' => 'exists:p_c_renouvs,id',
+    ]);
+
+    DB::beginTransaction();
+    try {
+        $locPret = LocPret::create([
+            'client_id' => $clientId,
+            'date_debut' => $validated['date_debut'],
+            'date_retour' => $validated['date_retour'],
+        ]);
+
+        $locPret->pcrenouvs()->attach($validated['pcrenouv_ids']);
+
+        PCRenouv::whereIn('id', $validated['pcrenouv_ids'])->update([
+            'statut' => $typeOperation === 'prêt' ? 'prêté' : 'loué'
+        ]);
+
+        DB::commit();
+        return redirect()->route('locpret.index')->with('success', 'Location/Prêt créé avec succès.');
+    } catch (\Exception $e) {
+        DB::rollBack();
+        Log::error('Erreur lors de la création: ' . $e->getMessage());
+        return back()->withInput()->with('error', 'Erreur: ' . $e->getMessage());
+    }
+}
     public function show($id)
     {
         $locPret = LocPret::with(['clients', 'pcrenouvs'])->findOrFail($id);
