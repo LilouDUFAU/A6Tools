@@ -2,30 +2,52 @@
 
 @section('content')
 <div class="py-10" x-data="{ 
-    view: '{{ request('view', 'grid') }}',
+    view: localStorage.getItem('view') || '{{ request('view', 'grid') }}',
     selectedRole: '{{ request('role', '') }}',
     selectedService: '{{ request('service', '') }}',
     filterEmployees() {
         const url = new URL(window.location);
         url.searchParams.set('role', this.selectedRole);
         url.searchParams.set('service', this.selectedService);
-        url.searchParams.set('view', this.view); // On garde la vue
+        url.searchParams.set('view', this.view); // On garde la vue actuelle dans l'URL
         window.location = url.toString();
+    },
+    changeView(viewName) {
+        this.view = viewName;
+        localStorage.setItem('view', viewName);
+        this.filterEmployees();
     }
 }">       
-        <div class="container mx-auto py-8 px-4 sm:px-6 lg:px-8">
-            <div class="flex flex-col sm:flex-row items-center justify-between mb-6">
-        <h1 class="text-3xl font-bold mb-8 px-4 pt-10 text-gray-800 text-center sm:text-left">Liste des employés ({{ $users->count() }})</h1>
-            <button 
-                @click="view = view === 'grid' ? 'list' : 'grid'" 
-                class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-xl transition w-full sm:w-auto"
-            >
-                <span x-text="view === 'grid' ? 'Afficher en liste' : 'Afficher en mosaïque'"></span>
-            </button>
+    <div class="container mx-auto py-8 px-4 sm:px-6 lg:px-8">
+        <div class="flex flex-col sm:flex-row items-center justify-between mb-6">
+            <h1 class="text-3xl font-bold mb-8 px-4 pt-10 text-gray-800 text-center sm:text-left">Liste des employés ({{ $users->count() }})</h1>
+            
+            <!-- Boutons de changement de vue -->
+            <div class="flex items-center gap-2 px-4 pt-10">
+                <span class="text-gray-700">Vue :</span>
+                <button 
+                    id="listView" 
+                    class="p-2 rounded-lg transition-colors" 
+                    :class="view === 'list' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700'"
+                    aria-label="Vue liste"
+                    @click="changeView('list')"
+                >
+                    <i class="fas fa-list"></i>
+                </button>
+                <button 
+                    id="gridView" 
+                    class="p-2 rounded-lg transition-colors" 
+                    :class="view === 'grid' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700'"
+                    aria-label="Vue mosaïque"
+                    @click="changeView('grid')"
+                >
+                    <i class="fas fa-th"></i>
+                </button>
+            </div>
         </div>
 
         {{-- Filtrage --}}
-        <div class="mb-6 flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
+        <div class="mb-6 flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 px-4">
             {{-- Filtre par Rôle --}}
             <div class="w-full sm:w-1/2">
                 <label for="role" class="block text-sm font-medium text-gray-700">Filtrer par rôle</label>
@@ -59,7 +81,7 @@
             </div>
 
             {{-- Bouton Réinitialiser --}}
-            <div class="w-full sm:w-auto">
+            <div class="w-full sm:w-auto flex items-end">
                 <button 
                     @click="selectedRole = ''; selectedService = ''; filterEmployees()" 
                     class="px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded-md transition w-full sm:w-auto"
@@ -69,7 +91,7 @@
             </div>
         </div>
 
-        <div class="mb-6 flex justify-end">
+        <div class="mb-6 flex justify-end px-4">
             <a href="{{ route('gestuser.create') }}" class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-xl transition w-full sm:w-auto text-center">
                 Créer un nouvel employé
             </a>
@@ -84,7 +106,7 @@
             x-transition:leave="transition ease-in duration-200"
             x-transition:leave-start="opacity-100 transform scale-100"
             x-transition:leave-end="opacity-0 transform scale-95"
-            class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6"
+            class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 px-4"
         >
             @foreach($users as $user)
                 <div class="bg-white rounded-2xl shadow p-6 text-center hover:shadow-lg transition-all">
@@ -122,7 +144,7 @@
             x-transition:leave-start="opacity-100 transform scale-100"
             x-transition:leave-end="opacity-0 transform scale-95"
             x-cloak 
-            class="overflow-x-auto mt-6"
+            class="overflow-x-auto mt-6 px-4"
         >
             <table class="min-w-full bg-white shadow rounded-2xl overflow-hidden">
                 <thead class="bg-gray-100 text-left text-sm font-semibold text-gray-700">
