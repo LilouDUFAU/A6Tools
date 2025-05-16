@@ -49,19 +49,18 @@
                 <p><strong>Date de début :</strong> {{ $locpret->date_debut }}</p>
                 <p><strong>Date de retour prévue :</strong> {{ $locpret->date_retour }}</p>
                 
-                <div class="mt-4">
-                    <a href="{{ route('locpret.show', $locpret->id) }}" class="inline-block bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded">
+                <div class="mt-4 flex flex-col sm:flex-row gap-4 items-stretch w-full">
+                    <a href="{{ route('locpret.show', $locpret->id) }}" class="inline-block bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded w-full text-center">
                         Voir la location / le prêt
                     </a>
+                    <form action="{{ route('locpret.retourner', $locpret->id) }}" method="POST" class="w-full">
+                        @csrf
+                        @method('PUT')
+                        <button type="submit" class="bg-yellow-600 hover:bg-yellow-700 text-white px-4 py-2 rounded w-full">
+                            Marquer comme retourné
+                        </button>
+                    </form>
                 </div>
-
-                <form action="{{ route('locpret.retourner', $locpret->id) }}" method="POST" class="mt-4">
-                    @csrf
-                    @method('PUT')
-                    <button type="submit" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded">
-                        Marquer comme retourné
-                    </button>
-                </form>
             @else
                 @if($pcRenouv->statut == 'en stock')
                     <a href="{{ route('locpret.create', ['pc_renouv_id' => $pcRenouv->id]) }}" class="inline-block bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded">
