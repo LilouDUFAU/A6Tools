@@ -103,8 +103,8 @@
             <h2 class="text-2xl font-bold text-gray-800 mb-4">Caractéristiques Techniques</h2>
             
             <div class="mb-4">
-                <label for="caracteristiques" class="block text-sm font-semibold text-gray-700">* Caractéristiques</label>
-                <textarea id="caracteristiques" name="caracteristiques" rows="4" required
+                <label for="caracteristiques" class="block text-sm font-semibold text-gray-700">Caractéristiques</label>
+                <textarea id="caracteristiques" name="caracteristiques" rows="4"
                     class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1">{{ old('caracteristiques', $pcRenouv->caracteristiques) }}</textarea>
                 @error('caracteristiques')
                     <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
