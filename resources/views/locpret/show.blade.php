@@ -15,10 +15,14 @@
             <p><strong>Statut :</strong>
                 @php
                     $today = \Carbon\Carbon::now();
+                    $startDate = \Carbon\Carbon::parse($locPret->date_debut);
                     $returnDate = \Carbon\Carbon::parse($locPret->date_retour);
-                    if ($today > $returnDate) {
+
+                    if ($today < $startDate) {
+                        echo '<span class="inline-block px-2 py-1 text-xs font-semibold text-blue-700 bg-blue-200 rounded">À venir</span>';
+                    } elseif ($today > $returnDate) {
                         echo '<span class="inline-block px-2 py-1 text-xs font-semibold text-white bg-red-600 rounded">En retard</span>';
-                    } else if ($today->diffInDays($returnDate) <= 3) {
+                    } elseif ($today->diffInDays($returnDate) <= 3) {
                         echo '<span class="inline-block px-2 py-1 text-xs font-semibold text-yellow-800 bg-yellow-300 rounded">Retour imminent</span>';
                     } else {
                         echo '<span class="inline-block px-2 py-1 text-xs font-semibold text-green-700 bg-green-200 rounded">En cours</span>';
