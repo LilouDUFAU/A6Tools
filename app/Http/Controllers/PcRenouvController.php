@@ -9,6 +9,7 @@ use App\Models\LocPret;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
 
 class PCRenouvController extends Controller
 {
@@ -18,7 +19,8 @@ class PCRenouvController extends Controller
     public function index()
     {
         $pcrenouvs = PCRenouv::with(['locprets.clients', 'stocks'])->get();
-        return view('gestrenouv.index', compact('pcrenouvs'));
+        $userStock = Auth::user()->stock ? Auth::user()->stock->lieux : null;
+        return view('gestrenouv.index', compact('pcrenouvs', 'userStock'));
     }
 
 
