@@ -114,6 +114,21 @@
                     Sélectionnez au moins un PC à prêter ou louer.
                 </div>
 
+                <!-- Barre de recherche pour les PCs -->
+                <div class="mb-4">
+                    <div class="relative">
+                        <input
+                            type="text"
+                            id="pcrenouv_search"
+                            placeholder="Rechercher par référence ou numéro de série..."
+                            class="block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 pl-10 pr-4 py-2"
+                        >
+                        <div class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                        </div>
+                    </div>
+                </div>
+
                 @if($pcrenouvs->count() > 0)
                     <div class="overflow-x-auto rounded-lg shadow">
                         <table class="min-w-full divide-y divide-gray-200 text-sm">
@@ -126,11 +141,11 @@
                                     <th class="px-3 py-3 text-left font-medium text-gray-500">Type</th>
                                 </tr>
                             </thead>
-                            <tbody class="bg-white divide-y divide-gray-100">
+                            <tbody id="pcrenouv_table_body" class="bg-white divide-y divide-gray-100">
                                 @foreach($pcrenouvs as $pcrenouv)
-                                    <tr class="hover:bg-gray-50">
+                                    <tr class="hover:bg-gray-50 pcrenouv-row" data-pcrenouv-id="{{ $pcrenouv->id }}" data-reference="{{ $pcrenouv->reference }}" data-numero-serie="{{ $pcrenouv->numero_serie }}">
                                         <td class="px-3 py-3">
-                                            <input class="h-4 w-4 text-green-600 border-gray-300 focus:ring-green-500" type="checkbox" name="pcrenouv_ids[]" value="{{ $pcrenouv->id }}" id="pc{{ $pcrenouv->id }}" {{ (is_array(old('pcrenouv_ids')) && in_array($pcrenouv->id, old('pcrenouv_ids'))) ? 'checked' : '' }}>
+                                            <input class="h-4 w-4 text-green-600 border-gray-300 focus:ring-green-500 pcrenouv-checkbox" type="checkbox" name="pcrenouv_ids[]" value="{{ $pcrenouv->id }}" id="pc{{ $pcrenouv->id }}" {{ (is_array(old('pcrenouv_ids')) && in_array($pcrenouv->id, old('pcrenouv_ids'))) ? 'checked' : '' }}>
                                         </td>
                                         <td class="px-3 py-3">{{ $pcrenouv->numero_serie }}</td>
                                         <td class="px-3 py-3">{{ $pcrenouv->reference }}</td>
@@ -140,6 +155,9 @@
                                 @endforeach
                             </tbody>
                         </table>
+                    </div>
+                    <div id="no_results" class="hidden p-4 bg-gray-50 text-gray-600 text-center rounded mt-2">
+                        Aucun PC ne correspond à votre recherche.
                     </div>
                     @error('pcrenouv_ids')
                         <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
@@ -173,6 +191,7 @@
 <script>
 let clients = @json($clients);
 let clientSearchTimeout;
+let pcSearchTimeout;
 
 function toggleNewClientForm() {
     const form = document.getElementById('new-client-form');
@@ -253,6 +272,50 @@ document.addEventListener('DOMContentLoaded', function() {
         if (!clientSearchInput.contains(e.target) && !clientSearchResults.contains(e.target)) {
             clientSearchResults.classList.add('hidden');
         }
+    });
+
+    // PC Search functionality
+    const pcSearchInput = document.getElementById('pcrenouv_search');
+    const pcRows = document.querySelectorAll('.pcrenouv-row');
+    const noResultsDiv = document.getElementById('no_results');
+
+    pcSearchInput.addEventListener('input', function(e) {
+        clearTimeout(pcSearchTimeout);
+        
+        pcSearchTimeout = setTimeout(() => {
+            const query = e.target.value.toLowerCase().trim();
+            let hasVisibleRows = false;
+            
+            pcRows.forEach(row => {
+                const reference = row.getAttribute('data-reference').toLowerCase();
+                const numeroSerie = row.getAttribute('data-numero-serie').toLowerCase();
+                
+                if (query === '' || reference.includes(query) || numeroSerie.includes(query)) {
+                    row.classList.remove('hidden');
+                    hasVisibleRows = true;
+                } else {
+                    row.classList.add('hidden');
+                }
+            });
+            
+            // Show or hide the "No results" message
+            if (hasVisibleRows) {
+                noResultsDiv.classList.add('hidden');
+            } else {
+                noResultsDiv.classList.remove('hidden');
+            }
+        }, 300);
+    });
+
+    // Clicking on row should also toggle the checkbox
+    pcRows.forEach(row => {
+        row.addEventListener('click', function(e) {
+            // Don't toggle if clicking on the checkbox itself
+            if (e.target.type !== 'checkbox') {
+                const checkbox = this.querySelector('.pcrenouv-checkbox');
+                checkbox.checked = !checkbox.checked;
+            }
+        });
     });
 });
 </script>
