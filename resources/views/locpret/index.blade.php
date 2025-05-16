@@ -292,15 +292,6 @@ document.addEventListener('DOMContentLoaded', () => {
         updateCounts();
     }
 
-    // Met à jour le titre de la table selon filtres
-    function updateTableTitle() {
-        if (activeFilters.statut.size === 0) {
-            tableTitle.textContent = "Liste des Locations et Prêts";
-        } else {
-            tableTitle.textContent = "Liste des Locations et Prêts - Filtré par : " + Array.from(activeFilters.statut).map(f => f.charAt(0).toUpperCase() + f.slice(1)).join(", ");
-        }
-    }
-
     // Met à jour les compteurs dynamiques sous les filtres
     function updateCounts() {
         ['prêté', 'loué'].forEach(statut => {
