@@ -14,14 +14,37 @@
             
             <div class="mb-4">
                 <label for="client_id" class="block text-sm font-semibold text-gray-700">* Client</label>
-                <select class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1" id="client_id" name="client_id" required>
-                    <option value="">-- Sélectionner un client --</option>
-                    @foreach($clients as $client)
-                        <option value="{{ $client->id }}" {{ old('client_id', $locPret->client_id) == $client->id ? 'selected' : '' }}>
-                            {{ $client->nom }} {{ $client->prenom }}
-                        </option>
-                    @endforeach
-                </select>
+                <div class="relative">
+                    @php
+                        $selectedClient = $clients->where('id', $locPret->client_id)->first();
+                        $clientName = $selectedClient ? ($selectedClient->prenom ? $selectedClient->nom . ' ' . $selectedClient->prenom : $selectedClient->nom) : 'Client inconnu';
+                    @endphp
+                    <input type="text" value="{{ $clientName }}" class="mt-2 block w-full border-gray-300 bg-gray-100 rounded-lg shadow-sm text-gray-700 cursor-not-allowed px-2 py-1" readonly>
+                    <input type="hidden" id="client_id" name="client_id" value="{{ $locPret->client_id }}">
+                </div>
+                <div class="mt-1 text-gray-500 text-sm italic">
+                    <span class="flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M12 15v5M8 9h8M6 19h12a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2z"/>
+                        </svg>
+                        Le client ne peut pas être modifié
+                    </span>
+                </div>
+                
+                <!-- Afficher les informations du client -->
+                @if($selectedClient)
+                <div class="mt-2 p-3 bg-blue-50 rounded-lg border border-blue-200">
+                    <div class="text-sm">
+                        @if($selectedClient->code_client)
+                            <p><span class="font-medium">Code client:</span> {{ $selectedClient->code_client }}</p>
+                        @endif
+                        @if($selectedClient->numero_telephone)
+                            <p><span class="font-medium">Téléphone:</span> {{ $selectedClient->numero_telephone }}</p>
+                        @endif
+                    </div>
+                </div>
+                @endif
+                
                 @error('client_id')
                     <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                 @enderror
@@ -84,6 +107,21 @@
                     Sélectionnez au moins un PC à prêter ou louer.
                 </div>
 
+                <!-- Barre de recherche pour les PCs -->
+                <div class="mb-4">
+                    <div class="relative">
+                        <input
+                            type="text"
+                            id="pcrenouv_search"
+                            placeholder="Rechercher par référence ou numéro de série..."
+                            class="block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 pl-10 pr-4 py-2"
+                        >
+                        <div class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                        </div>
+                    </div>
+                </div>
+
                 @php
                     // IDs des PC déjà associés à la commande
                     $pcAssocies = $locPret->pcrenouvs->pluck('id')->toArray();
@@ -107,15 +145,23 @@
                                     <th class="px-3 py-3 text-left font-medium text-gray-500">Caractéristiques</th>
                                     <th class="px-3 py-3 text-left font-medium text-gray-500">Type</th>
                                     <th class="px-3 py-3 text-left font-medium text-gray-500">Statut</th>
+                                    <th class="px-3 py-3 text-left font-medium text-gray-500">Magasin</th>
                                 </tr>
                             </thead>
-                            <tbody class="bg-white divide-y divide-gray-100">
+                            <tbody id="pcrenouv_table_body" class="bg-white divide-y divide-gray-100">
                                 @foreach($pcsAffiches as $pcrenouv)
-                                    <tr class="hover:bg-gray-50">
+                                    <tr class="hover:bg-gray-50 pcrenouv-row {{ in_array($pcrenouv->id, $pcAssocies) ? 'bg-blue-50' : '' }}" data-pcrenouv-id="{{ $pcrenouv->id }}" data-reference="{{ $pcrenouv->reference }}" data-numero-serie="{{ $pcrenouv->numero_serie }}">
                                         <td class="px-3 py-3">
-                                            <input class="h-4 w-4 text-green-600 border-gray-300 focus:ring-green-500" type="checkbox" name="pcrenouv_ids[]" value="{{ $pcrenouv->id }}" id="pc{{ $pcrenouv->id }}"
+                                            <input class="h-4 w-4 text-green-600 border-gray-300 focus:ring-green-500 pcrenouv-checkbox" type="checkbox" name="pcrenouv_ids[]" value="{{ $pcrenouv->id }}" id="pc{{ $pcrenouv->id }}"
                                                 {{ (is_array(old('pcrenouv_ids')) && in_array($pcrenouv->id, old('pcrenouv_ids')))
                                                     || (!old('pcrenouv_ids') && in_array($pcrenouv->id, $pcAssocies)) ? 'checked' : '' }}>
+                                            @if(in_array($pcrenouv->id, $pcAssocies))
+                                                <div class="mt-1">
+                                                    <span class="inline-block px-2 py-0.5 text-xs bg-blue-100 text-blue-800 rounded-full">
+                                                        Déjà associé
+                                                    </span>
+                                                </div>
+                                            @endif
                                         </td>
                                         <td class="px-3 py-3">{{ $pcrenouv->numero_serie }}</td>
                                         <td class="px-3 py-3">{{ $pcrenouv->reference }}</td>
@@ -130,10 +176,22 @@
                                                 {{ $pcrenouv->statut }}
                                             </span>
                                         </td>
+                                        <td class="px-3 py-3">
+                                            @php
+                                                $lieux = DB::table('pcrenouv_stock')
+                                                    ->join('stocks', 'pcrenouv_stock.stock_id', '=', 'stocks.id')
+                                                    ->where('pcrenouv_stock.pcrenouv_id', $pcrenouv->id)
+                                                    ->distinct()->pluck('stocks.lieux')->implode(', ');
+                                            @endphp
+                                            {{ $lieux ?: '-' }}
+                                        </td>
                                     </tr>
                                 @endforeach
                             </tbody>
                         </table>
+                    </div>
+                    <div id="no_results" class="hidden p-4 bg-gray-50 text-gray-600 text-center rounded mt-2">
+                        Aucun PC ne correspond à votre recherche.
                     </div>
                     @error('pcrenouv_ids')
                         <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
@@ -149,7 +207,7 @@
             </div>
         </div>
 
-        <button type="submit" class="w-full bg-green-600 text-white px-6 py-3 rounded-lg shadow hover:bg-green-700 focus:ring-2 focus:ring-green-500 flex items-center justify-center" {{ $pcrenouvs->count() > 0 ? '' : 'disabled' }}>
+        <button type="submit" class="w-full bg-green-600 text-white px-6 py-3 rounded-lg shadow hover:bg-green-700 focus:ring-2 focus:ring-green-500 flex items-center justify-center" {{ $pcsAffiches->count() > 0 ? '' : 'disabled' }}>
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
                 <polyline points="17 21 17 13 7 13 7 21"/>
@@ -163,4 +221,54 @@
         <a href="{{ route('locpret.index') }}" class="text-gray-500 hover:underline">Retour</a>
     </div>
 </div>
+
+<script>
+let pcSearchTimeout;
+
+document.addEventListener('DOMContentLoaded', function() {
+    // PC Search functionality
+    const pcSearchInput = document.getElementById('pcrenouv_search');
+    const pcRows = document.querySelectorAll('.pcrenouv-row');
+    const noResultsDiv = document.getElementById('no_results');
+
+    pcSearchInput.addEventListener('input', function(e) {
+        clearTimeout(pcSearchTimeout);
+        
+        pcSearchTimeout = setTimeout(() => {
+            const query = e.target.value.toLowerCase().trim();
+            let hasVisibleRows = false;
+            
+            pcRows.forEach(row => {
+                const reference = row.getAttribute('data-reference').toLowerCase();
+                const numeroSerie = row.getAttribute('data-numero-serie').toLowerCase();
+                
+                if (query === '' || reference.includes(query) || numeroSerie.includes(query)) {
+                    row.classList.remove('hidden');
+                    hasVisibleRows = true;
+                } else {
+                    row.classList.add('hidden');
+                }
+            });
+            
+            // Show or hide the "No results" message
+            if (hasVisibleRows) {
+                noResultsDiv.classList.add('hidden');
+            } else {
+                noResultsDiv.classList.remove('hidden');
+            }
+        }, 300);
+    });
+
+    // Clicking on row should also toggle the checkbox
+    pcRows.forEach(row => {
+        row.addEventListener('click', function(e) {
+            // Don't toggle if clicking on the checkbox itself
+            if (e.target.type !== 'checkbox') {
+                const checkbox = this.querySelector('.pcrenouv-checkbox');
+                checkbox.checked = !checkbox.checked;
+            }
+        });
+    });
+});
+</script>
 @endsection
