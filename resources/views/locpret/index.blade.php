@@ -241,6 +241,7 @@
 </div>
 @endforeach
 <script>
+
 document.addEventListener('DOMContentLoaded', () => {
     const filterButtons = document.querySelectorAll('.filter-btn');
     const resetFiltersBtn = document.getElementById('resetFilters');
@@ -253,6 +254,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let activeFilters = {statut: new Set()};
     let currentView = localStorage.getItem('locpretViewMode') || 'list';
+    
+    // Stocke les nombres totaux originaux pour chaque statut
+    const totalCounts = {};
+    ['prêté', 'loué'].forEach(statut => {
+        const countElem = document.getElementById(`count-${statut}`);
+        if(countElem) {
+            totalCounts[statut] = parseInt(countElem.textContent, 10);
+        }
+    });
 
     // Initial setup of view
     function setView(view) {
@@ -294,22 +304,46 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Met à jour les compteurs dynamiques sous les filtres
     function updateCounts() {
-        ['prêté', 'loué'].forEach(statut => {
-            let count = 0;
-            const items = document.querySelectorAll(`.item-row[data-statut="${statut}"], .item-card[data-statut="${statut}"]`);
-            
-            // Pour chaque statut, nous comptons combien d'éléments sont visibles
-            items.forEach(item => {
-                if (item.style.display !== 'none') {
-                    count++;
+        const statuts = ['prêté', 'loué'];
+        
+        // Si aucun filtre n'est actif, affiche les totaux originaux
+        if (activeFilters.statut.size === 0) {
+            statuts.forEach(statut => {
+                const countElem = document.getElementById(`count-${statut}`);
+                if(countElem) {
+                    countElem.textContent = totalCounts[statut];
                 }
             });
-
+            return;
+        }
+        
+        // Si des filtres sont actifs, mettre à jour les compteurs en conséquence
+        statuts.forEach(statut => {
             const countElem = document.getElementById(`count-${statut}`);
             if(countElem) {
-                countElem.textContent = count;
+                // Si ce statut est dans les filtres actifs, montrer son total
+                if(activeFilters.statut.has(statut)) {
+                    countElem.textContent = totalCounts[statut];
+                } else {
+                    // Sinon, montrer 0 car les éléments de ce statut ne sont pas visibles
+                    countElem.textContent = '0';
+                }
             }
         });
+    }
+
+    // Met à jour le titre du tableau
+    function updateTableTitle() {
+        if (!tableTitle) return;
+        
+        if (activeFilters.statut.size === 0) {
+            tableTitle.textContent = 'Liste des Locations et Prêts';
+        } else {
+            const filtreTextes = [];
+            if (activeFilters.statut.has('prêté')) filtreTextes.push('Prêts');
+            if (activeFilters.statut.has('loué')) filtreTextes.push('Locations');
+            tableTitle.textContent = 'Liste des ' + filtreTextes.join(' et ');
+        }
     }
 
     // Gestion du clic sur un filtre
