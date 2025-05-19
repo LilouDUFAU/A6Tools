@@ -139,6 +139,7 @@
                                     <th class="px-3 py-3 text-left font-medium text-gray-500">Référence</th>
                                     <th class="px-3 py-3 text-left font-medium text-gray-500">Caractéristiques</th>
                                     <th class="px-3 py-3 text-left font-medium text-gray-500">Type</th>
+                                    <th class="px-3 py-3 text-left font-medium text-gray-500">Magasin</th>
                                 </tr>
                             </thead>
                             <tbody id="pcrenouv_table_body" class="bg-white divide-y divide-gray-100">
@@ -149,8 +150,17 @@
                                         </td>
                                         <td class="px-3 py-3">{{ $pcrenouv->numero_serie }}</td>
                                         <td class="px-3 py-3">{{ $pcrenouv->reference }}</td>
-                                        <td class="px-3 py-3">{{ Str::limit($pcrenouv->caracteristiques, 50) }}</td>
+                                        <td class="px-3 py-3">{{ $pcrenouv->caracteristiques ? Str::limit($pcrenouv->caracteristiques, 50) : '-' }}</td>
                                         <td class="px-3 py-3">{{ $pcrenouv->type }}</td>
+                                        <td class="px-3 py-3">
+                                            @php
+                                                $lieux = DB::table('pcrenouv_stock')
+                                                    ->join('stocks', 'pcrenouv_stock.stock_id', '=', 'stocks.id')
+                                                    ->where('pcrenouv_stock.pcrenouv_id', $pcrenouv->id)
+                                                    ->distinct()->pluck('stocks.lieux')->implode(', ');
+                                            @endphp
+                                            {{ $lieux ?: '-' }}
+                                        </td>
                                     </tr>
                                 @endforeach
                             </tbody>
