@@ -37,48 +37,44 @@ class CommandeController extends Controller
      * 
      * @return \Illuminate\View\View
      */
-    public function index()
-    {
-        $commandes = Commande::with(['client', 'employe'])->get();
-        $userStock = Auth::user()->stock ? Auth::user()->stock->lieux : null;
-        $alerteCommandes = [];
-        
-        
-        foreach ($commandes as $commande) {
-        
-            $produits = DB::table('commande_produit')
-                ->join('produits', 'commande_produit.produit_id', '=', 'produits.id')
-                ->where('commande_produit.commande_id', $commande->id)
-                ->select('produits.*')
-                ->get();
-        
-            foreach ($produits as $produit) {
-        
-                if ($commande->date_installation_prevue) {
-                    $dateInstallation = Carbon::parse($commande->date_installation_prevue);
-                    
-                    $condition3 = !$produit->date_livraison_fournisseur && Carbon::now()->addDays(7)->greaterThanOrEqualTo($dateInstallation);
-                    $condition4 = !$produit->date_livraison_fournisseur && $commande->delai_installation &&
-                                  Carbon::now()->addDays($commande->delai_installation + 7)->greaterThanOrEqualTo($dateInstallation);
-            
-                    if ($condition3 || $condition4) {
-                        $alerteCommandes[$commande->id] = [
-                            'commande' => $commande,
-                            'produit' => $produit->nom,
-                            'dateLivraison' => $produit->date_livraison_fournisseur ? Carbon::parse($produit->date_livraison_fournisseur)->format('d/m/Y') : 'Non renseignée',
-                            'dateInstallation' => $dateInstallation->format('d/m/Y'),
-                            'difference' => $produit->date_livraison_fournisseur ? $dateInstallation->diffInDays($dateLivraison) : 'N/A',
-                        ];
-                        break;
-                    }
-                } else {
-                    Log::debug("Date installation prévue manquante pour commande ID: {$commande->id}");
-                }
-            }
-        }        
-        return view('gestcommande.index', compact('commandes', 'alerteCommandes', 'userStock'));
-    }
+public function index()
+{
+    $commandes = Commande::with(['client', 'employe'])->get();
+    $userStock = Auth::user()->stock ? Auth::user()->stock->lieux : null;
+    $alerteCommandes = [];
+    
+    foreach ($commandes as $commande) {
+        $produits = DB::table('commande_produit')
+            ->join('produits', 'commande_produit.produit_id', '=', 'produits.id')
+            ->where('commande_produit.commande_id', $commande->id)
+            ->select('produits.*') // is_derMinute est maintenant dans la table produits
+            ->get();
 
+        foreach ($produits as $produit) {
+            if ($commande->date_installation_prevue) {
+                $dateInstallation = Carbon::parse($commande->date_installation_prevue);
+                
+                $condition3 = !$produit->date_livraison_fournisseur && Carbon::now()->addDays(7)->greaterThanOrEqualTo($dateInstallation);
+                $condition4 = !$produit->date_livraison_fournisseur && $commande->delai_installation &&
+                              Carbon::now()->addDays($commande->delai_installation + 7)->greaterThanOrEqualTo($dateInstallation);
+        
+                if ($condition3 || $condition4) {
+                    $alerteCommandes[$commande->id] = [
+                        'commande' => $commande,
+                        'produit' => $produit->nom,
+                        'dateLivraison' => $produit->date_livraison_fournisseur ? Carbon::parse($produit->date_livraison_fournisseur)->format('d/m/Y') : 'Non renseignée',
+                        'dateInstallation' => $dateInstallation->format('d/m/Y'),
+                        'difference' => $produit->date_livraison_fournisseur ? $dateInstallation->diffInDays($dateLivraison) : 'N/A',
+                    ];
+                    break;
+                }
+            } else {
+                Log::debug("Date installation prévue manquante pour commande ID: {$commande->id}");
+            }
+        }
+    }        
+    return view('gestcommande.index', compact('commandes', 'alerteCommandes', 'userStock'));
+}
     /**
      * Affiche le formulaire de création d'une nouvelle commande.
      * 
