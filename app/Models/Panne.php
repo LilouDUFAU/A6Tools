@@ -36,6 +36,7 @@ class Panne extends Model
     ];
 
     const STATUT = [
+        'En attente',
         'Remboursement',
         'Transit',
         'Envoyé',
