@@ -35,12 +35,12 @@
             </div>
 
             <div class="mb-4">
-                <label for="demande" class="block text-sm font-semibold text-gray-700">Demande</label>
+                <label for="demande" class="block text-sm font-semibold text-gray-700">* Demande</label>
                 <input type="text" id="demande" name="demande" class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1">
             </div>
 
             <div class="mb-4">
-                <label for="statut" class="block text-sm font-semibold text-gray-700">Statut</label>
+                <label for="statut" class="block text-sm font-semibold text-gray-700">* Statut</label>
                 <select id="statut" name="statut" class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1">
                     <option value="">-- Sélectionner un statut --</option>
                     @foreach ($statut as $statut)
@@ -54,7 +54,7 @@
         <div class="border-l-4 border-green-600 pl-4">
             <h2 class="text-2xl font-bold text-gray-800 mb-4">Client</h2>
             <div class="mb-4">
-                <label class="block text-sm font-semibold text-gray-700">Client</label>
+                <label class="block text-sm font-semibold text-gray-700">* Client</label>
                 <div class="relative w-full">
                     <div class="relative">
                         <input
@@ -79,12 +79,16 @@
             <div id="new-client-form" class="mb-4 hidden bg-gray-50 p-4 rounded-lg">
                 <h3 class="text-lg font-semibold text-gray-700 mb-2">Nouveau Client</h3>
                 <div class="mb-4">
-                    <label for="new_client_nom" class="block text-sm font-semibold text-gray-700">Nom</label>
+                    <label for="new_client_nom" class="block text-sm font-semibold text-gray-700">* Nom</label>
                     <input type="text" id="new_client_nom" name="new_client[nom]" class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1">
                 </div>
                 <div class="mb-4">
-                    <label for="code_client" class="block text-sm font-semibold text-gray-700">Code client</label>
+                    <label for="code_client" class="block text-sm font-semibold text-gray-700">* Code client</label>
                     <input type="text" id="code_client" name="new_client[code_client]" class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1">
+                </div>
+                <div class="mb-4">
+                        <label for="numero_telephone" class="block text-sm font-semibold text-gray-700">Numéro téléphone client</label>
+                        <input type="text" id="numero_telephone" name="new_client[numero_telephone]" class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1">
                 </div>
             </div>
             <div id="selected_client" class="mb-6 p-4 bg-green-50 rounded-lg border border-green-200 hidden">
@@ -92,7 +96,7 @@
                 <p id="selected_client_info" class="text-green-700"></p>
             </div>
             <div class="mb-4">
-                <label for="etat" class="block text-sm font-semibold text-gray-700">État côté client</label>
+                <label for="etat" class="block text-sm font-semibold text-gray-700">* État côté client</label>
                 <select id="etat" name="etat" class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1" required>
                     <option value="">-- Sélectionner un état --</option>
                     @foreach ($etat_clients as $etat_client)
@@ -104,7 +108,7 @@
         <div class="border-l-4 border-green-600 pl-4">
             <h2 class="text-2xl font-bold text-gray-800 mb-4">Fournisseur</h2>
             <div class="mb-4">
-                <label for="fournisseur_id" class="block text-sm font-semibold text-gray-700">Fournisseur</label>
+                <label for="fournisseur_id" class="block text-sm font-semibold text-gray-700">* Fournisseur</label>
                 <div class="flex space-x-2">
                     <select id="fournisseur_id" name="fournisseur_id" class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1">
                         <option value="">-- Choisir un fournisseur --</option>
@@ -118,7 +122,7 @@
             <div id="new-supplier-form" class="mb-4 hidden bg-gray-50 p-4 rounded-lg">
                 <h3 class="text-lg font-semibold text-gray-700 mb-2">Nouveau Fournisseur</h3>
                 <div class="mb-4">
-                    <label for="new_fournisseur_nom" class="block text-sm font-semibold text-gray-700">Nom</label>
+                    <label for="new_fournisseur_nom" class="block text-sm font-semibold text-gray-700">* Nom</label>
                     <input type="text" id="new_fournisseur_nom" name="new_fournisseur[nom]" class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1">
                 </div>
             </div>
