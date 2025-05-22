@@ -1,7 +1,6 @@
 @extends('layouts.app')
 
 @section('content')
-
 <div class="max-w-6xl mx-auto my-4 py-8 px-6 bg-white shadow-md rounded-lg">
     <h1 class="text-3xl font-extrabold text-gray-800 mb-8">Modifier la Commande</h1>
 
@@ -107,28 +106,38 @@
             @endif
         </div>
 
-        <!-- Partie Produits (Modifiée pour Multi-Produits) -->
+        <!-- Partie Produits -->
         <div class="border-l-4 border-green-600 pl-4">
             <div class="flex justify-between items-center mb-4">
                 <h2 class="text-2xl font-bold text-gray-800">Produits</h2>
                 <button type="button" onclick="addProduct()" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 flex items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+                    <i data-lucide="plus" class="h-4 w-4 mr-2"></i>
                     Ajouter un produit
                 </button>
             </div>
             
             <div id="products-container">
                 @foreach($commande->produits as $index => $produit)
+                @php
+                    $fournisseurProduit = DB::table('fournisseur_produit')
+                        ->join('fournisseurs', 'fournisseur_produit.fournisseur_id', '=', 'fournisseurs.id')
+                        ->where('fournisseur_produit.produit_id', $produit->id)
+                        ->where('fournisseur_produit.commande_id', $commande->id)
+                        ->select('fournisseurs.*')
+                        ->first();
+                @endphp
                 <div class="product-item bg-gray-50 p-4 rounded-lg shadow-sm mb-4" data-product-index="{{ $index }}">
                     <div class="flex justify-between items-center mb-3">
                         <h3 class="text-lg font-semibold text-gray-700">Produit {{ $index + 1 }}</h3>
                         @if($index > 0)
                         <button type="button" onclick="removeProduct({{ $index }})" class="text-red-600 hover:text-red-800 font-medium">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+                            <i data-lucide="x" class="h-5 w-5"></i>
                         </button>
                         @endif
                     </div>
-                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    
+                    <!-- Informations produit -->
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
                         <div class="mb-4">
                             <label class="block text-sm font-semibold text-gray-700">* Nom</label>
                             <input type="text" name="produits[{{ $index }}][nom]" value="{{ old('produits.'.$index.'.nom', $produit->pivot->nom ?? $produit->nom) }}" class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1" required>
@@ -140,7 +149,7 @@
                         </div>
 
                         <div class="mb-4">
-                            <label class="block text-sm font-semibold text-gray-700">Prix de réferencement</label>
+                            <label class="block text-sm font-semibold text-gray-700">Prix d'achat</label>
                             <input type="number" name="produits[{{ $index }}][prix_referencement]" value="{{ old('produits.'.$index.'.prix_referencement', $produit->pivot->prix_referencement ?? $produit->prix_referencement) }}" step="0.01" class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1">
                         </div>
 
@@ -175,56 +184,77 @@
                             <label class="text-sm font-semibold text-gray-700">Mise en place de dernière minute ?</label>
                         </div>
                     </div>
+
+                    <!-- Section Fournisseur pour ce produit -->
+                    <div class="border-t border-gray-200 pt-4">
+                        <h4 class="text-md font-semibold text-gray-700 mb-3">Fournisseur pour ce produit</h4>
+                        <div class="mb-4">
+                            <label class="block text-sm font-semibold text-gray-700">* Choisir un fournisseur</label>
+                            <div class="relative w-full">
+                                <div class="relative">
+                                    <input
+                                        type="text"
+                                        id="fournisseur_search_{{ $index }}"
+                                        placeholder="Rechercher un fournisseur..."
+                                        value="{{ $fournisseurProduit->nom ?? '' }}"
+                                        class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 pl-10 pr-4 py-2"
+                                    >
+                                    <input type="hidden" id="fournisseur_id_{{ $index }}" name="produits[{{ $index }}][fournisseur_id]" value="{{ $fournisseurProduit->id ?? '' }}">
+                                    <div class="absolute left-3 top-1/2 transform -translate-y-1/4 text-gray-400">
+                                        <i data-lucide="search" class="h-5 w-5"></i>
+                                    </div>
+                                </div>
+                                <div id="fournisseur_search_results_{{ $index }}" class="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-60 overflow-y-auto hidden"></div>
+                            </div>
+                            <div class="mt-2">
+                                <button type="button" onclick="toggleNewFournisseurForm({{ $index }})" class="text-green-600 hover:text-green-800 font-medium text-sm flex items-center">
+                                    <i data-lucide="plus" class="h-4 w-4 mr-1"></i>
+                                    Ajouter un nouveau fournisseur
+                                </button>
+                            </div>
+                        </div>
+
+                        <div id="new-fournisseur-form-{{ $index }}" class="mb-4 hidden bg-gray-50 p-4 rounded-lg">
+                            <h5 class="text-md font-semibold text-gray-700 mb-2">Nouveau Fournisseur</h5>
+                            <div class="mb-4">
+                                <label for="new_fournisseur_nom_{{ $index }}" class="block text-sm font-semibold text-gray-700">* Nom</label>
+                                <div class="flex">
+                                    <input 
+                                        type="text" 
+                                        id="new_fournisseur_nom_{{ $index }}" 
+                                        name="produits[{{ $index }}][new_fournisseur][nom]" 
+                                        class="mt-2 block w-full border-gray-300 rounded-l-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1"
+                                    >
+                                    <button 
+                                        type="button" 
+                                        onclick="saveNewFournisseur({{ $index }})" 
+                                        class="mt-2 bg-green-600 text-white px-4 rounded-r-lg hover:bg-green-700 flex items-center"
+                                    >
+                                        <i class="fa-solid fa-check"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="selected_fournisseur_{{ $index }}" class="mb-4 p-4 bg-blue-50 rounded-lg border border-blue-200 {{ $fournisseurProduit ? '' : 'hidden' }}">
+                            <h5 class="font-medium text-blue-800">Fournisseur actuellement sélectionné</h5>
+                            <p id="selected_fournisseur_info_{{ $index }}" class="text-blue-700">
+                                @if($fournisseurProduit)
+                                    {{ $fournisseurProduit->nom }} (ID: {{ $fournisseurProduit->id }})
+                                @endif
+                            </p>
+                        </div>
+                    </div>
                 </div>
                 @endforeach
             </div>
         </div>
 
-        <!-- Partie Fournisseur -->
-        <div class="border-l-4 border-green-600 pl-4">
-            <h2 class="text-2xl font-bold text-gray-800 mb-4">Fournisseur</h2>
-            <div class="mb-4">
-                <label for="fournisseur_id" class="block text-sm font-semibold text-gray-700">* Choisir un fournisseur</label>
-                <select id="fournisseur_id" name="fournisseur_id" class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1" onchange="fetchFournisseurDetails(this.value)">
-                @php
-                    $selectedFournisseurId = null;
-
-                    foreach($commande->produits as $produit) {
-                        $fournisseur = DB::table('fournisseur_produit')
-                            ->join('fournisseurs', 'fournisseur_produit.fournisseur_id', '=', 'fournisseurs.id')
-                            ->where('fournisseur_produit.produit_id', $produit->id)
-                            ->where('fournisseur_produit.commande_id', $commande->id)
-                            ->select('fournisseurs.id')
-                            ->first();
-
-                        if ($fournisseur) {
-                            $selectedFournisseurId = $fournisseur->id;
-                            break;
-                        }
-                    }
-                @endphp
-
-                @foreach ($fournisseurs as $fournisseur)
-                <option value="{{ $fournisseur->id }}" 
-                    @if(($commande->fournisseur_id === $fournisseur->id) || ($selectedFournisseurId && $selectedFournisseurId === $fournisseur->id)) 
-                        selected 
-                    @endif>
-                    {{ $fournisseur->nom }}
-                </option>
-                @endforeach
-                </select>
-            </div>
-        </div>
-
         <button type="submit"
                 class="w-full bg-green-600 text-white px-6 py-3 rounded-lg shadow hover:bg-green-700 focus:ring-2 focus:ring-green-500 flex items-center justify-center">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none"
-                    viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round"
-                        d="M5 13l4 4L19 7" />
-                </svg>
+                <i data-lucide="check" class="h-5 w-5 mr-2"></i>
                 Mettre à jour
-            </button>
+        </button>
     </form>
     <div class="text-right mt-4 p-4">
         <a href="{{ route('gestcommande.index') }}" class="text-gray-500 hover:underline">Retour</a>
@@ -232,9 +262,135 @@
 </div>
 
 <script>
-let productCount = {{ count($commande->produits) }}; // Initialise avec le nombre de produits existants
+let fournisseurs = @json($fournisseurs);
+let fournisseurSearchTimeouts = {};
+let productCount = {{ count($commande->produits) }};
 
-// Fonction pour ajouter un nouveau produit
+function toggleNewFournisseurForm(productIndex) {
+    const form = document.getElementById(`new-fournisseur-form-${productIndex}`);
+    const searchInput = document.getElementById(`fournisseur_search_${productIndex}`);
+    const fournisseurId = document.getElementById(`fournisseur_id_${productIndex}`);
+    const selectedFournisseur = document.getElementById(`selected_fournisseur_${productIndex}`);
+    
+    if (form.classList.contains('hidden')) {
+        form.classList.remove('hidden');
+        searchInput.value = '';
+        fournisseurId.value = '';
+        selectedFournisseur.classList.add('hidden');
+    } else {
+        form.classList.add('hidden');
+    }
+}
+
+function saveNewFournisseur(productIndex) {
+    const newFournisseurInput = document.getElementById(`new_fournisseur_nom_${productIndex}`);
+    const selectedFournisseurDiv = document.getElementById(`selected_fournisseur_${productIndex}`);
+    const selectedFournisseurInfo = document.getElementById(`selected_fournisseur_info_${productIndex}`);
+    const searchInput = document.getElementById(`fournisseur_search_${productIndex}`);
+    
+    if (newFournisseurInput.value.trim()) {
+        searchInput.value = '';
+        document.getElementById(`fournisseur_id_${productIndex}`).value = '';
+        
+        selectedFournisseurDiv.classList.remove('hidden');
+        selectedFournisseurDiv.className = 'mb-4 p-4 bg-green-50 rounded-lg border border-green-200';
+        
+        const title = selectedFournisseurDiv.querySelector('h5');
+        title.textContent = 'Nouveau fournisseur à créer';
+        title.className = 'font-medium text-green-800';
+        
+        selectedFournisseurInfo.textContent = newFournisseurInput.value;
+        selectedFournisseurInfo.className = 'text-green-700';
+        
+        document.getElementById(`new-fournisseur-form-${productIndex}`).classList.add('hidden');
+    }
+}
+
+function highlightMatch(text, query) {
+    if (!query.trim()) return text;
+    const regex = new RegExp(`(${query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
+    return text.replace(regex, '<span class="bg-yellow-200 font-medium">$1</span>');
+}
+
+function initializeFournisseurSearch(productIndex) {
+    const fournisseurSearchInput = document.getElementById(`fournisseur_search_${productIndex}`);
+    const fournisseurSearchResults = document.getElementById(`fournisseur_search_results_${productIndex}`);
+    
+    if (!fournisseurSearchInput || !fournisseurSearchResults) return;
+
+    fournisseurSearchInput.addEventListener('input', function(e) {
+        clearTimeout(fournisseurSearchTimeouts[productIndex]);
+        const query = e.target.value.toLowerCase();
+
+        fournisseurSearchTimeouts[productIndex] = setTimeout(() => {
+            if (query.trim() === '') {
+                fournisseurSearchResults.classList.add('hidden');
+                return;
+            }
+
+            const filtered = fournisseurs
+                .filter(fournisseur => fournisseur.nom.toLowerCase().includes(query))
+                .slice(0, 10);
+
+            fournisseurSearchResults.innerHTML = '';
+            
+            if (filtered.length > 0) {
+                const ul = document.createElement('ul');
+                filtered.forEach(fournisseur => {
+                    const li = document.createElement('li');
+                    li.className = 'px-4 py-2 hover:bg-gray-100 cursor-pointer transition-colors duration-150';
+                    li.innerHTML = highlightMatch(fournisseur.nom, query);
+                    li.onclick = () => selectFournisseur(fournisseur, productIndex);
+                    ul.appendChild(li);
+                });
+                fournisseurSearchResults.appendChild(ul);
+                fournisseurSearchResults.classList.remove('hidden');
+            } else {
+                fournisseurSearchResults.innerHTML = `
+                    <div class="p-4 text-gray-500">
+                        <p class="text-sm">Aucun fournisseur trouvé</p>
+                        <button type="button" onclick="toggleNewFournisseurForm(${productIndex})" class="mt-2 text-green-600 hover:text-green-800 font-semibold text-sm flex items-center">
+                            <i data-lucide="plus" class="h-4 w-4 mr-1"></i>
+                            Ajouter un nouveau fournisseur
+                        </button>
+                    </div>
+                `;
+                fournisseurSearchResults.classList.remove('hidden');
+            }
+            
+            lucide.createIcons();
+        }, 300);
+    });
+}
+
+function selectFournisseur(fournisseur, productIndex) {
+    const fournisseurSearchInput = document.getElementById(`fournisseur_search_${productIndex}`);
+    const fournisseurIdInput = document.getElementById(`fournisseur_id_${productIndex}`);
+    const fournisseurSearchResults = document.getElementById(`fournisseur_search_results_${productIndex}`);
+    const selectedFournisseurDiv = document.getElementById(`selected_fournisseur_${productIndex}`);
+    const selectedFournisseurInfo = document.getElementById(`selected_fournisseur_info_${productIndex}`);
+    const newFournisseurInput = document.getElementById(`new_fournisseur_nom_${productIndex}`);
+    
+    fournisseurSearchInput.value = fournisseur.nom;
+    fournisseurIdInput.value = fournisseur.id;
+    fournisseurSearchResults.classList.add('hidden');
+    
+    if (newFournisseurInput) {
+        newFournisseurInput.value = '';
+        document.getElementById(`new-fournisseur-form-${productIndex}`).classList.add('hidden');
+    }
+    
+    selectedFournisseurDiv.classList.remove('hidden');
+    selectedFournisseurDiv.className = 'mb-4 p-4 bg-blue-50 rounded-lg border border-blue-200';
+    
+    const title = selectedFournisseurDiv.querySelector('h5');
+    title.textContent = 'Fournisseur sélectionné';
+    title.className = 'font-medium text-blue-800';
+    
+    selectedFournisseurInfo.textContent = `${fournisseur.nom} (ID: ${fournisseur.id})`;
+    selectedFournisseurInfo.className = 'text-blue-700';
+}
+
 function addProduct() {
     const container = document.getElementById('products-container');
     const productIndex = productCount;
@@ -244,20 +400,22 @@ function addProduct() {
             <div class="flex justify-between items-center mb-3">
                 <h3 class="text-lg font-semibold text-gray-700">Produit ${productIndex + 1}</h3>
                 <button type="button" onclick="removeProduct(${productIndex})" class="text-red-600 hover:text-red-800 font-medium">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+                    <i data-lucide="x" class="h-5 w-5"></i>
                 </button>
             </div>
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+            
+            <!-- Informations produit -->
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
                 <div class="mb-4">
                     <label class="block text-sm font-semibold text-gray-700">* Nom</label>
                     <input type="text" name="produits[${productIndex}][nom]" class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1" required>
                 </div>
                 <div class="mb-4">
                     <label class="block text-sm font-semibold text-gray-700">* Référence produit</label>
-                    <input type="text" name="produits[${productIndex}][reference]" class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1" required>
+                    <input type="text" name="produits[${productIndex}][reference]" class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1">
                 </div>
                 <div class="mb-4">
-                    <label class="block text-sm font-semibold text-gray-700">Prix de réferencement</label>
+                    <label class="block text-sm font-semibold text-gray-700">Prix d'achat</label>
                     <input type="number" name="produits[${productIndex}][prix_referencement]" step="0.01" class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1">
                 </div>
                 <div class="mb-4">
@@ -270,7 +428,7 @@ function addProduct() {
                 </div>
                 <div class="mb-4">
                     <label class="block text-sm font-semibold text-gray-700">* Quantité totale</label>
-                    <input type="number" name="produits[${productIndex}][quantite_totale]" class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1" required>
+                    <input type="number" name="produits[${productIndex}][quantite_totale]" class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1">
                 </div>
                 <div class="mb-4">
                     <label class="block text-sm font-semibold text-gray-700">Quantité Client</label>
@@ -281,24 +439,88 @@ function addProduct() {
                     <label class="text-sm font-semibold text-gray-700">Mise en place de dernière minute ?</label>
                 </div>
             </div>
+
+            <!-- Section Fournisseur pour ce produit -->
+            <div class="border-t border-gray-200 pt-4">
+                <h4 class="text-md font-semibold text-gray-700 mb-3">Fournisseur pour ce produit</h4>
+                <div class="mb-4">
+                    <label class="block text-sm font-semibold text-gray-700">* Choisir un fournisseur</label>
+                    <div class="relative w-full">
+                        <div class="relative">
+                            <input
+                                type="text"
+                                id="fournisseur_search_${productIndex}"
+                                placeholder="Rechercher un fournisseur..."
+                                class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 pl-10 pr-4 py-2"
+                            >
+                            <input type="hidden" id="fournisseur_id_${productIndex}" name="produits[${productIndex}][fournisseur_id]">
+                            <div class="absolute left-3 top-1/2 transform -translate-y-1/4 text-gray-400">
+                                <i data-lucide="search" class="h-5 w-5"></i>
+                            </div>
+                        </div>
+                        
+                        <div id="fournisseur_search_results_${productIndex}" class="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-60 overflow-y-auto hidden"></div>
+                    </div>
+                    <div class="mt-2">
+                        <button type="button" onclick="toggleNewFournisseurForm(${productIndex})" class="text-green-600 hover:text-green-800 font-medium text-sm flex items-center">
+                            <i data-lucide="plus" class="h-4 w-4 mr-1"></i>
+                            Ajouter un nouveau fournisseur
+                        </button>
+                    </div>
+                </div>
+
+                <div id="new-fournisseur-form-${productIndex}" class="mb-4 hidden bg-gray-50 p-4 rounded-lg">
+                    <h5 class="text-md font-semibold text-gray-700 mb-2">Nouveau Fournisseur</h5>
+                    <div class="mb-4">
+                        <label for="new_fournisseur_nom_${productIndex}" class="block text-sm font-semibold text-gray-700">* Nom</label>
+                        <div class="flex">
+                            <input 
+                                type="text" 
+                                id="new_fournisseur_nom_${productIndex}" 
+                                name="produits[${productIndex}][new_fournisseur][nom]" 
+                                class="mt-2 block w-full border-gray-300 rounded-l-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1"
+                            >
+                            <button 
+                                type="button" 
+                                onclick="saveNewFournisseur(${productIndex})" 
+                                class="mt-2 bg-green-600 text-white px-4 rounded-r-lg hover:bg-green-700 flex items-center"
+                            >
+                                <i data-lucide="check" class="h-5 w-5"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="selected_fournisseur_${productIndex}" class="mb-4 p-4 bg-blue-50 rounded-lg border border-blue-200 hidden">
+                    <h5 class="font-medium text-blue-800">Fournisseur sélectionné</h5>
+                    <p id="selected_fournisseur_info_${productIndex}" class="text-blue-700"></p>
+                </div>
+            </div>
         </div>
     `;
     
     container.insertAdjacentHTML('beforeend', productHtml);
+    
+    setTimeout(() => {
+        initializeFournisseurSearch(productIndex);
+        lucide.createIcons();
+    }, 100);
+    
     productCount++;
 }
 
-// Fonction pour supprimer un produit
 function removeProduct(index) {
     const productItem = document.querySelector(`[data-product-index="${index}"]`);
     if (productItem) {
         productItem.remove();
-        // Optionnel: réorganiser les numéros des produits restants
+        if (fournisseurSearchTimeouts[index]) {
+            clearTimeout(fournisseurSearchTimeouts[index]);
+            delete fournisseurSearchTimeouts[index];
+        }
         updateProductNumbers();
     }
 }
 
-// Fonction pour mettre à jour les numéros des produits après suppression
 function updateProductNumbers() {
     const productItems = document.querySelectorAll('.product-item');
     productItems.forEach((item, index) => {
@@ -309,10 +531,24 @@ function updateProductNumbers() {
     });
 }
 
-// Fonction placeholder pour fetchFournisseurDetails si nécessaire
-function fetchFournisseurDetails(fournisseurId) {
-    // À implémenter si vous avez besoin de cette fonctionnalité
-    console.log('Fournisseur sélectionné:', fournisseurId);
-}
+document.addEventListener('DOMContentLoaded', function() {
+    @foreach($commande->produits as $index => $produit)
+        initializeFournisseurSearch({{ $index }});
+    @endforeach
+
+    document.addEventListener('click', function(e) {
+        Object.keys(fournisseurSearchTimeouts).forEach(index => {
+            const fournisseurSearchInput = document.getElementById(`fournisseur_search_${index}`);
+            const fournisseurSearchResults = document.getElementById(`fournisseur_search_results_${index}`);
+            if (fournisseurSearchInput && fournisseurSearchResults) {
+                if (!fournisseurSearchInput.contains(e.target) && !fournisseurSearchResults.contains(e.target)) {
+                    fournisseurSearchResults.classList.add('hidden');
+                }
+            }
+        });
+    });
+
+    lucide.createIcons();
+});
 </script>
 @endsection
