@@ -110,8 +110,8 @@
         <div class="border-l-4 border-green-600 pl-4">
             <div class="flex justify-between items-center mb-4">
                 <h2 class="text-2xl font-bold text-gray-800">Produits</h2>
-                <button type="button" onclick="addProduct()" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 flex items-center">
-                    <i class="fa-solid fa-plus"></i>
+                <button type="button" onclick="addProduct()" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 flex items-center gap-1">
+                    <i class="fa-solid fa-plus"></i> 
                     Ajouter un produit
                 </button>
             </div>
