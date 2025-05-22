@@ -71,33 +71,24 @@
                         @endif
                     </p>
                     <p><strong>Date livraison fournisseur :</strong> {{ $produit->date_livraison_fournisseur ?? '/' }}</p>
-                    <p><strong>Mise en place de dernière minute :</strong> {{ ($produit->is_derMinute ?? 0) == 1 ? 'Oui' : 'Non' }}</p>                </div>
+                    <p><strong>Mise en place de dernière minute :</strong> {{ ($produit->is_derMinute ?? 0) == 1 ? 'Oui' : 'Non' }}</p>                
+                    @php
+                        $fournisseurProduit = DB::table('fournisseur_produit')
+                            ->join('fournisseurs', 'fournisseur_produit.fournisseur_id', '=', 'fournisseurs.id')
+                            ->where('fournisseur_produit.produit_id', $produit->id)
+                            ->where('fournisseur_produit.commande_id', $commande->id)
+                            ->select('fournisseurs.nom')
+                            ->first();
+                    @endphp
+
+                    <p><strong>Fournisseur :</strong> {{ $fournisseurProduit->nom ?? '/' }}</p>
+                </div>
             @empty
                 <p>Aucun produit associé à cette commande.</p>
             @endforelse
         </div>
 
-        <!-- Partie Fournisseur -->
-        <div class="border-l-4 border-green-600 pl-4 mb-8">
-            <h2 class="text-2xl font-bold text-gray-800 mb-4">Fournisseur</h2>
-            @foreach($commande->produits as $produit)
-                @php
-                    $fournisseurProduitCommande = DB::table('fournisseur_produit')
-                        ->join('fournisseurs', 'fournisseur_produit.fournisseur_id', '=', 'fournisseurs.id')
-                        ->where('fournisseur_produit.produit_id', $produit->id)
-                        ->where('fournisseur_produit.commande_id', $commande->id)
-                        ->select('fournisseurs.nom')
-                        ->first();
-                @endphp
-
-                @if($fournisseurProduitCommande)
-                    <p><strong>Fournisseur :</strong> {{ $fournisseurProduitCommande->nom ?? '/' }}</p>
-                @else
-                    <p class="text-red-500"><strong>Aucun fournisseur associé</strong></p>
-                @endif
-            @endforeach
-        </div>
-
+        
         <!-- Préparation Atelier -->
         @if (auth()->check() && auth()->user()->stock_id === 1)
         <div class="border-l-4 border-green-600 pl-4 mb-8">
