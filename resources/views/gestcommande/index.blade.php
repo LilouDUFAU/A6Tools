@@ -258,10 +258,10 @@ const defaultHeaders = `
     <th class="py-2 px-2 border border-gray-200 min-w-20">Client</th>
     <th class="py-2 px-2 border border-gray-200 min-w-32">Fournisseur</th>
     <th class="py-2 px-2 border border-gray-200 min-w-40">Produit</th>
+    <th class="py-2 px-2 border border-gray-200 min-w-20 text-center">Der-min?</th>
     <th class="py-2 px-2 border border-gray-200 min-w-24">Site</th>
     <th class="py-2 px-2 border border-gray-200 min-w-24">État</th>
     <th class="py-2 px-2 border border-gray-200 min-w-20">Urgence</th>
-    <th class="py-2 px-2 border border-gray-200 min-w-20 text-center">Der-min?</th>
     <th class="py-2 px-2 border border-gray-200 min-w-32">Actions</th>
 `;
 
@@ -298,6 +298,17 @@ const rowHTML = cmd => `
                 }
             }).join('')}
         </td>
+        <td class="py-2 px-2 border border-gray-200 text-xs">
+            ${cmd.produits.map(p => {
+                // Affiche "Oui" si is_derMinute vaut 1, sinon "Non"
+                return `<div class="mb-1 break-words">
+                    ${p.is_derMinute ? 
+                        '<span class="bg-red-100 text-red-700 px-2 py-1 rounded text-xs font-semibold">Oui</span>' : 
+                        '<span class="bg-green-100 text-green-700 px-2 py-1 rounded text-xs font-semibold">Non</span>'
+                    }
+                </div>`;
+            }).join('')}
+        </td>
         <td class="py-2 px-2 border border-gray-200 text-xs break-words">${cmd.lieux}</td>
         <td class="py-2 px-2 border border-gray-200">
             <div class="relative">
@@ -322,11 +333,6 @@ const rowHTML = cmd => `
                     <div class="animate-spin rounded-full h-3 w-3 border-b-2 border-gray-900"></div>
                 </div>
             </div>
-        </td>
-        <td class="py-2 px-2 border border-gray-200">
-            <span class="${cmd.urgence === 'urgent' ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'} px-1 py-0.5 rounded text-xs">
-                ${cmd.urgence}
-            </span>
         </td>
 <td class="py-2 px-2 border border-gray-200 text-center">
     ${
