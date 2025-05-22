@@ -90,12 +90,12 @@
                         <th class="py-2 px-2 border border-gray-200 min-w-32">N° cmde fournisseur</th>
                         <th class="py-2 px-2 border border-gray-200 min-w-28">Doc client</th>
                         <th class="py-2 px-2 border border-gray-200 min-w-20">Client</th>
-                        <th class="py-2 px-2 border border-gray-200 min-w-32">Fournisseur</th>
                         <th class="py-2 px-2 border border-gray-200 min-w-40">Produit</th>
+                        <th class="py-2 px-2 border border-gray-200 min-w-32">Fournisseur</th>
+                        <th class="py-2 px-2 border border-gray-200 min-w-20 text-center">Der-min?</th>
                         <th class="py-2 px-2 border border-gray-200 min-w-24">Site</th>
                         <th class="py-2 px-2 border border-gray-200 min-w-24">État</th>
                         <th class="py-2 px-2 border border-gray-200 min-w-20">Urgence</th>
-                        <th class="py-2 px-2 border border-gray-200 min-w-20 text-center">Der-min?</th>
                         <th class="py-2 px-2 border border-gray-200 min-w-32">Actions</th>
                     </tr>
                 </thead>
@@ -118,17 +118,37 @@ $commandesData = $commandes->map(function($c) use($csrf) {
         ->join('stocks','produit_stock.stock_id','=','stocks.id')
         ->where('produit_stock.commande_id',$c->id)
         ->distinct()->pluck('stocks.lieux')->implode(', ');
+    
+    // Récupération des produits avec leurs fournisseurs et is_derMinute
     $produits = DB::table('commande_produit')
         ->join('produits','commande_produit.produit_id','=','produits.id')
+        ->leftJoin('fournisseur_produit', function($join) use ($c) {
+            $join->on('fournisseur_produit.produit_id', '=', 'produits.id')
+                 ->where('fournisseur_produit.commande_id', '=', $c->id);
+        })
+        ->leftJoin('fournisseurs', 'fournisseur_produit.fournisseur_id', '=', 'fournisseurs.id')
         ->where('commande_produit.commande_id',$c->id)
-        ->select('produits.nom as nom', 'produits.lien_produit_fournisseur as lien', 'commande_produit.quantite_totale as quantite')
-        ->get()->map(fn($p)=>['nom'=>$p->nom, 'lien'=>$p->lien, 'quantite'=>$p->quantite]);
-    $fourn = $produits->isNotEmpty()
-        ? DB::table('fournisseur_produit')
-            ->join('fournisseurs','fournisseur_produit.fournisseur_id','=','fournisseurs.id')
-            ->where('produit_id',DB::table('produits')->where('nom',$produits[0]['nom'])->value('id'))
-            ->where('commande_id',$c->id)->value('fournisseurs.nom')
-        : '/';
+        ->select(
+            'produits.id as produit_id',
+            'produits.nom as nom', 
+            'produits.lien_produit_fournisseur as lien', 
+            'commande_produit.quantite_totale as quantite',
+            'produits.is_derMinute as is_derMinute',
+            'fournisseurs.nom as fournisseur_nom',
+            'fournisseurs.id as fournisseur_id'
+        )
+        ->get()->map(function($p) {
+            return [
+                'produit_id' => $p->produit_id,
+                'nom' => $p->nom, 
+                'lien' => $p->lien, 
+                'quantite' => $p->quantite,
+                'is_derMinute' => $p->is_derMinute ? true : false,
+                'fournisseur_nom' => $p->fournisseur_nom ?? 'Non défini',
+                'fournisseur_id' => $p->fournisseur_id
+            ];
+        });
+
     $actions = 
         "<form action='".route('gestcommande.destroy',$c->id)."' method='POST' class='inline'>".
         "<input type='hidden' name='_token' value='{$csrf}'>".
@@ -137,6 +157,7 @@ $commandesData = $commandes->map(function($c) use($csrf) {
         "<button type='button' class='text-yellow-600 hover:text-yellow-700 font-semibold mr-1 text-xs' onclick=\"window.location.href='".route('gestcommande.edit',$c->id)."'\">Modifier</button>".
         "<button type='button' onclick=\"openModal({$c->id})\" class='text-red-600 hover:text-red-700 font-semibold text-xs'>Supprimer</button>".
         "</form>";
+    
     // Check if this command has an alert
     $hasAlert = isset($alerteCommandes[$c->id]);
     return [
@@ -144,12 +165,10 @@ $commandesData = $commandes->map(function($c) use($csrf) {
         'numero_commande_fournisseur'=>$c->numero_commande_fournisseur ?? 'Non défini',
         'doc_client'=>$c->doc_client ?? 'Non défini',
         'client'=>$c->client?->code_client?:'<p class="text-red-500">Pas de client</p>',
-        'fournisseur'=>$fourn,
         'lieux'=>$lieux?:'Non défini',
         'produits'=>$produits,
         'etat'=>strtolower($c->etat),
         'urgence'=>strtolower($c->urgence),
-        'is_derMinute'=>$c->is_derMinute ?? false, // Ajout de la valeur is_derMinute
         'hasAlert'=>$hasAlert,
         'actions'=>$actions];
 });
@@ -256,8 +275,8 @@ const defaultHeaders = `
     <th class="py-2 px-2 border border-gray-200 min-w-32">N° cmde fournisseur</th>
     <th class="py-2 px-2 border border-gray-200 min-w-28">Doc client</th>
     <th class="py-2 px-2 border border-gray-200 min-w-20">Client</th>
-    <th class="py-2 px-2 border border-gray-200 min-w-32">Fournisseur</th>
     <th class="py-2 px-2 border border-gray-200 min-w-40">Produit</th>
+    <th class="py-2 px-2 border border-gray-200 min-w-32">Fournisseur</th>
     <th class="py-2 px-2 border border-gray-200 min-w-20 text-center">Der-min?</th>
     <th class="py-2 px-2 border border-gray-200 min-w-24">Site</th>
     <th class="py-2 px-2 border border-gray-200 min-w-24">État</th>
@@ -279,29 +298,43 @@ const rowHTML = cmd => `
             ${cmd.doc_client ?? 'N/A'}
         </td>
         <td class="py-2 px-2 border border-gray-200 text-xs">${cmd.client}</td>
-        <td class="py-2 px-2 border border-gray-200 text-xs break-words">${cmd.fournisseur}</td>
         <td class="py-2 px-2 border border-gray-200 text-xs">
             ${cmd.produits.map(p => {
                 // Vérifie si le lien produit existe
                 if (p.lien) {
-                    return `<div class="mb-1">
+                    return `<div class="mb-1 border-b border-gray-200 pb-1 last:border-b-0">
                         <a href="${p.lien}" 
                            target="_blank" 
                            class="text-blue-600 hover:underline break-words" 
                            title="Voir le produit chez le fournisseur">
                             ${p.nom}
                         </a>
+                        <div class="text-xs text-gray-500">Qté: ${p.quantite}</div>
                     </div>`;
                 } else {
                     // Si pas de lien, affichage normal
-                    return `<div class="mb-1 break-words">${p.nom}</div>`;
+                    return `<div class="mb-1 border-b border-gray-200 pb-1 last:border-b-0 break-words">
+                        ${p.nom}
+                        <div class="text-xs text-gray-500">Qté: ${p.quantite}</div>
+                    </div>`;
                 }
             }).join('')}
         </td>
         <td class="py-2 px-2 border border-gray-200 text-xs">
             ${cmd.produits.map(p => {
-                // Affiche "Oui" si is_derMinute vaut 1, sinon "Non"
-                return `<div class="mb-1 break-words">
+                return `<div class="mb-1 border-b border-gray-200 pb-1 last:border-b-0">
+                    <div class="supplier-cell cursor-pointer hover:bg-gray-200 px-1 py-1 rounded break-words" 
+                         data-commande-id="${cmd.id}" 
+                         data-produit-id="${p.produit_id}"
+                         title="Cliquer pour modifier">
+                        ${p.fournisseur_nom}
+                    </div>
+                </div>`;
+            }).join('')}
+        </td>
+        <td class="py-2 px-2 border border-gray-200 text-xs text-center">
+            ${cmd.produits.map(p => {
+                return `<div class="mb-1 border-b border-gray-200 pb-1 last:border-b-0">
                     ${p.is_derMinute ? 
                         '<span class="bg-red-100 text-red-700 px-2 py-1 rounded text-xs font-semibold">Oui</span>' : 
                         '<span class="bg-green-100 text-green-700 px-2 py-1 rounded text-xs font-semibold">Non</span>'
@@ -334,14 +367,7 @@ const rowHTML = cmd => `
                 </div>
             </div>
         </td>
-<td class="py-2 px-2 border border-gray-200 text-center">
-    ${
-        cmd.produits.some(p => p.is_derMinute)
-            ? '<span class="bg-red-100 text-red-700 px-2 py-1 rounded text-xs font-semibold">Oui</span>'
-            : '<span class="bg-green-100 text-green-700 px-2 py-1 rounded text-xs font-semibold">Non</span>'
-    }
-</td>
-
+        <td class="py-2 px-2 border border-gray-200 text-xs">${cmd.urgence}</td>
         <td class="py-2 px-2 border border-gray-200 text-xs">${cmd.actions}</td>
     </tr>
 `;
@@ -349,14 +375,7 @@ const rowHTML = cmd => `
 function renderDefault() {
     titre.textContent = 'Liste des Commandes';
     headers.innerHTML = defaultHeaders;
-    body.innerHTML = données.filter(filtreOK).map(cmd => {
-        const rowHtml = rowHTML(cmd);
-        // Modifier le HTML pour ajouter la classe et le data attribute
-        return rowHtml.replace(
-            `<td class="py-2 px-2 border border-gray-200 text-xs break-words">${cmd.fournisseur}</td>`, 
-            `<td class="py-2 px-2 border border-gray-200 text-xs break-words supplier-cell cursor-pointer hover:bg-gray-200" data-commande-id="${cmd.id}">${cmd.fournisseur}</td>`
-        );
-    }).join('');
+    body.innerHTML = données.filter(filtreOK).map(rowHTML).join('');
     updateFilterCounts();
     makeSupplierEditable();
     reactivateStateSelectors();
@@ -397,7 +416,7 @@ function renderByFournisseur() {
     données.forEach(cmd => {
         if (filtreOK(cmd)) {
             cmd.produits.forEach(p => {
-                const fournisseur = cmd.fournisseur || 'Non défini';
+                const fournisseur = p.fournisseur_nom || 'Non défini';
                 const key = fournisseur + '|' + p.nom;
                 if (!agg[key]) agg[key] = {fournisseur: fournisseur, produit: p.nom, quantite: 0};
                 agg[key].quantite += p.quantite;
@@ -522,6 +541,7 @@ function makeSupplierEditable() {
 
             const originalText = this.textContent.trim();
             const commandeId = this.dataset.commandeId;
+            const produitId = this.dataset.produitId;
             
             // Créer un input pour éditer
             const input = document.createElement('input');
@@ -542,7 +562,7 @@ function makeSupplierEditable() {
                 // Si la valeur est différente, envoyer une requête AJAX
                 if (newValue !== originalText) {
                     try {
-                        const response = await fetch(`/commandes/${commandeId}/fournisseur`, {
+                        const response = await fetch(`/commandes/update-fournisseur-produit`, {
                             method: 'PATCH',
                             headers: {
                                 'Content-Type': 'application/json',
@@ -550,7 +570,8 @@ function makeSupplierEditable() {
                             },
                             body: JSON.stringify({ 
                                 fournisseur: newValue,
-                                commande_id: commandeId 
+                                commande_id: commandeId,
+                                produit_id: produitId
                             })
                         });
                         
@@ -561,7 +582,10 @@ function makeSupplierEditable() {
                             // Mettre à jour les données du client
                             const cmdIndex = données.findIndex(cmd => cmd.id == commandeId);
                             if (cmdIndex !== -1) {
-                                données[cmdIndex].fournisseur = newValue;
+                                const produitIndex = données[cmdIndex].produits.findIndex(p => p.produit_id == produitId);
+                                if (produitIndex !== -1) {
+                                    données[cmdIndex].produits[produitIndex].fournisseur_nom = newValue;
+                                }
                             }
                             showToast('Fournisseur mis à jour avec succès', 'success');
                         } else {
