@@ -22,11 +22,12 @@
     </div>
 
     <h2 class="text-2xl font-semibold px-4 py-2 text-gray-700">Répartition des pannes selon le statut</h2>
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8 px-4">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6 mb-8 px-4">
         @php
             $statuts = [
-                'Remboursement' => 'bg-green-600 hover:bg-green-700',
-                'Transit' => 'bg-yellow-600 hover:bg-yellow-700',
+                'En attente' => 'bg-green-600 hover:bg-green-700',
+                'Remboursement' => 'bg-yellow-600 hover:bg-yellow-700',
+                'Transit' => 'bg-amber-600 hover:bg-amber-700',
                 'Envoyé' => 'bg-orange-600 hover:bg-orange-700',
                 'Échange anticipé' => 'bg-red-600 hover:bg-red-700',
             ];
@@ -87,11 +88,11 @@
                         </td>
                             <td class="py-3 px-4 border border-gray-200">{{ $panne->clients->first()->nom ?? 'N/A' }}</td>
                             <td class="py-3 px-4 border border-gray-200">{{ $panne->fournisseur->nom ?? 'N/A' }}</td>
-                            <td class="py-3 px-4 border border-gray-200">{{ $panne->etat_client }}</td>
-                            <td class="py-3 px-4 border border-gray-200">{{ $panne->demande }}</td>
-                            <td class="py-3 px-4 border border-gray-200">{{ $panne->statut }}</td>
-                            <td class="py-3 px-4 border border-gray-200">{{ $panne->categorie_panne }}</td>
-                            <td class="py-3 px-4 border border-gray-200">{{ $panne->date_panne }}</td>
+                            <td class="py-3 px-4 border border-gray-200">{{ $panne->etat_client ?? 'N/A' }}</td>
+                            <td class="py-3 px-4 border border-gray-200">{{ $panne->demande ?? 'N/A' }}</td>
+                            <td class="py-3 px-4 border border-gray-200">{{ $panne->statut ?? 'N/A' }}</td>
+                            <td class="py-3 px-4 border border-gray-200">{{ $panne->categorie_panne ?? 'N/A' }}</td>
+                            <td class="py-3 px-4 border border-gray-200">{{ $panne->date_panne ?? 'N/A' }}</td>
                             <td class="py-3 px-4 border border-gray-200">
                                 <div class="inline-flex space-x-2">
                                     <a href="{{ route('gestsav.show', $panne->id) }}" class="text-green-600 font-semibold hover:underline">Détails</a>
