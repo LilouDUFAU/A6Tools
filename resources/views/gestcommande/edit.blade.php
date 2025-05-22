@@ -111,7 +111,7 @@
             <div class="flex justify-between items-center mb-4">
                 <h2 class="text-2xl font-bold text-gray-800">Produits</h2>
                 <button type="button" onclick="addProduct()" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 flex items-center">
-                    <i data-lucide="plus" class="h-4 w-4 mr-2"></i>
+                    <i class="fa-solid fa-plus"></i>
                     Ajouter un produit
                 </button>
             </div>
@@ -485,7 +485,7 @@ function addProduct() {
                                 onclick="saveNewFournisseur(${productIndex})" 
                                 class="mt-2 bg-green-600 text-white px-4 rounded-r-lg hover:bg-green-700 flex items-center"
                             >
-                                <i data-lucide="check" class="h-5 w-5"></i>
+                                <i class="fa-solid fa-check"></i>
                             </button>
                         </div>
                     </div>
