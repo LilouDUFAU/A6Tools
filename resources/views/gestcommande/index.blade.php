@@ -84,18 +84,19 @@
     <div class="bg-white shadow rounded-lg p-4 sm:p-6">
         <h2 id="table-title" class="text-xl sm:text-2xl font-semibold text-gray-800 mb-4">Liste des Commandes</h2>
         <div class="overflow-x-auto">
-            <table class="min-w-full bg-white shadow-md rounded-lg">
+            <table class="min-w-full bg-white shadow-md rounded-lg text-sm">
                 <thead>
-                    <tr id="table-headers" class="bg-gray-100 text-left text-sm font-semibold text-gray-700">
-                        <th class="py-3 px-4 border border-gray-200">N° cmde fournisseur</th>
-                        <th class="py-3 px-4 border border-gray-200">Doc client</th>
-                        <th class="py-3 px-4 border border-gray-200">Client</th>
-                        <th class="py-3 px-4 border border-gray-200">Fournisseur</th>
-                        <th class="py-3 px-4 border border-gray-200">Produit</th>
-                        <th class="py-3 px-4 border border-gray-200">Site</th>
-                        <th class="py-3 px-4 border border-gray-200">État</th>
-                        <th class="py-3 px-4 border border-gray-200">Urgence</th>
-                        <th class="py-3 px-4 border border-gray-200">Actions</th>
+                    <tr id="table-headers" class="bg-gray-100 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                        <th class="py-2 px-2 border border-gray-200 min-w-32">N° cmde fournisseur</th>
+                        <th class="py-2 px-2 border border-gray-200 min-w-28">Doc client</th>
+                        <th class="py-2 px-2 border border-gray-200 min-w-20">Client</th>
+                        <th class="py-2 px-2 border border-gray-200 min-w-32">Fournisseur</th>
+                        <th class="py-2 px-2 border border-gray-200 min-w-40">Produit</th>
+                        <th class="py-2 px-2 border border-gray-200 min-w-24">Site</th>
+                        <th class="py-2 px-2 border border-gray-200 min-w-24">État</th>
+                        <th class="py-2 px-2 border border-gray-200 min-w-20">Urgence</th>
+                        <th class="py-2 px-2 border border-gray-200 min-w-20 text-center">Der-min?</th>
+                        <th class="py-2 px-2 border border-gray-200 min-w-32">Actions</th>
                     </tr>
                 </thead>
                 <tbody id="commandes-body">
@@ -132,22 +133,23 @@ $commandesData = $commandes->map(function($c) use($csrf) {
         "<form action='".route('gestcommande.destroy',$c->id)."' method='POST' class='inline'>".
         "<input type='hidden' name='_token' value='{$csrf}'>".
         "<input type='hidden' name='_method' value='DELETE'>".
-        "<button type='button' class='text-green-600 hover:text-green-700 font-semibold mr-2' onclick=\"window.location.href='".route('gestcommande.show',$c->id)."'\">Détails</button>".
-        "<button type='button' class='text-yellow-600 hover:text-yellow-700 font-semibold mr-2' onclick=\"window.location.href='".route('gestcommande.edit',$c->id)."'\">Modifier</button>".
-        "<button type='button' onclick=\"openModal({$c->id})\" class='text-red-600 hover:text-red-700 font-semibold'>Supprimer</button>".
+        "<button type='button' class='text-green-600 hover:text-green-700 font-semibold mr-1 text-xs' onclick=\"window.location.href='".route('gestcommande.show',$c->id)."'\">Détails</button>".
+        "<button type='button' class='text-yellow-600 hover:text-yellow-700 font-semibold mr-1 text-xs' onclick=\"window.location.href='".route('gestcommande.edit',$c->id)."'\">Modifier</button>".
+        "<button type='button' onclick=\"openModal({$c->id})\" class='text-red-600 hover:text-red-700 font-semibold text-xs'>Supprimer</button>".
         "</form>";
     // Check if this command has an alert
     $hasAlert = isset($alerteCommandes[$c->id]);
     return [
         'id'=>$c->id,
         'numero_commande_fournisseur'=>$c->numero_commande_fournisseur ?? 'Non défini',
-        'doc_client'=>$c->doc_client ?? 'Non défini', // Ajout de cette ligne
+        'doc_client'=>$c->doc_client ?? 'Non défini',
         'client'=>$c->client?->code_client?:'<p class="text-red-500">Pas de client</p>',
         'fournisseur'=>$fourn,
         'lieux'=>$lieux?:'Non défini',
         'produits'=>$produits,
         'etat'=>strtolower($c->etat),
         'urgence'=>strtolower($c->urgence),
+        'is_derMinute'=>$c->is_derMinute ?? false, // Ajout de la valeur is_derMinute
         'hasAlert'=>$hasAlert,
         'actions'=>$actions];
 });
@@ -251,15 +253,16 @@ const updateFilterCounts = () => {
 };
 
 const defaultHeaders = `
-    <th class="py-3 px-4 border border-gray-200">N° cmde fournisseur</th>
-    <th class="py-3 px-4 border border-gray-200">Doc client</th>
-    <th class="py-3 px-4 border border-gray-200">Client</th>
-    <th class="py-3 px-4 border border-gray-200">Fournisseur</th>
-    <th class="py-3 px-4 border border-gray-200">Produit</th>
-    <th class="py-3 px-4 border border-gray-200">Site</th>
-    <th class="py-3 px-4 border border-gray-200">État</th>
-    <th class="py-3 px-4 border border-gray-200">Urgence</th>
-    <th class="py-3 px-4 border border-gray-200">Actions</th>
+    <th class="py-2 px-2 border border-gray-200 min-w-32">N° cmde fournisseur</th>
+    <th class="py-2 px-2 border border-gray-200 min-w-28">Doc client</th>
+    <th class="py-2 px-2 border border-gray-200 min-w-20">Client</th>
+    <th class="py-2 px-2 border border-gray-200 min-w-32">Fournisseur</th>
+    <th class="py-2 px-2 border border-gray-200 min-w-40">Produit</th>
+    <th class="py-2 px-2 border border-gray-200 min-w-24">Site</th>
+    <th class="py-2 px-2 border border-gray-200 min-w-24">État</th>
+    <th class="py-2 px-2 border border-gray-200 min-w-20">Urgence</th>
+    <th class="py-2 px-2 border border-gray-200 min-w-20 text-center">Der-min?</th>
+    <th class="py-2 px-2 border border-gray-200 min-w-32">Actions</th>
 `;
 
 const filtreOK = cmd =>
@@ -269,38 +272,38 @@ const filtreOK = cmd =>
 
 const rowHTML = cmd => `
     <tr class="border-t hover:bg-gray-50">
-        <td class="py-3 px-4 border border-gray-200">
+        <td class="py-2 px-2 border border-gray-200 text-xs break-words">
             ${cmd.numero_commande_fournisseur}
         </td>
-        <td class="py-3 px-4 border border-gray-200">
+        <td class="py-2 px-2 border border-gray-200 text-xs break-words">
             ${cmd.doc_client ?? 'N/A'}
         </td>
-        <td class="py-3 px-4 border border-gray-200">${cmd.client}</td>
-        <td class="py-3 px-4 border border-gray-200">${cmd.fournisseur}</td>
-        <td class="py-3 px-4 border border-gray-200">
+        <td class="py-2 px-2 border border-gray-200 text-xs">${cmd.client}</td>
+        <td class="py-2 px-2 border border-gray-200 text-xs break-words">${cmd.fournisseur}</td>
+        <td class="py-2 px-2 border border-gray-200 text-xs">
             ${cmd.produits.map(p => {
                 // Vérifie si le lien produit existe
                 if (p.lien) {
-                    return `<p>
+                    return `<div class="mb-1">
                         <a href="${p.lien}" 
                            target="_blank" 
-                           class="text-blue-600 hover:underline" 
+                           class="text-blue-600 hover:underline break-words" 
                            title="Voir le produit chez le fournisseur">
                             ${p.nom}
                         </a>
-                    </p>`;
+                    </div>`;
                 } else {
                     // Si pas de lien, affichage normal
-                    return `<p>${p.nom}</p>`;
+                    return `<div class="mb-1 break-words">${p.nom}</div>`;
                 }
             }).join('')}
         </td>
-        <td class="py-3 px-4 border border-gray-200">${cmd.lieux}</td>
-        <td class="py-3 px-4 border border-gray-200">
+        <td class="py-2 px-2 border border-gray-200 text-xs break-words">${cmd.lieux}</td>
+        <td class="py-2 px-2 border border-gray-200">
             <div class="relative">
                 <select
                     data-commande-id="${cmd.id}"
-                    class="state-select appearance-none w-full pl-3 pr-10 py-2 rounded-md border focus:outline-none ${
+                    class="state-select appearance-none w-full pl-2 pr-6 py-1 rounded-md border text-xs focus:outline-none ${
                         {
                             'a faire': 'border-green-600',
                             'commandé': 'border-yellow-600',
@@ -315,17 +318,25 @@ const rowHTML = cmd => `
                             cmd.etat === etat.toLowerCase() ? 'selected' : ''
                         }>${etat}</option>`).join('')}
                 </select>
-                <div class="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none loading-indicator hidden">
-                    <div class="animate-spin rounded-full h-5 w-5 border-b-2 border-gray-900"></div>
+                <div class="absolute inset-y-0 right-0 flex items-center pr-1 pointer-events-none loading-indicator hidden">
+                    <div class="animate-spin rounded-full h-3 w-3 border-b-2 border-gray-900"></div>
                 </div>
             </div>
         </td>
-        <td class="py-3 px-4 border border-gray-200">
-            <span class="${cmd.urgence === 'urgent' ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'} px-2 py-1 rounded">
+        <td class="py-2 px-2 border border-gray-200">
+            <span class="${cmd.urgence === 'urgent' ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'} px-1 py-0.5 rounded text-xs">
                 ${cmd.urgence}
             </span>
         </td>
-        <td class="py-3 px-4 border border-gray-200">${cmd.actions}</td>
+<td class="py-2 px-2 border border-gray-200 text-center">
+    ${
+        cmd.produits.some(p => p.is_derMinute)
+            ? '<span class="bg-red-100 text-red-700 px-2 py-1 rounded text-xs font-semibold">Oui</span>'
+            : '<span class="bg-green-100 text-green-700 px-2 py-1 rounded text-xs font-semibold">Non</span>'
+    }
+</td>
+
+        <td class="py-2 px-2 border border-gray-200 text-xs">${cmd.actions}</td>
     </tr>
 `;
 
@@ -336,8 +347,8 @@ function renderDefault() {
         const rowHtml = rowHTML(cmd);
         // Modifier le HTML pour ajouter la classe et le data attribute
         return rowHtml.replace(
-            `<td class="py-3 px-4 border border-gray-200">${cmd.fournisseur}</td>`, 
-            `<td class="py-3 px-4 border border-gray-200 supplier-cell cursor-pointer hover:bg-gray-200" data-commande-id="${cmd.id}">${cmd.fournisseur}</td>`
+            `<td class="py-2 px-2 border border-gray-200 text-xs break-words">${cmd.fournisseur}</td>`, 
+            `<td class="py-2 px-2 border border-gray-200 text-xs break-words supplier-cell cursor-pointer hover:bg-gray-200" data-commande-id="${cmd.id}">${cmd.fournisseur}</td>`
         );
     }).join('');
     updateFilterCounts();
@@ -348,8 +359,8 @@ function renderDefault() {
 function renderByArticle() {
     titre.textContent = 'Grouper par Article';
     headers.innerHTML = `
-        <th class="py-3 px-4 border border-gray-200">Produit</th>
-        <th class="py-3 px-4 border border-gray-200">Quantité</th>
+        <th class="py-2 px-2 border border-gray-200">Produit</th>
+        <th class="py-2 px-2 border border-gray-200">Quantité</th>
     `;
     const agg = {};
     données.forEach(cmd => {
@@ -361,8 +372,8 @@ function renderByArticle() {
     });
     const rows = Object.entries(agg).map(([nom, total]) => `
         <tr class="border-t hover:bg-gray-50">
-            <td class="py-3 px-4 border border-gray-200">${nom}</td>
-            <td class="py-3 px-4 border border-gray-200">${total}</td>
+            <td class="py-2 px-2 border border-gray-200 text-xs break-words">${nom}</td>
+            <td class="py-2 px-2 border border-gray-200 text-xs">${total}</td>
         </tr>
     `);
     body.innerHTML = rows.join('');
@@ -372,9 +383,9 @@ function renderByArticle() {
 function renderByFournisseur() {
     titre.textContent = 'Grouper par Fournisseur';
     headers.innerHTML = `
-        <th class="py-3 px-4 border border-gray-200">Fournisseur</th>
-        <th class="py-3 px-4 border border-gray-200">Produit</th>
-        <th class="py-3 px-4 border border-gray-200">Quantité</th>
+        <th class="py-2 px-2 border border-gray-200">Fournisseur</th>
+        <th class="py-2 px-2 border border-gray-200">Produit</th>
+        <th class="py-2 px-2 border border-gray-200">Quantité</th>
     `;
     const agg = {};
     données.forEach(cmd => {
@@ -391,9 +402,9 @@ function renderByFournisseur() {
         .sort((a, b) => a.fournisseur.localeCompare(b.fournisseur) || a.produit.localeCompare(b.produit))
         .map(item => `
         <tr class="border-t hover:bg-gray-50">
-            <td class="py-3 px-4 border border-gray-200">${item.fournisseur}</td>
-            <td class="py-3 px-4 border border-gray-200">${item.produit}</td>
-            <td class="py-3 px-4 border border-gray-200">${item.quantite}</td>
+            <td class="py-2 px-2 border border-gray-200 text-xs break-words">${item.fournisseur}</td>
+            <td class="py-2 px-2 border border-gray-200 text-xs break-words">${item.produit}</td>
+            <td class="py-2 px-2 border border-gray-200 text-xs">${item.quantite}</td>
         </tr>
     `);
     body.innerHTML = rows.join('');
@@ -510,7 +521,7 @@ function makeSupplierEditable() {
             const input = document.createElement('input');
             input.type = 'text';
             input.value = originalText;
-            input.classList.add('w-full', 'px-2', 'py-1', 'border', 'rounded');
+            input.classList.add('w-full', 'px-2', 'py-1', 'border', 'rounded', 'text-xs');
             
             // Sauvegarder les anciens contenus
             const oldContent = this.innerHTML;

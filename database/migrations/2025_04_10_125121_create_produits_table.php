@@ -18,6 +18,7 @@ return new class extends Migration
             $table->decimal('prix_referencement', 8, 2); // Prix du produit
             $table->string('lien_produit_fournisseur', 1000)->nullable(); // URL de l'image du produit (optionnel)
             $table->date('date_livraison_fournisseur')->nullable(); // Date de livraison du produit par le fournisseur (optionnel)
+            $table->boolean('is_derMinute')->default(false); // Indique si le produit est de dernière minute
             $table->timestamps(); // created_at, updated_at
         });
     }

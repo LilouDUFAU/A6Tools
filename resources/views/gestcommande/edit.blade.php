@@ -148,6 +148,17 @@
                         <label for="produit_quantite_client" class="block text-sm font-semibold text-gray-700">Quantité Client</label>
                         <input type="number" id="produit_quantite_client" name="produit[quantite_client]" value="{{ old('produit.quantite_client', $produit->pivot->quantite_client ?? '') }}" class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm   px-2 py-1">
                     </div>
+                    <div class="mb-4 flex items-center">
+                        <input 
+                            type="checkbox" 
+                            id="produit_is_derMinute" 
+                            name="produit[is_derMinute]" 
+                            value="1" 
+                            class="mr-2"
+                            {{ old('produit.is_derMinute', $produit->is_derMinute ?? 0) == 1 ? 'checked' : '' }}
+                        >
+                        <label for="produit_is_derMinute" class="text-sm font-semibold text-gray-700">Mise en place de dernière minute ?</label>
+                    </div>
                 @endforeach
             </div>
         </div>

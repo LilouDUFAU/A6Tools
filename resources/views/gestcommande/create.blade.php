@@ -159,6 +159,11 @@
                             <label for="produit_quantite_client" class="block text-sm font-semibold text-gray-700">Quantité Client</label>
                             <input type="number" id="produit_quantite_client" name="produit[quantite_client]" class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-2 py-1">
                         </div>
+
+                        <div class="mb-4 flex items-center">
+                            <input type="checkbox" id="produit_is_derMinute" name="produit[is_derMinute]" value="1" class="mr-2">
+                            <label for="produit_is_derMinute" class="text-sm font-semibold text-gray-700">Mise en place de dernière minute ?</label>
+                        </div>
                     </div>
                 </div>
             </div>

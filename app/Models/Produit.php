@@ -19,6 +19,7 @@ class Produit extends Model
         'prix_referencement',
         'lien_produit_fournisseur',
         'date_livraison_fournisseur',
+        'is_derMinute',
     ];
     
     //////////////////////////////

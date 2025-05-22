@@ -71,7 +71,7 @@
                         @endif
                     </p>
                     <p><strong>Date livraison fournisseur :</strong> {{ $produit->date_livraison_fournisseur ?? '/' }}</p>
-                </div>
+                    <p><strong>Mise en place de dernière minute :</strong> {{ ($produit->is_derMinute ?? 0) == 1 ? 'Oui' : 'Non' }}</p>                </div>
             @empty
                 <p>Aucun produit associé à cette commande.</p>
             @endforelse
