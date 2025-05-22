@@ -336,8 +336,8 @@ const rowHTML = cmd => `
             ${cmd.produits.map(p => {
                 return `<div class="mb-1 border-b border-gray-200 pb-1 last:border-b-0">
                     ${p.is_derMinute ? 
-                        '<span class="bg-red-100 text-red-700 px-2 py-1 rounded text-xs font-semibold">Oui</span>' : 
-                        '<span class="bg-green-100 text-green-700 px-2 py-1 rounded text-xs font-semibold">Non</span>'
+                        '<span class="inline-block bg-red-200 text-red-800 px-2 py-0.5 rounded-full text-xs font-bold shadow-sm">Oui</span>' : 
+                        '<span class="inline-block bg-green-200 text-green-800 px-2 py-0.5 rounded-full text-xs font-bold shadow-sm">Non</span>'
                     }
                 </div>`;
             }).join('')}
