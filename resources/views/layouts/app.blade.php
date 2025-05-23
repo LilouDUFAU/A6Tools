@@ -24,12 +24,12 @@
         </div>
 
         <!-- Aside pour md et lg -->
-        <aside class="hidden md:block col-start-1 md:col-span-3 lg:col-span-2 bg-white h-full sticky top-0 overflow-y-auto border-r border-gray-300">
+        <aside class="hidden md:block col-start-1 md:col-span-4 lg:col-span-3 xl:col-span-2 bg-white h-full sticky top-0 overflow-y-auto border-r border-gray-300">
             @include('layouts.partials.aside')
         </aside>
 
         <!-- Section principale -->
-        <section class="col-span-12 md:col-span-9 lg:col-span-10 bg-gray-100 h-full overflow-y-auto flex flex-col min-h-screen pb-8">
+        <section class="col-span-12 md:col-span-8 lg:col-span-9 xl:col-span-10 bg-gray-100 h-full overflow-y-auto flex flex-col min-h-screen pb-8">
             <!-- Header -->
             <header>
                 @include('layouts.partials.header')

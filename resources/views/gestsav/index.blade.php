@@ -22,7 +22,7 @@
     </div>
 
     <h2 class="text-2xl font-semibold px-4 py-2 text-gray-700">Répartition des pannes selon le statut</h2>
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6 mb-8 px-4">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6 mb-8 px-4">
         @php
             $statuts = [
                 'En attente' => 'bg-green-600 hover:bg-green-700',
