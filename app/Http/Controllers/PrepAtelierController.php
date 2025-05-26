@@ -7,7 +7,6 @@ use App\Models\Commande;
 use App\Models\User;
 use App\Models\Etape;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
 
 class PrepAtelierController extends Controller
 {
@@ -36,10 +35,7 @@ class PrepAtelierController extends Controller
      * Store a newly created resource in storage.
      */
     public function store(Request $request)
-    {
-        // Log des données envoyées dans la requête
-        Log::debug('Données de la requête:', $request->all());
-        
+    {       
         // Validation des données du formulaire
         $validated = $request->validate([
             'notes' => 'nullable|string', // Modification pour permettre à 'notes' d'être null
@@ -54,8 +50,6 @@ class PrepAtelierController extends Controller
         // Utiliser l'ID de l'employé sélectionné
         $validated['employe_id'] = $validated['employe_id'];  // L'ID de l'employé sélectionné envoyé dans le formulaire
         
-        // Log des données validées
-        Log::debug('Données validées:', $validated);
         
         // Création de la préparation de l'atelier
         $prepAtelier = PrepAtelier::create([
@@ -64,18 +58,10 @@ class PrepAtelierController extends Controller
             'employe_id' => $validated['employe_id'],    // Utilisation de l'employe_id sélectionné
         ]);
         
-        // Log après la création de la préparation
-        Log::debug('Préparation de l\'atelier créée:', $prepAtelier->toArray());
         
         // Ajouter les étapes à la préparation de l'atelier
         if (isset($validated['etapes']) && !empty($validated['etapes'])) {
             foreach ($validated['etapes'] as $index => $etape) {
-                // Log de chaque étape avant l'insertion
-                Log::debug('Création de l\'étape:', [
-                    'intitulé' => $etape,
-                    'is_done' => isset($validated['etapes_done'][$index]) ? $validated['etapes_done'][$index] : false,
-                ]);
-        
                 // Création de l'étape et association avec la préparation
                 Etape::create([
                     'preparation_id' => $prepAtelier->id,  // Associer l'étape à la préparation (utilisation de preparation_id)
@@ -84,9 +70,6 @@ class PrepAtelierController extends Controller
                 ]);
             }
         }
-        
-        // Log final pour la redirection
-        Log::debug('Préparation et étapes créées avec succès.');
         
         // Retourner vers la liste avec un message de succès
         return redirect()->route('gestatelier.index')->with('success', 'Préparation créée avec succès!');

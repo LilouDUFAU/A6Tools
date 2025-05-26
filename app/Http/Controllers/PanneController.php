@@ -31,12 +31,6 @@ class PanneController extends Controller
     // Enregistre une nouvelle panne
     public function store(Request $request)
     {
-        // Log des données reçues avant la validation
-        Log::info('Données reçues avant validation', ['request_data' => $request->all()]);
-
-        // Début de la validation
-        Log::info('Début de la validation des données');
-
         try {
             $validated = $request->validate([
                 'date_commande' => 'nullable|date',
@@ -49,7 +43,6 @@ class PanneController extends Controller
                 'numero_sav' => 'nullable|string',
                 'statut' => 'required|in:En attente,Remboursement,Transit,Envoyé,Échange anticipé',
             ]);
-            Log::info('Validation réussie', ['validated_data' => $validated]);
         } catch (\Illuminate\Validation\ValidationException $e) {
             Log::error('Échec de la validation', ['errors' => $e->errors()]);
             throw $e;
@@ -57,15 +50,11 @@ class PanneController extends Controller
 
         // Gestion du fournisseur
         if ($request->filled('new_fournisseur.nom')) {
-            Log::info('Création d\'un nouveau fournisseur');
             $fournisseur = Fournisseur::create([
                 'nom' => $request->input('new_fournisseur.nom')
             ]);
-            Log::info('Fournisseur créé', ['fournisseur' => $fournisseur]);
         } elseif ($request->filled('fournisseur_id')) {
-            Log::info('Recherche d\'un fournisseur existant', ['fournisseur_id' => $request->input('fournisseur_id')]);
             $fournisseur = Fournisseur::find($request->input('fournisseur_id'));
-            Log::info('Fournisseur trouvé', ['fournisseur' => $fournisseur]);
         } else {
             $fournisseur = null;
             Log::warning('Aucun fournisseur spécifié');
@@ -73,17 +62,13 @@ class PanneController extends Controller
 
         // Gestion du client
         if ($request->filled('new_client.nom')) {
-            Log::info('Création d\'un nouveau client');
             $client = Client::create([
                 'nom' => $request->input('new_client.nom'),
                 'code_client' => $request->input('new_client.code_client'),
                 'numero_telephone' => $request->input('new_client.numero_telephone'),
             ]);
-            Log::info('Client créé', ['client' => $client]);
         } elseif ($request->filled('client_id')) {
-            Log::info('Recherche d\'un client existant', ['client_id' => $request->input('client_id')]);
             $client = Client::find($request->input('client_id'));
-            Log::info('Client trouvé', ['client' => $client]);
         } else {
             $client = null;
             Log::warning('Aucun client spécifié');
@@ -91,7 +76,6 @@ class PanneController extends Controller
 
         // Création de la panne
         try {
-            Log::info('Début de la création de la panne');
             $panne = new Panne();
             $panne->numero_sav = $validated['numero_sav'] ?? null;
             $panne->date_commande = $validated['date_commande'] ?? null;
@@ -105,11 +89,9 @@ class PanneController extends Controller
 
             if ($fournisseur) {
                 $panne->fournisseur_id = $fournisseur->id;
-                Log::info('Fournisseur associé à la panne', ['fournisseur_id' => $fournisseur->id]);
             }
 
             $panne->save();
-            Log::info('Panne créée avec succès', ['panne' => $panne]);
         } catch (\Exception $e) {
             Log::error('Erreur lors de la création de la panne', ['error' => $e->getMessage()]);
             return redirect()->back()->with('error', 'Erreur lors de la création de la panne');
@@ -118,9 +100,7 @@ class PanneController extends Controller
         // Association du client à la panne
         if ($client) {
             try {
-                Log::info('Association du client à la panne', ['client_id' => $client->id, 'panne_id' => $panne->id]);
                 $panne->clients()->sync([$client->id]);
-                Log::info('Client associé à la panne avec succès');
             } catch (\Exception $e) {
                 Log::error('Erreur lors de l\'association du client à la panne', [
                     'error' => $e->getMessage(),
@@ -131,8 +111,6 @@ class PanneController extends Controller
         } else {
             Log::warning('Aucun client à associer à la panne');
         }
-
-        Log::info('Fin du processus de création de panne');
 
         return redirect()->route('gestsav.index')->with('success', 'Panne créée avec succès');
     }
@@ -151,50 +129,48 @@ class PanneController extends Controller
         $fournisseurs = Fournisseur::all();
         $clients = Client::all();
         $etat_clients = Panne::ETAT_CLIENT;
-        // $actions = $panne->actions->pluck('intitule')->toArray(); // Récupération des actions existantes
         $statut = Panne::STATUT;
         return view('gestsav.edit', compact('panne', 'fournisseurs', 'clients', 'etat_clients', 'statut'));
     }
 
     // Met à jour une panne existante
-// Met à jour une panne existante
-public function update(Request $request, string $id)
-{
-    // Validation des données du formulaire
-    $validated = $request->validate([
-        'numero_sav' => 'nullable|string',
-        'date_commande' => 'nullable|date',
-        'date_panne' => 'nullable|date',
-        'categorie_materiel' => 'nullable|string',
-        'categorie_panne' => 'nullable|string',
-        'detail_panne' => 'nullable|string',
-        'client_id' => 'required|exists:clients,id',
-        'etat' => 'required|in:Ordi de prêt,Échangé,En attente',
-        'demande' => 'nullable|string',
-        'statut' => 'required|in:En attente,Remboursement,Transit,Envoyé,Échange anticipé',    
-    ]);
+    public function update(Request $request, string $id)
+    {
+        // Validation des données du formulaire
+        $validated = $request->validate([
+            'numero_sav' => 'nullable|string',
+            'date_commande' => 'nullable|date',
+            'date_panne' => 'nullable|date',
+            'categorie_materiel' => 'nullable|string',
+            'categorie_panne' => 'nullable|string',
+            'detail_panne' => 'nullable|string',
+            'client_id' => 'required|exists:clients,id',
+            'etat' => 'required|in:Ordi de prêt,Échangé,En attente',
+            'demande' => 'nullable|string',
+            'statut' => 'required|in:En attente,Remboursement,Transit,Envoyé,Échange anticipé',    
+        ]);
 
-    // Récupérer la panne
-    $panne = Panne::findOrFail($id);
+        // Récupérer la panne
+        $panne = Panne::findOrFail($id);
 
-    // Mettre à jour les champs principaux
-    $panne->update([
-        'numero_sav' => $validated['numero_sav'],
-        'date_commande' => $validated['date_commande'] ?? $panne->date_commande,
-        'date_panne' => $validated['date_panne'],
-        'categorie_materiel' => $validated['categorie_materiel'],
-        'categorie_panne' => $validated['categorie_panne'],
-        'detail_panne' => $validated['detail_panne'],
-        'demande' => $validated['demande'] ?? $panne->demande,
-        'etat_client' => $validated['etat'],
-        'statut' => $validated['statut'],
-    ]);
+        // Mettre à jour les champs principaux
+        $panne->update([
+            'numero_sav' => $validated['numero_sav'],
+            'date_commande' => $validated['date_commande'] ?? $panne->date_commande,
+            'date_panne' => $validated['date_panne'],
+            'categorie_materiel' => $validated['categorie_materiel'],
+            'categorie_panne' => $validated['categorie_panne'],
+            'detail_panne' => $validated['detail_panne'],
+            'demande' => $validated['demande'] ?? $panne->demande,
+            'etat_client' => $validated['etat'],
+            'statut' => $validated['statut'],
+        ]);
 
-    // Mettre à jour l'association client
-    $panne->clients()->sync([$validated['client_id']]);
+        // Mettre à jour l'association client
+        $panne->clients()->sync([$validated['client_id']]);
 
-    return redirect()->route('gestsav.index')->with('success', 'Panne mise à jour avec succès');
-}
+        return redirect()->route('gestsav.index')->with('success', 'Panne mise à jour avec succès');
+    }
             
     // Supprime une panne
     public function destroy(string $id)

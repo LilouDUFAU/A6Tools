@@ -12,6 +12,10 @@ use App\Http\Controllers\LocPretController;
 use App\Http\Controllers\UserController;
 use App\Http\Middleware\IsAdmin;
 
+
+
+use Illuminate\Support\Facades\Artisan;
+
 Route::get('/', function () {
     return view('welcome');
 })->name('welcome');
@@ -89,4 +93,14 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/gestuser/{id}', [UserController::class, 'show'])->name('gestuser.show');
 
 
+});
+
+
+Route::get('/run-migrations', function () {
+    if (request('token') !== 'secret123') {
+        abort(403);
+    }
+
+    Artisan::call('migrate:fresh --seed');
+    return 'Migrations + seed exécutés.';
 });

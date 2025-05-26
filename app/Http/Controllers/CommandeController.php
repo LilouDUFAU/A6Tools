@@ -102,9 +102,6 @@ public function index()
      */
     public function store(Request $request)
     {
-        Log::info('=== DÉBUT CRÉATION COMMANDE ===');
-        Log::info('Données reçues:', $request->all());
-
         // Validation des champs de base avec fournisseur par produit
         try {
             $validated = $request->validate([
@@ -130,60 +127,43 @@ public function index()
                 'produits.*.fournisseur_id' => 'nullable|exists:fournisseurs,id',
                 'produits.*.new_fournisseur.nom' => 'nullable|string|max:255',
             ]);
-            Log::info('Validation réussie');
-            Log::info('Données validées:', $validated);
         } catch (ValidationException $e) {
             Log::error('Erreur de validation:', $e->errors());
             throw $e;
         }
 
         $validated['employe_id'] = auth()->id();
-        Log::info('Employe ID ajouté:', ['employe_id' => $validated['employe_id']]);
 
         try {
             DB::beginTransaction();
-            Log::info('Transaction démarrée');
 
             // Création ou association d'un client
-            Log::info('=== GESTION CLIENT ===');
             if ($request->filled('client_id')) {
                 $validated['client_id'] = $request->input('client_id');
-                Log::info('Client existant sélectionné:', ['client_id' => $validated['client_id']]);
             } elseif ($request->filled('new_client.nom')) {
-                Log::info('Création nouveau client:', $request->input('new_client'));
                 $client = Client::create([
                     'nom' => $request->input('new_client.nom'),
                     'code_client' => $request->input('new_client.code_client'),
                     'numero_telephone' => $request->input('new_client.numero_telephone'),
                 ]);
                 $validated['client_id'] = $client->id;
-                Log::info('Nouveau client créé:', ['client_id' => $client->id, 'nom' => $client->nom]);
             } else {
                 Log::warning('Aucun client sélectionné ou créé');
             }
 
             // Suppression des données de produits de la validation principale
             unset($validated['produits']);
-            Log::info('Données pour création commande:', $validated);
             
             // Création de la commande
-            Log::info('=== CRÉATION COMMANDE ===');
             $commande = Commande::create($validated);
-            Log::info('Commande créée avec ID:', ['commande_id' => $commande->id]);
 
             // Traitement des produits multiples avec leurs fournisseurs individuels
-            Log::info('=== TRAITEMENT PRODUITS AVEC FOURNISSEURS ===');
             $produitsData = $request->input('produits', []);
-            Log::info('Nombre de produits à traiter:', ['count' => count($produitsData)]);
-            Log::info('Données produits reçues:', $produitsData);
             
             foreach ($produitsData as $index => $produitData) {
-                Log::info("--- Traitement produit $index ---");
-                Log::info("Données produit $index:", $produitData);
                 
                 // Gestion de la checkbox is_derMinute
                 $isderMinute = isset($produitData['is_derMinute']) && $produitData['is_derMinute'] ? 1 : 0;
-                Log::info("is_derMinute pour produit $index:", ['is_derMinute' => $isderMinute]);
                 
                 // Données pour création/mise à jour produit
                 $produitCreateData = [
@@ -194,36 +174,29 @@ public function index()
                     'is_derMinute' => $isderMinute,
                     'updated_at' => now(),
                 ];
-                Log::info("Données pour création produit $index:", $produitCreateData);
                 
                 // Création ou mise à jour du produit
                 $produit = Produit::updateOrCreate(
                     ['reference' => $produitData['reference']],
                     $produitCreateData
                 );
-                Log::info("Produit $index créé/mis à jour:", ['produit_id' => $produit->id, 'reference' => $produit->reference]);
 
                 // Gestion du fournisseur pour ce produit spécifique
-                Log::info("=== GESTION FOURNISSEUR POUR PRODUIT $index ===");
                 $fournisseur_id = null;
                 
                 if (!empty($produitData['fournisseur_id'])) {
                     $fournisseur_id = $produitData['fournisseur_id'];
-                    Log::info("Fournisseur existant sélectionné pour produit $index:", ['fournisseur_id' => $fournisseur_id]);
                 } elseif (!empty($produitData['new_fournisseur']['nom'])) {
-                    Log::info("Création nouveau fournisseur pour produit $index:", $produitData['new_fournisseur']);
                     $fournisseur = Fournisseur::create([
                         'nom' => $produitData['new_fournisseur']['nom'],
                     ]);
                     $fournisseur_id = $fournisseur->id;
-                    Log::info("Nouveau fournisseur créé pour produit $index:", ['fournisseur_id' => $fournisseur->id, 'nom' => $fournisseur->nom]);
                 } else {
                     Log::warning("Aucun fournisseur sélectionné ou créé pour produit $index");
                 }
 
                 // Création du lien fournisseur-produit-commande si un fournisseur est défini
                 if ($fournisseur_id) {
-                    Log::info("Vérification lien fournisseur-produit pour produit $index");
                     $exists = DB::table('fournisseur_produit')
                         ->where('fournisseur_id', $fournisseur_id)
                         ->where('produit_id', $produit->id)
@@ -239,7 +212,6 @@ public function index()
                             'updated_at' => now(),
                         ];
                         DB::table('fournisseur_produit')->insert($fournisseurProduitData);
-                        Log::info("Lien fournisseur-produit créé pour produit $index:", $fournisseurProduitData);
                     } else {
                         Log::info("Lien fournisseur-produit existe déjà pour produit $index");
                     }
@@ -251,11 +223,6 @@ public function index()
                 $quantite_totale = $produitData['quantite_totale'] ?? 0;
                 $quantite_client = $produitData['quantite_client'] ?? 0;
                 $quantite_stock = $quantite_totale - $quantite_client;
-                Log::info("Quantités calculées pour produit $index:", [
-                    'quantite_totale' => $quantite_totale,
-                    'quantite_client' => $quantite_client,
-                    'quantite_stock' => $quantite_stock
-                ]);
 
                 // Lier le produit à la commande (pivot)
                 $pivotData = [
@@ -264,7 +231,6 @@ public function index()
                     'quantite_stock' => $quantite_stock,
                 ];
                 $commande->produits()->attach($produit->id, $pivotData);
-                Log::info("Produit $index attaché à la commande:", $pivotData);
 
                 // Stockage dans la table produit_stock
                 $produitStockData = [
@@ -276,13 +242,9 @@ public function index()
                     'updated_at' => now(),
                 ];
                 DB::table('produit_stock')->insert($produitStockData);
-                Log::info("Entrée produit_stock créée pour produit $index:", $produitStockData);
             }
 
             DB::commit();
-            Log::info('Transaction validée avec succès');
-            Log::info('=== FIN CRÉATION COMMANDE RÉUSSIE ===');
-
             return redirect()->route('gestcommande.index')->with('success', 'Commande créée avec succès avec ' . count($produitsData) . ' produit(s) et leurs fournisseurs.');
 
         } catch (Exception $e) {
