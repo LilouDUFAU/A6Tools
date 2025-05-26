@@ -94,13 +94,3 @@ Route::middleware(['auth'])->group(function () {
 
 
 });
-
-
-Route::get('/run-migrations', function () {
-    if (request('token') !== 'secret123') {
-        abort(403);
-    }
-
-    Artisan::call('migrate:fresh --seed');
-    return 'Migrations + seed exécutés.';
-});
